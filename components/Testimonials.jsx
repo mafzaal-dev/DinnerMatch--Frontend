@@ -1,0 +1,60 @@
+import React from 'react';
+
+const testimonials = [
+    {
+        text: "The whole night was amazing. I think if we didn't have to go to work the following day, we would have stayed there all night. We couldn't stop chatting.",
+        author: "L, 28, Cape Town",
+        align: "left"
+    },
+    {
+        text: "We were all such different people, but somehow it meshed really well. It was a very memorable evening — a roaring success in my opinion.",
+        author: "G, 43, Cape Town",
+        align: "right"
+    },
+    {
+        text: "Thank you for creating something like this, I didn't know how much I needed it.",
+        author: "L, 28, Cape Town",
+        align: "left"
+    },
+    {
+        text: "Conversing and having great chats... it mostly seemed like we knew each other 😊. So much laughter, and everyone was fully engaged.",
+        author: "L, 31, Cape Town",
+        align: "right"
+    },
+    {
+        text: "My first DinnerMatch experience was great! I was a bit nervous at first, but it turned out to be such a lovely evening. The group was well-matched - good energy, interesting conversations, and an overall comfortable vibe. We were five instead of six unfortunately, but it still flowed really nicely. The restaurant was lovely too (hope we weren't too loud lol). You can tell thought and effort went into putting the group together. I'm really looking forward to the next one!",
+        author: "N, 36, Cape Town",
+        align: "left"
+    }
+];
+
+const Testimonials = () => {
+    return (
+        <section className="bg-white py-24 px-6">
+            <div className="max-w-5xl mx-auto">
+                <h2 className="text-2xl md:text-3xl font-bold text-center mb-20 tracking-tight text-black">
+                    REAL PEOPLE. UNREAL NIGHTS.
+                </h2>
+
+                <div className="flex flex-col gap-10 md:gap-10 relative max-w-4xl mx-auto">
+                    {testimonials.map((item, index) => (
+                        <div
+                            key={index}
+                            className={`w-full md:w-[520px] bg-white p-10 rounded-xl shadow-[0_15px_50px_rgba(0,0,0,0.05)] border border-gray-100/50 transition-all duration-500 hover:shadow-[0_20px_60px_rgba(0,0,0,0.08)] ${item.align === 'right' ? 'md:ml-auto' : 'md:mr-auto'
+                                } relative`}
+                        >
+                            <p className="text-[1.05rem] leading-[1.6] text-gray-700 mb-6 font-normal">
+                                "{item.text}"
+                            </p>
+                            <p className="text-[0.75rem] text-gray-400 font-semibold uppercase tracking-widest">
+                                — {item.author}
+                            </p>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </section>
+    );
+};
+
+export default Testimonials;
