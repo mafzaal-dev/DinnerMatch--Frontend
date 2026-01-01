@@ -1,3 +1,5 @@
+"use client";
+
 import React from 'react';
 import Image from 'next/image';
 
@@ -15,7 +17,14 @@ const Hero = () => {
                     </p>
 
                     <div className="flex flex-col gap-4">
-                        <button className="bg-[#F97315] text-white px-6 py-3 rounded-md font-bold text-[0.8rem] tracking-wide w-fit uppercase">
+                        <button 
+                            onClick={() => {
+                                if (typeof window !== 'undefined') {
+                                    window.dispatchEvent(new CustomEvent('openQuiz'));
+                                }
+                            }}
+                            className="bg-[#FFAA55] text-white px-6 py-3 rounded-md font-bold text-[0.8rem] tracking-wide w-fit uppercase hover:bg-[#FF9955] transition-colors cursor-pointer"
+                        >
                             Take the Quiz
                         </button>
                         <p className="text-sm text-gray-500 font-medium">

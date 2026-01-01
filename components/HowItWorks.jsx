@@ -88,7 +88,7 @@ const HowItWorks = () => {
                     ))}
                 </div>
 
-                <button className="bg-[#F97315] text-white px-8 py-3 rounded-md font-bold text-[0.85rem] tracking-wide hover:bg-[#EA580C] transition-all flex items-center gap-2 mx-auto uppercase">
+                <button className="bg-[#FFAA55] text-white px-8 py-3 rounded-md font-bold text-[0.85rem] tracking-wide hover:bg-[#FF9955] transition-all flex items-center gap-2 mx-auto uppercase">
                     Take the Quiz <span className="text-lg">→</span>
                 </button>
             </div>

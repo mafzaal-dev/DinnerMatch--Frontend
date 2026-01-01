@@ -1,4 +1,6 @@
 import "./globals.css";
+import MetaPixel from "../../components/MetaPixel";
+import UTMTracker from "../../components/UTMTracker";
 
 export const metadata = {
   title: "DinnerMatch",
@@ -9,6 +11,8 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className="antialiased">
+        <MetaPixel />
+        <UTMTracker />
         {children}
       </body>
     </html>
