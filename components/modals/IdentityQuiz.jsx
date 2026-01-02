@@ -132,14 +132,14 @@ const IdentityQuiz = ({ isOpen, onClose, onComplete, onBack }) => {
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-[#1a1f2e] rounded-2xl w-full max-w-2xl p-8 relative shadow-2xl max-h-[90vh] overflow-y-auto">
+      <div className="bg-[#080814] rounded-xl w-full max-w-[616px] p-10 relative shadow-2xl max-h-[90vh] overflow-y-auto">
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-6 right-6 text-white/70 hover:text-white transition-colors z-10"
+          className="absolute top-10 right-10 text-[#D9D9D9] hover:text-[#F5F5F5] transition-colors z-10"
           aria-label="Close modal"
         >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
@@ -147,7 +147,7 @@ const IdentityQuiz = ({ isOpen, onClose, onComplete, onBack }) => {
         {/* Back Button */}
         <button
           onClick={handleBack}
-          className="absolute top-6 left-6 flex items-center gap-2 text-gray-400 hover:text-white transition-colors z-10"
+          className="absolute top-10 left-10 flex items-center gap-2 text-[#E0E0E0] hover:text-[#F5F5F5] transition-colors z-10"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -157,15 +157,15 @@ const IdentityQuiz = ({ isOpen, onClose, onComplete, onBack }) => {
 
         {/* Header */}
         <div className="mb-6">
-          <h2 className="text-2xl font-bold text-white mb-1 text-center">DinnersMatch</h2>
-          <p className="text-sm text-[#F97315] uppercase tracking-wide text-center">Identity</p>
+          <h2 className="text-2xl font-bold text-[#F5F5F5] mb-1 text-center">DinnersMatch</h2>
+          <p className="text-sm text-[#FFAA55] uppercase tracking-wide text-center">Identity</p>
         </div>
 
         {/* Progress Bar */}
         <div className="mb-8">
-          <div className="w-full bg-gray-700 rounded-full h-1">
+          <div className="w-full bg-[#2F3A51] rounded-full h-1">
             <div
-              className="bg-[#F97315] h-1 rounded-full transition-all duration-300"
+              className="bg-[#FFAA55] h-1 rounded-full transition-all duration-300"
               style={{ width: `${progress}%` }}
             />
           </div>
@@ -173,26 +173,26 @@ const IdentityQuiz = ({ isOpen, onClose, onComplete, onBack }) => {
 
         {/* Question */}
         <div className="mb-8">
-          <h3 className="text-2xl md:text-3xl font-bold text-white text-center mb-2">
+          <h3 className="text-2xl md:text-3xl font-bold text-[#F5F5F5] text-center mb-2">
             {currentQ.question}
           </h3>
           {currentQ.subtitle && (
-            <p className="text-gray-400 text-center mb-6">{currentQ.subtitle}</p>
+            <p className="text-[#E0E0E0] text-center mb-6">{currentQ.subtitle}</p>
           )}
 
           {/* Single Select Questions */}
           {currentQ.type === 'single-select' && (
-            <div className="space-y-3 max-h-[400px] overflow-y-auto">
+            <div className="space-y-4 max-h-[400px] overflow-y-auto">
               {currentQ.options.map((option) => {
                 const isSelected = currentAnswer === option.id;
                 return (
                   <button
                     key={option.id}
                     onClick={() => handleAnswer(option.id)}
-                    className={`w-full text-left px-6 py-4 rounded-lg border-2 transition-all ${
+                    className={`w-full text-left px-6 py-4 rounded-lg border transition-all ${
                       isSelected
-                        ? 'bg-[#0f1419] border-white text-white'
-                        : 'bg-[#0f1419] border-gray-700 text-gray-300 hover:border-gray-600'
+                        ? 'bg-[#111121] border-[#F5F5F5] text-[#F5F5F5]'
+                        : 'bg-[#111121] border-white text-[#E0E0E0] hover:border-[#FFAA55]'
                     }`}
                   >
                     {option.label}
@@ -215,10 +215,10 @@ const IdentityQuiz = ({ isOpen, onClose, onComplete, onBack }) => {
                   }}
                   onFocus={() => setShowDropdown(true)}
                   placeholder={currentQ.placeholder}
-                  className="w-full px-4 py-3 bg-[#0f1419] border-2 border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-[#F97315] pr-12"
+                  className="w-full px-4 py-3 bg-[#111121] border border-[#2F3A51] rounded-lg text-[#F5F5F5] placeholder-[#E0E0E0] focus:outline-none focus:border-[#FFAA55] pr-12"
                 />
                 <svg
-                  className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#E0E0E0] pointer-events-none"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -234,7 +234,7 @@ const IdentityQuiz = ({ isOpen, onClose, onComplete, onBack }) => {
 
               {/* Dropdown */}
               {showDropdown && (
-                <div className="absolute z-20 w-full mt-2 bg-[#0f1419] border-2 border-gray-700 rounded-lg max-h-60 overflow-y-auto">
+                <div className="absolute z-20 w-full mt-2 bg-[#111121] border border-[#2F3A51] rounded-lg max-h-60 overflow-y-auto">
                   {filteredCountries.length > 0 ? (
                     filteredCountries.map((country) => (
                       <button
@@ -244,13 +244,13 @@ const IdentityQuiz = ({ isOpen, onClose, onComplete, onBack }) => {
                           setShowDropdown(false);
                           handleAnswer(country);
                         }}
-                        className="w-full text-left px-4 py-3 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors"
+                        className="w-full text-left px-4 py-3 text-[#E0E0E0] hover:bg-[#080814] hover:text-[#F5F5F5] transition-colors"
                       >
                         {country}
                       </button>
                     ))
                   ) : (
-                    <div className="px-4 py-3 text-gray-500">No results found</div>
+                    <div className="px-4 py-3 text-[#E0E0E0]">No results found</div>
                   )}
                 </div>
               )}
@@ -267,7 +267,7 @@ const IdentityQuiz = ({ isOpen, onClose, onComplete, onBack }) => {
                       onComplete(answers);
                     }
                   }}
-                  className="w-full mt-4 bg-[#F97315] text-white py-4 rounded-lg font-bold text-sm uppercase tracking-wide hover:bg-[#EA580C] transition-colors"
+                  className="w-full mt-4 bg-[#FFAA55] text-white py-4 rounded-lg font-bold text-sm uppercase tracking-wide hover:bg-[#FF9955] transition-colors"
                 >
                   Continue
                 </button>
@@ -277,7 +277,7 @@ const IdentityQuiz = ({ isOpen, onClose, onComplete, onBack }) => {
         </div>
 
         {/* Question Counter */}
-        <p className="text-center text-gray-400 text-sm">
+        <p className="text-center text-[#E0E0E0] text-sm">
           Question {currentQuestion + 1} of {totalQuestions}
         </p>
       </div>

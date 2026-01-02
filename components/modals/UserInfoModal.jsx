@@ -17,15 +17,15 @@ const UserInfoModal = ({ isOpen, onClose, onContinue, onBack }) => {
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-[#1a1f2e] rounded-2xl w-full max-w-md p-8 relative shadow-2xl">
+      <div className="bg-[#080814] rounded-xl w-full max-w-[616px] p-10 relative shadow-2xl">
         {/* Close Button */}
         {onClose && (
           <button
             onClick={onClose}
-            className="absolute top-6 right-6 text-white/70 hover:text-white transition-colors"
+            className="absolute top-10 right-10 text-[#D9D9D9] hover:text-[#F5F5F5] transition-colors"
             aria-label="Close modal"
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
@@ -35,7 +35,7 @@ const UserInfoModal = ({ isOpen, onClose, onContinue, onBack }) => {
         {onBack && (
           <button
             onClick={onBack}
-            className="absolute top-6 left-6 text-gray-400 hover:text-white transition-colors"
+            className="absolute top-10 left-10 text-[#E0E0E0] hover:text-[#F5F5F5] transition-colors"
             aria-label="Go back"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -45,9 +45,9 @@ const UserInfoModal = ({ isOpen, onClose, onContinue, onBack }) => {
         )}
 
         {/* Header */}
-        <div className="mb-8 text-center">
-          <h2 className="text-3xl font-bold text-white mb-2">DinnersMatch</h2>
-          <p className="text-gray-400">Tell us about yourself</p>
+        <div className="mb-10 text-center">
+          <h2 className="text-3xl font-bold text-[#F5F5F5] mb-2">DinnersMatch</h2>
+          <p className="text-[#E0E0E0]">Tell us about yourself</p>
         </div>
 
         {/* Form */}
@@ -58,7 +58,7 @@ const UserInfoModal = ({ isOpen, onClose, onContinue, onBack }) => {
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
               placeholder="First name"
-              className="w-full px-4 py-3 bg-[#0f1419] border-2 border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-[#F97315] transition-colors"
+              className="w-full px-4 py-3 bg-[#111121] border border-[#2F3A51] rounded-lg text-[#F5F5F5] placeholder-[#E0E0E0] focus:outline-none focus:border-[#FFAA55] transition-colors"
               required
             />
           </div>
@@ -69,14 +69,14 @@ const UserInfoModal = ({ isOpen, onClose, onContinue, onBack }) => {
               value={mobileNumber}
               onChange={(e) => setMobileNumber(e.target.value)}
               placeholder="Mobile number"
-              className="w-full px-4 py-3 bg-[#0f1419] border-2 border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-[#F97315] transition-colors"
+              className="w-full px-4 py-3 bg-[#111121] border border-[#2F3A51] rounded-lg text-[#F5F5F5] placeholder-[#E0E0E0] focus:outline-none focus:border-[#FFAA55] transition-colors"
               required
             />
           </div>
 
           <button
             type="submit"
-            className="w-full bg-[#F97315] text-white py-4 rounded-lg font-bold text-sm uppercase tracking-wide hover:bg-[#EA580C] transition-colors"
+            className="w-full bg-[#FFAA55] text-white py-4 rounded-lg font-bold text-sm uppercase tracking-wide hover:bg-[#FF9955] transition-colors"
           >
             Continue
           </button>

@@ -50,15 +50,15 @@ const BirthdayPicker = ({ isOpen, onClose, onConfirm, onBack }) => {
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-[#1a1f2e] rounded-2xl w-full max-w-md p-8 relative shadow-2xl">
+      <div className="bg-[#080814] rounded-xl w-full max-w-[616px] p-10 relative shadow-2xl">
         {/* Close Button */}
         {onClose && (
           <button
             onClick={onClose}
-            className="absolute top-6 right-6 text-white/70 hover:text-white transition-colors"
+            className="absolute top-10 right-10 text-[#D9D9D9] hover:text-[#F5F5F5] transition-colors"
             aria-label="Close modal"
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
@@ -68,7 +68,7 @@ const BirthdayPicker = ({ isOpen, onClose, onConfirm, onBack }) => {
         {onBack && (
           <button
             onClick={onBack}
-            className="absolute top-6 left-6 text-gray-400 hover:text-white transition-colors"
+            className="absolute top-10 left-10 text-[#E0E0E0] hover:text-[#F5F5F5] transition-colors"
             aria-label="Go back"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -79,8 +79,8 @@ const BirthdayPicker = ({ isOpen, onClose, onConfirm, onBack }) => {
 
         {/* Header */}
         <div className="mb-8 text-center">
-          <h2 className="text-3xl font-bold text-white mb-1">DinnersMatch</h2>
-          <p className="text-sm text-[#F97315] uppercase tracking-wide">Identity</p>
+          <h2 className="text-3xl font-bold text-[#F5F5F5] mb-1">DinnersMatch</h2>
+          <p className="text-sm text-[#FFAA55] uppercase tracking-wide">Identity</p>
         </div>
 
         {/* Question */}
@@ -96,7 +96,7 @@ const BirthdayPicker = ({ isOpen, onClose, onConfirm, onBack }) => {
               value={selectedDate}
               readOnly
               onClick={() => setShowDatePicker(!showDatePicker)}
-              className="w-full px-4 py-3 bg-[#0f1419] border-2 border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-[#F97315] transition-colors cursor-pointer"
+              className="w-full px-4 py-3 bg-[#111121] border border-[#2F3A51] rounded-lg text-[#F5F5F5] placeholder-[#E0E0E0] focus:outline-none focus:border-[#FFAA55] transition-colors cursor-pointer"
             />
             <svg
               className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none"
@@ -115,7 +115,7 @@ const BirthdayPicker = ({ isOpen, onClose, onConfirm, onBack }) => {
 
           {/* Date Picker */}
           {showDatePicker && (
-            <div className="mt-4 bg-[#0f1419] rounded-lg p-4 border-2 border-gray-700">
+            <div className="mt-4 bg-[#111121] rounded-lg p-4 border border-[#2F3A51]">
               <div className="grid grid-cols-3 gap-4">
                 {/* Months */}
                 <div className="space-y-2 max-h-60 overflow-y-auto">
@@ -131,8 +131,8 @@ const BirthdayPicker = ({ isOpen, onClose, onConfirm, onBack }) => {
                       }}
                       className={`w-full px-3 py-2 rounded text-sm transition-colors ${
                         selectedMonth === index
-                          ? 'bg-[#F97315] text-white'
-                          : 'bg-[#1a1f2e] text-gray-300 hover:bg-gray-700'
+                          ? 'bg-[#FFAA55] text-white'
+                          : 'bg-[#080814] text-[#E0E0E0] hover:bg-[#111121]'
                       }`}
                     >
                       {month}
@@ -148,8 +148,8 @@ const BirthdayPicker = ({ isOpen, onClose, onConfirm, onBack }) => {
                       onClick={() => setSelectedDay(day)}
                       className={`w-full px-3 py-2 rounded text-sm transition-colors ${
                         selectedDay === day
-                          ? 'bg-[#F97315] text-white'
-                          : 'bg-[#1a1f2e] text-gray-300 hover:bg-gray-700'
+                          ? 'bg-[#FFAA55] text-white'
+                          : 'bg-[#080814] text-[#E0E0E0] hover:bg-[#111121]'
                       }`}
                     >
                       {day}
@@ -171,8 +171,8 @@ const BirthdayPicker = ({ isOpen, onClose, onConfirm, onBack }) => {
                       }}
                       className={`w-full px-3 py-2 rounded text-sm transition-colors ${
                         selectedYear === year
-                          ? 'bg-[#F97315] text-white'
-                          : 'bg-[#1a1f2e] text-gray-300 hover:bg-gray-700'
+                          ? 'bg-[#FFAA55] text-white'
+                          : 'bg-[#080814] text-[#E0E0E0] hover:bg-[#111121]'
                       }`}
                     >
                       {year}
@@ -183,7 +183,7 @@ const BirthdayPicker = ({ isOpen, onClose, onConfirm, onBack }) => {
 
               <button
                 onClick={handleDateSelect}
-                className="w-full mt-4 bg-[#F97315] text-white py-2 rounded-lg font-medium text-sm hover:bg-[#EA580C] transition-colors"
+                className="w-full mt-4 bg-[#FFAA55] text-white py-2 rounded-lg font-medium text-sm hover:bg-[#FF9955] transition-colors"
               >
                 Select Date
               </button>
@@ -194,7 +194,7 @@ const BirthdayPicker = ({ isOpen, onClose, onConfirm, onBack }) => {
         {/* Confirm Button */}
         <button
           onClick={handleConfirm}
-          className="w-full bg-[#F97315] text-white py-4 rounded-lg font-bold text-sm uppercase tracking-wide hover:bg-[#EA580C] transition-colors"
+          className="w-full bg-[#FFAA55] text-white py-4 rounded-lg font-bold text-sm uppercase tracking-wide hover:bg-[#FF9955] transition-colors"
         >
           Confirm
         </button>

@@ -57,34 +57,34 @@ const SocialLoginModal = ({ isOpen, onClose, onSelectMethod, onBackToOptions, on
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-[#1a1f2e] rounded-2xl w-full max-w-md p-8 relative shadow-2xl">
+      <div className="bg-[#080814] rounded-xl w-full max-w-[616px] p-10 relative shadow-2xl">
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-6 right-6 text-white/70 hover:text-white transition-colors"
+          className="absolute top-10 right-10 text-[#D9D9D9] hover:text-[#F5F5F5] transition-colors"
           aria-label="Close modal"
         >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
 
         {/* Header */}
-        <div className="mb-8 text-center">
-          <h2 className="text-3xl font-bold text-white mb-2">DinnersMatch</h2>
-          <p className="text-gray-400">Let's get started.</p>
+        <div className="mb-10 text-center">
+          <h2 className="text-3xl font-bold text-[#F5F5F5] mb-2">DinnersMatch</h2>
+          <p className="text-[#E0E0E0]">Let's get started.</p>
         </div>
 
         {/* Social Login Options */}
-        <div className="space-y-4 mb-6">
+        <div className="space-y-4 mb-10">
           {socialOptions.map((option) => (
             <button
               key={option.id}
               onClick={() => onSelectMethod(option.id)}
-              className="w-full bg-[#0f1419] border-2 border-gray-700 rounded-lg px-6 py-4 flex items-center gap-4 hover:border-[#F97315] transition-colors"
+              className="w-full bg-[#111121] border border-white rounded-lg px-6 py-4 flex items-center gap-4 hover:border-[#FFAA55] transition-colors"
             >
-              <div className="text-white">{option.icon}</div>
-              <span className="text-white font-medium flex-1 text-left">{option.label}</span>
+              <div className="text-[#F5F5F5]">{option.icon}</div>
+              <span className="text-[#F5F5F5] font-medium flex-1 text-left">{option.label}</span>
             </button>
           ))}
         </div>
@@ -94,15 +94,15 @@ const SocialLoginModal = ({ isOpen, onClose, onSelectMethod, onBackToOptions, on
           {onBackToOptions && (
             <button
               onClick={onBackToOptions}
-              className="text-gray-400 hover:text-white transition-colors text-sm"
+              className="text-[#E0E0E0] hover:text-[#F5F5F5] transition-colors text-sm"
             >
               Back to Options
             </button>
           )}
           {onSignIn && (
-            <p className="text-gray-400 text-sm">
+            <p className="text-[#E0E0E0] text-sm">
               Already have an account?{' '}
-              <button onClick={onSignIn} className="text-[#F97315] hover:underline">
+              <button onClick={onSignIn} className="text-[#FFAA55] hover:underline">
                 Sign in
               </button>
             </p>
