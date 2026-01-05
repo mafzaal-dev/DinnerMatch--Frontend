@@ -2,7 +2,22 @@
 
 import React from 'react';
 
-const AccountPage = ({ onEditProfile, onMyTickets, onHelpCenter, onPrivacyPolicy, onTermsConditions, onBack }) => {
+const AccountPage = ({
+  subscription = {
+    memberSince: 'NOV 2025',
+    type: 'Monthly Member',
+    status: 'Active',
+    unlimitedDinners: true,
+    renewalDate: 'December 29, 2025',
+  },
+  onEditProfile,
+  onMyTickets,
+  onHelpCenter,
+  onPrivacyPolicy,
+  onTermsConditions,
+  onLogOut,
+  onBack,
+}) => {
   const menuItems = [
     {
       id: 'edit-profile',
@@ -14,17 +29,9 @@ const AccountPage = ({ onEditProfile, onMyTickets, onHelpCenter, onPrivacyPolicy
             strokeWidth={2}
             d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
           />
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M11 4a2 2 0 114 0m1 10a2 2 0 11-4 0"
-          />
         </svg>
       ),
       title: 'Edit Profile',
-      subtitle: 'Update your personal information and preferences',
-      color: 'bg-[#F97315]',
       onClick: onEditProfile,
     },
     {
@@ -40,8 +47,6 @@ const AccountPage = ({ onEditProfile, onMyTickets, onHelpCenter, onPrivacyPolicy
         </svg>
       ),
       title: 'My Tickets',
-      subtitle: 'View and manage your dinner tickets',
-      color: 'bg-[#F97315]',
       onClick: onMyTickets,
     },
   ];
@@ -59,9 +64,7 @@ const AccountPage = ({ onEditProfile, onMyTickets, onHelpCenter, onPrivacyPolicy
           />
         </svg>
       ),
-      title: 'Help Center',
-      subtitle: 'Get support and contact our team',
-      color: 'bg-[#F97315]',
+      title: 'Help & Support',
       onClick: onHelpCenter,
     },
   ];
@@ -80,8 +83,6 @@ const AccountPage = ({ onEditProfile, onMyTickets, onHelpCenter, onPrivacyPolicy
         </svg>
       ),
       title: 'Privacy Policy',
-      subtitle: 'How we protect and use your personal information',
-      color: 'bg-blue-500',
       onClick: onPrivacyPolicy,
     },
     {
@@ -97,25 +98,6 @@ const AccountPage = ({ onEditProfile, onMyTickets, onHelpCenter, onPrivacyPolicy
         </svg>
       ),
       title: 'Terms & Conditions',
-      subtitle: 'Our service terms and user agreement',
-      color: 'bg-green-500',
-      onClick: onTermsConditions,
-    },
-    {
-      id: 'terms-community',
-      icon: (
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-          />
-        </svg>
-      ),
-      title: 'Terms & Conditions',
-      subtitle: 'Community guidelines and expected behavior',
-      color: 'bg-purple-500',
       onClick: onTermsConditions,
     },
   ];
@@ -124,28 +106,27 @@ const AccountPage = ({ onEditProfile, onMyTickets, onHelpCenter, onPrivacyPolicy
     <button
       key={item.id}
       onClick={item.onClick}
-      className="w-full bg-[#0f1419] rounded-lg p-4 flex items-center gap-4 hover:bg-[#1a1f2e] transition-colors"
+      className="w-full bg-[#111121] border border-white rounded-lg p-4 flex items-center gap-4 hover:border-[#FFAA55] transition-colors text-left"
     >
-      <div className={`${item.color} p-3 rounded-lg`}>{item.icon}</div>
-      <div className="flex-1 text-left">
-        <p className="text-white font-medium text-lg">{item.title}</p>
-        <p className="text-gray-400 text-sm">{item.subtitle}</p>
+      <div className="text-[#FFAA55]">{item.icon}</div>
+      <div className="flex-1">
+        <p className="text-[#F5F5F5] font-medium text-lg">{item.title}</p>
       </div>
-      <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <svg className="w-5 h-5 text-[#E0E0E0]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
       </svg>
     </button>
   );
 
   return (
-    <div className="min-h-screen bg-black p-4 md:p-8">
+    <div className="min-h-screen bg-[#080814] p-4 md:p-8">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-8 flex items-center justify-between">
           {onBack && (
             <button
               onClick={onBack}
-              className="text-gray-400 hover:text-white transition-colors flex items-center gap-2"
+              className="text-[#E0E0E0] hover:text-[#F5F5F5] transition-colors flex items-center gap-2"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -153,31 +134,62 @@ const AccountPage = ({ onEditProfile, onMyTickets, onHelpCenter, onPrivacyPolicy
               <span>Back</span>
             </button>
           )}
-          <h1 className="text-3xl font-bold text-[#F97315] flex-1 text-center">My Account</h1>
+          <h1 className="text-3xl font-bold text-[#F5F5F5] flex-1 text-center">My Account</h1>
           <div className="w-20"></div> {/* Spacer for centering */}
         </div>
 
+        {/* Subscription Info */}
+        {subscription && (
+          <div className="bg-[#111121] border border-white rounded-lg p-6 mb-8">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <p className="text-[#E0E0E0] text-sm mb-1">MEMBER SINCE {subscription.memberSince}</p>
+                <h2 className="text-2xl font-bold text-[#F5F5F5]">DinnersMatch Pass</h2>
+                <p className="text-[#E0E0E0]">{subscription.type}</p>
+              </div>
+              <span className="bg-green-500 text-[#F5F5F5] px-3 py-1 rounded-full text-sm font-medium">
+                • {subscription.status}
+              </span>
+            </div>
+            <div className="space-y-2">
+              <p className="text-[#E0E0E0]">
+                {subscription.unlimitedDinners ? 'Unlimited dinners this month.' : 'Limited dinners available.'}
+              </p>
+              <p className="text-[#E0E0E0]">Renewal on {subscription.renewalDate}.</p>
+            </div>
+          </div>
+        )}
+
         {/* My Account Section */}
         <div className="mb-8">
-          <h2 className="text-white text-xl font-semibold mb-4">My Account</h2>
+          <h2 className="text-[#F5F5F5] text-xl font-semibold mb-4">My Account</h2>
           <div className="space-y-3">{menuItems.map(renderMenuItem)}</div>
         </div>
 
         {/* Help & Support Section */}
         <div className="mb-8">
-          <h2 className="text-white text-xl font-semibold mb-4">Help & Support</h2>
+          <h2 className="text-[#F5F5F5] text-xl font-semibold mb-4">Help & Support</h2>
           <div className="space-y-3">{helpItems.map(renderMenuItem)}</div>
         </div>
 
         {/* Legal Section */}
         <div className="mb-8">
-          <h2 className="text-white text-xl font-semibold mb-4">Legal</h2>
+          <h2 className="text-[#F5F5F5] text-xl font-semibold mb-4">Legal</h2>
           <div className="space-y-3">{legalItems.map(renderMenuItem)}</div>
         </div>
+
+        {/* Log Out Button */}
+        {onLogOut && (
+          <button
+            onClick={onLogOut}
+            className="w-full bg-[#111121] border border-red-500 text-red-500 py-4 rounded-lg font-bold text-sm uppercase tracking-wide hover:bg-red-500/10 transition-colors"
+          >
+            Log Out
+          </button>
+        )}
       </div>
     </div>
   );
 };
 
 export default AccountPage;
-

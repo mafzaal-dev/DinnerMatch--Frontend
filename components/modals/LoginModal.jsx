@@ -84,7 +84,12 @@ const LoginModal = ({ isOpen, onClose }) => {
           <div className="flex justify-end">
             <button
               type="button"
-              className="text-sm text-[#F97315] hover:text-[#EA580C] transition-colors"
+              onClick={() => {
+                if (typeof window !== 'undefined') {
+                  window.location.href = '/forgot-password';
+                }
+              }}
+              className="text-sm text-[#FFAA55] hover:underline transition-colors"
             >
               Forgot Password?
             </button>
@@ -99,10 +104,10 @@ const LoginModal = ({ isOpen, onClose }) => {
           </button>
 
           {/* Terms */}
-          <p className="text-xs text-gray-500 text-center">
+          <p className="text-xs text-[#A0A0A0] text-center">
             By continuing, you agree to our{' '}
-            <a href="#" className="text-[#F97315] hover:underline">Terms of Service</a> and{' '}
-            <a href="#" className="text-[#F97315] hover:underline">Privacy Policy</a>.
+            <a href="/terms-conditions" className="text-[#FFAA55] hover:underline">Terms of Service</a> and{' '}
+            <a href="/privacy-policy" className="text-[#FFAA55] hover:underline">Privacy Policy</a>.
           </p>
         </form>
       </div>

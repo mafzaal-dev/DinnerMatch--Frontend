@@ -42,7 +42,7 @@ const Footer = () => {
                     </button>
 
                     <p className="text-[0.7rem] text-gray-400 font-medium">
-                        By joining, you agree to our <a href="#" className="underline">Terms</a> and <a href="#" className="underline">Privacy Policy</a>.
+                        By joining, you agree to our <a href="/terms-conditions" className="underline">Terms</a> and <a href="/privacy-policy" className="underline">Privacy Policy</a>.
                     </p>
                 </div>
             </section>

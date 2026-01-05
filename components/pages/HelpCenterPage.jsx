@@ -4,35 +4,59 @@ import React, { useState } from 'react';
 
 const HelpCenterPage = ({ onSubmit, onBack }) => {
   const [formData, setFormData] = useState({
-    email: '',
-    name: '',
-    reason: '',
     subject: '',
-    description: '',
+    message: '',
   });
 
-  const reasons = [
-    'General Inquiry',
-    'Technical Issue',
-    'Billing Question',
-    'Account Problem',
-    'Other',
+  const faqData = [
+    {
+      question: "Is this a dating app?",
+      answer: "No, DinnerMatch is not a dating app. It's a social platform designed to help people make new friends and have meaningful conversations over dinner. While people do sometimes form romantic connections, our primary focus is on platonic social matching."
+    },
+    {
+      question: "Do I have to talk to strangers before the dinner?",
+      answer: "Nope! One of the best parts of DinnerMatch is the surprise. You'll receive the restaurant details and a little bit about your group's 'vibe', but you won't chat with them until you're all sitting around the table together."
+    },
+    {
+      question: "How much does it cost?",
+      answer: "We offer different subscription tiers to suit your social life. Each tier covers the matching service and coordination. You simply pay for your own meal and drinks at the restaurant."
+    },
+    {
+      question: "Why is DinnerMatch a subscription now?",
+      answer: "Moving to a subscription model allows us to invest more in our matching algorithm and expand to more restaurants and cities, ensuring you get the best possible experience every single time."
+    },
+    {
+      question: "What if I'm shy or introverted?",
+      answer: "You're in good company! Many of our members are introverts. We match groups based on personality types to ensure a comfortable environment, and our conversation starters help break the ice naturally."
+    },
+    {
+      question: "How do I cancel my subscription?",
+      answer: "You can cancel your subscription at any time through your account settings. There are no long-term contracts or cancellation fees."
+    }
   ];
+
+  const [activeFaqIndex, setActiveFaqIndex] = useState(null);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit(formData);
+    if (onSubmit) {
+      onSubmit(formData);
+    }
+  };
+
+  const toggleFAQ = (index) => {
+    setActiveFaqIndex(activeFaqIndex === index ? null : index);
   };
 
   return (
-    <div className="min-h-screen bg-black p-4 md:p-8">
-      <div className="max-w-2xl mx-auto">
+    <div className="min-h-screen bg-[#080814] p-4 md:p-8">
+      <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-8">
           {onBack && (
             <button
               onClick={onBack}
-              className="text-gray-400 hover:text-white transition-colors mb-4 flex items-center gap-2"
+              className="text-[#E0E0E0] hover:text-[#F5F5F5] transition-colors mb-4 flex items-center gap-2"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -40,75 +64,16 @@ const HelpCenterPage = ({ onSubmit, onBack }) => {
               <span>Back</span>
             </button>
           )}
-          <h1 className="text-3xl font-bold text-[#F97315] uppercase text-center">Help Center</h1>
+          <h1 className="text-3xl font-bold text-[#F5F5F5] mb-2">DinnersMatch</h1>
+          <p className="text-sm text-[#FFAA55] uppercase tracking-wide">HELP CENTER</p>
         </div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="bg-[#1a1f2e] rounded-xl p-6 md:p-8">
-          <div className="space-y-6">
-            {/* Email */}
+        {/* Contact Form */}
+        <div className="bg-[#111121] border border-white rounded-lg p-6 mb-8">
+          <h2 className="text-xl font-bold text-[#F5F5F5] mb-6">Contact Us</h2>
+          <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label className="block text-white text-sm font-medium mb-2">
-                Your email address <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="email"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                placeholder="John Doe"
-                className="w-full px-4 py-3 bg-[#0f1419] border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-[#F97315]"
-                required
-              />
-            </div>
-
-            {/* Name */}
-            <div>
-              <label className="block text-white text-sm font-medium mb-2">
-                Your name <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                placeholder="Enter your full name"
-                className="w-full px-4 py-3 bg-[#0f1419] border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-[#F97315]"
-                required
-              />
-            </div>
-
-            {/* Reason */}
-            <div>
-              <label className="block text-white text-sm font-medium mb-2">
-                Reason for contacting us <span className="text-red-500">*</span>
-              </label>
-              <div className="relative">
-                <select
-                  value={formData.reason}
-                  onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
-                  className="w-full px-4 py-3 bg-[#0f1419] border border-gray-700 rounded-lg text-white focus:outline-none focus:border-[#F97315] appearance-none pr-10"
-                  required
-                >
-                  <option value="">Select reason</option>
-                  {reasons.map((reason) => (
-                    <option key={reason} value={reason}>
-                      {reason}
-                    </option>
-                  ))}
-                </select>
-                <svg
-                  className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </div>
-            </div>
-
-            {/* Subject */}
-            <div>
-              <label className="block text-white text-sm font-medium mb-2">
+              <label className="block text-[#E0E0E0] text-sm mb-2">
                 Subject <span className="text-red-500">*</span>
               </label>
               <input
@@ -116,39 +81,66 @@ const HelpCenterPage = ({ onSubmit, onBack }) => {
                 value={formData.subject}
                 onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
                 placeholder="Brief summary of your message"
-                className="w-full px-4 py-3 bg-[#0f1419] border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-[#F97315]"
+                className="w-full px-4 py-3 bg-[#0F1419] border border-white rounded-lg text-[#F5F5F5] placeholder-[#A0A0A0] focus:outline-none focus:border-[#FFAA55]"
                 required
               />
             </div>
-
-            {/* Description */}
             <div>
-              <label className="block text-white text-sm font-medium mb-2">
-                Description <span className="text-red-500">*</span>
+              <label className="block text-[#E0E0E0] text-sm mb-2">
+                Message <span className="text-red-500">*</span>
               </label>
               <textarea
-                value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                value={formData.message}
+                onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                 placeholder="Please provide detailed information about your inquiry or issue"
                 rows={6}
-                className="w-full px-4 py-3 bg-[#0f1419] border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-[#F97315] resize-none"
+                className="w-full px-4 py-3 bg-[#0F1419] border border-white rounded-lg text-[#F5F5F5] placeholder-[#A0A0A0] focus:outline-none focus:border-[#FFAA55] resize-none"
                 required
               />
             </div>
-
-            {/* Submit Button */}
             <button
               type="submit"
-              className="w-full bg-[#F97315] text-white py-4 rounded-lg font-bold text-lg uppercase tracking-wide hover:bg-[#EA580C] transition-colors"
+              className="w-full bg-[#FFAA55] text-[#F5F5F5] py-4 rounded-lg font-bold text-sm uppercase tracking-wide hover:bg-[#FF9955] transition-colors"
             >
               Send Message
             </button>
+          </form>
+        </div>
+
+        {/* FAQ Section */}
+        <div className="bg-[#111121] border border-white rounded-lg p-6">
+          <h2 className="text-xl font-bold text-[#F5F5F5] mb-6">Frequently Asked Questions</h2>
+          <div className="space-y-3">
+            {faqData.map((faq, index) => (
+              <div key={index} className="border-b border-[#2F3A51] last:border-0 pb-3 last:pb-0">
+                <button
+                  onClick={() => toggleFAQ(index)}
+                  className="w-full text-left flex items-center justify-between py-3"
+                >
+                  <span className="text-[#F5F5F5] font-medium">{faq.question}</span>
+                  <svg
+                    className={`w-5 h-5 text-[#E0E0E0] transition-transform ${
+                      activeFaqIndex === index ? 'rotate-180' : ''
+                    }`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                {activeFaqIndex === index && (
+                  <div className="pb-3">
+                    <p className="text-[#E0E0E0] text-sm leading-relaxed">{faq.answer}</p>
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
-        </form>
+        </div>
       </div>
     </div>
   );
 };
 
 export default HelpCenterPage;
-
