@@ -1,11 +1,10 @@
 "use client";
 
 import DinnerDetailsPage from '../../../components/pages/DinnerDetailsPage';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 export default function DinnerDetails() {
   const router = useRouter();
-  const searchParams = useSearchParams();
 
   const handleManageSubscription = () => {
     router.push('/account');
