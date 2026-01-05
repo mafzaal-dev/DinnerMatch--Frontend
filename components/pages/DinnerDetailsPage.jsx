@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 
 const DinnerDetailsPage = ({
   dinner = {
@@ -52,185 +53,286 @@ const DinnerDetailsPage = ({
 
   return (
     <div className="min-h-screen bg-[#080814] p-4 md:p-8">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-[616px] mx-auto" style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
         {/* Header */}
-        <div className="mb-8 flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-[#E0E0E0]">dinner details</h1>
-          <div className="flex items-center gap-4">
-            <span className="text-[#F5F5F5]">DinnersMatch</span>
-            {onMyAccount && (
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-bold text-[#F5F5F5]">DinnersMatch</h1>
+          {onMyAccount && (
+            <Link
+              href="/account"
+              className="text-[#F5F5F5] hover:text-[#FFAA55] transition-colors text-sm"
+            >
+              My Account
+            </Link>
+          )}
+        </div>
+
+        {/* DinnersMatch Pass Section */}
+        <div 
+          className="relative rounded-lg p-6 overflow-hidden"
+          style={{
+            background: 'linear-gradient(135deg, rgba(26, 26, 45, 1) 0%, rgba(15, 20, 25, 1) 100%)',
+            boxShadow: '0 0 16px rgba(0, 0, 0, 0.12)',
+          }}
+        >
+          {/* Top golden gradient line */}
+          <div 
+            className="absolute top-0 left-0 right-0 h-[1px]"
+            style={{
+              background: 'linear-gradient(90deg, rgba(244, 208, 63, 0) 2%, rgba(244, 208, 63, 1) 50%, rgba(244, 208, 63, 0) 98%)',
+            }}
+          ></div>
+          
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+            <div className="flex items-start justify-between">
+              <div className="flex-1" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <p className="text-[#E3BF3B] text-xs uppercase tracking-wide">MEMBER SINCE {subscription.memberSince}</p>
+                <h2 className="text-[#E3BF3B] text-lg font-bold">DinnersMatch Pass</h2>
+                <p className="text-[#F5F5F5] text-sm">{subscription.type}</p>
+              </div>
+              <div className="flex items-center gap-2 bg-[#162B2A] px-3 py-1.5 rounded-full">
+                <div className="w-2 h-2 bg-[#41B36E] rounded-full"></div>
+                <span className="text-white text-xs font-medium">{subscription.status}</span>
+              </div>
+            </div>
+            
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-[#2A2829] rounded flex items-center justify-center flex-shrink-0">
+                  <svg className="w-6 h-6 text-[#E3BF3B]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                  </svg>
+                </div>
+                <span className="text-[#F5F5F5] text-sm">Unlimited dinners this month</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-[#2A2829] rounded flex items-center justify-center flex-shrink-0">
+                  <svg className="w-6 h-6 text-[#E3BF3B]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <span className="text-[#F5F5F5] text-sm">Renews: {subscription.renewalDate}</span>
+              </div>
+            </div>
+            
+            {onManageSubscription && (
               <button
-                onClick={onMyAccount}
-                className="text-[#FFAA55] hover:underline"
+                onClick={onManageSubscription}
+                className="w-full bg-[#272727] border border-[#5B504C] rounded-lg py-3 px-4 flex items-center justify-center gap-2 hover:bg-[#2F2F2F] transition-colors"
               >
-                My Account
+                <svg className="w-6 h-6 text-[#E3BF3B]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                </svg>
+                <span className="text-white text-sm font-medium">Manage Subscription</span>
               </button>
             )}
           </div>
         </div>
 
-        {/* DinnersMatch Pass Section */}
-        <div className="bg-[#111121] border border-[#2F3A51] rounded-lg p-6 mb-6">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <p className="text-[#E0E0E0] text-sm mb-1">MEMBER SINCE {subscription.memberSince}</p>
-              <h2 className="text-2xl font-bold text-[#F5F5F5]">DinnersMatch Pass</h2>
-              <p className="text-[#E0E0E0]">{subscription.type}</p>
-            </div>
-            <span className="bg-green-500 text-[#F5F5F5] px-3 py-1 rounded-full text-sm font-medium">
-              • {subscription.status}
-            </span>
-          </div>
-          <div className="space-y-3 mb-4">
-            <div className="flex items-center gap-3">
-              <svg className="w-5 h-5 text-[#FFAA55]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-              </svg>
-              <span className="text-[#E0E0E0]">Unlimited dinners this month.</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <svg className="w-5 h-5 text-[#FFAA55]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-              <span className="text-[#E0E0E0]">Renews: {subscription.renewalDate}</span>
-            </div>
-          </div>
-          {onManageSubscription && (
-            <button
-              onClick={onManageSubscription}
-              className="w-full bg-[#FFAA55] text-[#F5F5F5] py-3 rounded-lg font-medium text-sm uppercase tracking-wide hover:bg-[#FF9955] transition-colors flex items-center justify-center gap-2"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-              Manage Subscription
-            </button>
-          )}
-        </div>
-
         {/* Your Next Dinner Section */}
-        <div className="bg-[#111121] border border-[#2F3A51] rounded-lg p-6 mb-6">
-          <h2 className="text-xl font-bold text-[#F5F5F5] mb-4">Your Next Dinner</h2>
-          <div className="space-y-3 mb-4">
-            <div className="flex items-center gap-3">
-              <svg className="w-5 h-5 text-[#FFAA55]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-              <span className="text-[#E0E0E0]">CITY: {dinner.city}</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <svg className="w-5 h-5 text-[#FFAA55]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-              <span className="text-[#E0E0E0]">DATE: {dinner.date}</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <svg className="w-5 h-5 text-[#FFAA55]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <span className="text-[#E0E0E0]">TIME: {dinner.time}</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <svg className="w-5 h-5 text-[#FFAA55]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-              </svg>
-              <div className="flex-1">
-                <span className="text-[#E0E0E0]">RESTAURANT: {dinner.restaurant}</span>
-                <div className="flex items-center gap-2 mt-1">
-                  <span className="text-[#E0E0E0] text-sm">{dinner.address}</span>
-                  {onCopyAddress && (
-                    <button
-                      onClick={handleCopyAddress}
-                      className="text-[#FFAA55] hover:underline text-sm"
-                    >
-                      Copy Address
-                    </button>
-                  )}
-                </div>
+        <div className="bg-[#0F0F14] border border-[#191A1D] rounded-lg p-6" style={{ boxShadow: '0 0 16px rgba(0, 0, 0, 0.12)', display: 'flex', flexDirection: 'column', gap: '24px' }}>
+          <h2 className="text-[#F5F5F5] text-sm font-bold">Your Next Dinner</h2>
+          
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {/* City */}
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 bg-[#2A2829] rounded flex items-center justify-center flex-shrink-0">
+                <svg className="w-6 h-6 text-[#E3BF3B]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              </div>
+              <div className="flex-1" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <p className="text-[#77777B] text-xs uppercase">CITY</p>
+                <p className="text-[#F5F5F5] text-sm">{dinner.city}</p>
               </div>
             </div>
-            <div className="flex items-start gap-3 mt-4">
-              <svg className="w-5 h-5 text-[#FFAA55] mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-              </svg>
-              <div className="flex-1">
-                <span className="text-[#E0E0E0]">GROUP: A little sneak peak of your group:</span>
-                <div className="mt-3 space-y-2">
-                  <div>
-                    <span className="text-[#E0E0E0] font-medium">LANGUAGES: </span>
-                    <span className="text-[#E0E0E0]">{dinner.group.languages.join(', ')}</span>
-                  </div>
-                  <div>
-                    <span className="text-[#E0E0E0] font-medium">NATIONALITIES: </span>
-                    <span className="text-[#E0E0E0]">
-                      {Object.entries(dinner.group.nationalities)
-                        .map(([key, value]) => `${key} ${value}%`)
-                        .join(' - ')}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-[#E0E0E0] font-medium">OCCUPATIONS: </span>
-                    <span className="text-[#E0E0E0]">
-                      {Object.entries(dinner.group.occupations)
-                        .map(([key, value]) => `${key} ${value}%`)
-                        .join(' - ')}
-                    </span>
-                  </div>
-                </div>
+            
+            {/* Date */}
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 bg-[#2A2829] rounded flex items-center justify-center flex-shrink-0">
+                <svg className="w-6 h-6 text-[#E3BF3B]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <div className="flex-1" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <p className="text-[#77777B] text-xs uppercase">DATE</p>
+                <p className="text-[#F5F5F5] text-sm">{dinner.date}</p>
               </div>
             </div>
+            
+            {/* Time */}
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 bg-[#2A2829] rounded flex items-center justify-center flex-shrink-0">
+                <svg className="w-6 h-6 text-[#E3BF3B]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div className="flex-1" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <p className="text-[#77777B] text-xs uppercase">TIME</p>
+                <p className="text-[#F5F5F5] text-sm">{dinner.time}</p>
+              </div>
+            </div>
+            
+            {/* Restaurant */}
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 bg-[#2A2829] rounded flex items-center justify-center flex-shrink-0">
+                <svg className="w-6 h-6 text-[#E3BF3B]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+              </div>
+              <div className="flex-1" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <p className="text-[#77777B] text-xs uppercase">RESTAURANT</p>
+                <p className="text-[#F5F5F5] text-sm">{dinner.restaurant}</p>
+                <p className="text-[#BDBDBD] text-xs">{dinner.address}</p>
+              </div>
+              {onCopyAddress && (
+                <button
+                  onClick={handleCopyAddress}
+                  className="bg-[#2A2829] border border-[#5B504C] rounded-lg px-2 py-2 flex items-center gap-1 hover:bg-[#333] transition-colors flex-shrink-0 h-10"
+                >
+                  <svg className="w-6 h-6 text-[#E3BF3B]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                  </svg>
+                  <span className="text-[#E3BF3B] text-xs whitespace-nowrap">Copy Address</span>
+                </button>
+              )}
+            </div>
+            
+            {/* Group */}
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 bg-[#2A2829] rounded flex items-center justify-center flex-shrink-0">
+                <svg className="w-6 h-6 text-[#E3BF3B]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+              </div>
+              <div className="flex-1" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <p className="text-[#77777B] text-xs uppercase">Group</p>
+                <p className="text-[#F5F5F5] text-sm">A little sneak peak of your group:</p>
+              </div>
+            </div>
+          </div>
+          
+          {/* Divider */}
+          <div className="border-t border-[#1B1C1F]"></div>
+          
+          {/* Group Details */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <p className="text-[#77777B] text-xs uppercase">LANGUAGES</p>
+            <p className="text-[#F5F5F5] text-sm">{dinner.group.languages.join(', ')}</p>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <p className="text-[#77777B] text-xs uppercase">NATIONALITIES</p>
+            <p className="text-[#F5F5F5] text-sm">
+              {Object.entries(dinner.group.nationalities)
+                .map(([key, value]) => `${key} ${value}%`)
+                .join(' - ')}
+            </p>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <p className="text-[#77777B] text-xs uppercase">OCCUPATIONS</p>
+            <p className="text-[#F5F5F5] text-sm">
+              {Object.entries(dinner.group.occupations)
+                .map(([key, value]) => `${key} ${value}%`)
+                .join(' - ')}
+            </p>
+          </div>
+          
+          {/* Divider */}
+          <div className="border-t border-[#1B1C1F]"></div>
+          
+          {/* RSVP Section */}
+          <h3 className="text-[#F5F5F5] text-sm font-bold">RSPV FOR TONIGHT</h3>
+          
+          <div className="flex gap-4">
+            <button
+              onClick={() => handleRSVP('I\'ll be There')}
+              className={`flex-1 rounded-lg py-3 px-2 flex items-center justify-center transition-colors ${
+                rsvpStatus === 'I\'ll be There'
+                  ? 'bg-[#FFAA55] border-[#FFAA55] text-white'
+                  : 'bg-[#111121] border border-[#2F3A51] text-white hover:bg-[#1A1F2E]'
+              }`}
+            >
+              <span className="text-sm font-medium">I'll be There</span>
+            </button>
+            <button
+              onClick={() => handleRSVP('I\'ll be Late')}
+              className={`flex-1 rounded-lg py-3 px-2 flex items-center justify-center transition-colors ${
+                rsvpStatus === 'I\'ll be Late'
+                  ? 'bg-[#FFAA55] border-[#FFAA55] text-white'
+                  : 'bg-[#111121] border border-[#2F3A51] text-white hover:bg-[#1A1F2E]'
+              }`}
+            >
+              <span className="text-sm font-medium">I'll be Late</span>
+            </button>
+            <button
+              onClick={() => handleRSVP('Can\'t Make It')}
+              className={`flex-1 rounded-lg py-3 px-2 flex items-center justify-center transition-colors ${
+                rsvpStatus === 'Can\'t Make It'
+                  ? 'bg-[#FFAA55] border-[#FFAA55] text-white'
+                  : 'bg-[#111121] border border-[#2F3A51] text-white hover:bg-[#1A1F2E]'
+              }`}
+            >
+              <span className="text-sm font-medium">Can't Make It</span>
+            </button>
+          </div>
+          
+          {/* Group Status */}
+          <div className="bg-[#080810] rounded-lg p-6" style={{ boxShadow: '0 0 16px rgba(0, 0, 0, 0.12)', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <p className="text-[#757575] text-xs uppercase">GROUP STATUS (ANONYMOUS)</p>
+            <p className="text-white text-xs">
+              You: <span className={rsvpStatus ? 'text-white' : 'text-red-500'}>{rsvpStatus || 'Not Responded'}</span>
+            </p>
+            <p className="text-[#757575] text-xs">2 attending, 1 late, 3 not responded</p>
+          </div>
+          
+          {/* TableTalk Unlock */}
+          <div className="bg-[#1A1711] border border-[#534A3E] rounded-lg p-4" style={{ boxShadow: '0 0 16px rgba(0, 0, 0, 0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <p className="text-[#FFAA55] text-xs">TableTalk Unlocks at 7:00 PM</p>
           </div>
         </div>
-
-        {/* RSVP Section */}
-        {onRSVP && (
-          <div className="bg-[#111121] border border-[#2F3A51] rounded-lg p-6 mb-6">
-            <h2 className="text-xl font-bold text-[#F5F5F5] mb-4">RSVP FOR TONIGHT</h2>
-            <div className="flex flex-wrap gap-3 mb-4">
-              {['I\'ll Be There', 'I\'ll Be Late', 'Can\'t Make It'].map((option) => (
-                <button
-                  key={option}
-                  onClick={() => handleRSVP(option)}
-                  className={`px-4 py-2 rounded-lg border-2 transition-all ${
-                    rsvpStatus === option
-                      ? 'bg-[#FFAA55] border-[#FFAA55] text-[#F5F5F5]'
-                      : 'bg-[#0F1419] border-white text-[#E0E0E0] hover:border-[#FFAA55]'
-                  }`}
-                >
-                  {option}
-                </button>
-              ))}
-            </div>
-            <div className="bg-[#0F1419] rounded-lg p-4 mb-2">
-              <p className="text-[#E0E0E0] text-sm mb-2">GROUP STATUS (ANONYMOUS)</p>
-              <p className="text-[#E0E0E0]">You: {rsvpStatus || 'Not Responded'}</p>
-              <p className="text-[#E0E0E0] text-sm mt-1">2 attending, 1 late, 3 not responded</p>
-            </div>
-            <p className="text-[#E0E0E0] text-sm">TableTalk Unlocks at 7:00 PM</p>
-          </div>
-        )}
 
         {/* Upcoming Dates Section */}
         {upcomingDates && upcomingDates.length > 0 && (
-          <div className="bg-[#111121] border border-[#2F3A51] rounded-lg p-6 mb-6">
-            <h2 className="text-xl font-bold text-[#F5F5F5] mb-4">Upcoming Dates</h2>
-            <div className="space-y-3">
+          <div>
+            <h2 className="text-[#F5F5F5] text-sm font-bold mb-4">Upcoming Dates</h2>
+            <div className="space-y-4">
               {upcomingDates.map((item, index) => (
-                <div key={index} className="flex items-center justify-between">
+                <div
+                  key={index}
+                  className={`rounded-lg p-6 flex items-center justify-between ${
+                    item.status === 'Selected'
+                      ? 'bg-[#1A1711] border border-[#534A3E]'
+                      : 'bg-[#0C0C11] border border-[#141418]'
+                  }`}
+                  style={{ boxShadow: '0 0 16px rgba(0, 0, 0, 0.12)' }}
+                >
                   <div>
-                    <p className="text-[#F5F5F5] font-medium">{item.date}</p>
-                    <p className="text-[#E0E0E0] text-sm">{item.city}</p>
+                    <p className="text-[#F5F5F5] text-sm font-medium mb-1">{item.date}</p>
+                    <p className="text-[#77777B] text-xs">{item.city}</p>
                   </div>
-                  <span
-                    className={`px-3 py-1 rounded-full text-sm font-medium ${
+                  <div
+                    className={`px-3 py-1.5 rounded-full flex items-center gap-2 ${
                       item.status === 'Selected'
-                        ? 'bg-[#FFAA55] text-[#F5F5F5]'
-                        : 'bg-[#2F3A51] text-[#E0E0E0]'
+                        ? 'bg-[#E3BF3B]'
+                        : 'bg-[#18181D]'
                     }`}
                   >
-                    {item.status}
-                  </span>
+                    {item.status === 'Selected' && (
+                      <svg className="w-3 h-3 text-[#212121]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                    )}
+                    <span
+                      className={`text-xs font-medium ${
+                        item.status === 'Selected' ? 'text-[#212121]' : 'text-[#4E4E52]'
+                      }`}
+                    >
+                      {item.status}
+                    </span>
+                  </div>
                 </div>
               ))}
             </div>
@@ -238,33 +340,40 @@ const DinnerDetailsPage = ({
         )}
 
         {/* Your Access Section */}
-        <div className="bg-[#111121] border border-[#2F3A51] rounded-lg p-6">
-          <h2 className="text-xl font-bold text-[#F5F5F5] mb-4">Your Access</h2>
-          <div className="space-y-2 mb-4">
-            <p className="text-[#E0E0E0]">Unlimited dinners this month.</p>
-            <p className="text-[#E0E0E0]">Renewal on {subscription.renewalDate}.</p>
+        <div className="bg-[#0F0F14] border border-[#191A1D] rounded-lg p-6" style={{ boxShadow: '0 0 16px rgba(0, 0, 0, 0.12)' }}>
+          <h2 className="text-[#F5F5F5] text-sm font-bold mb-6">Your Access</h2>
+          <div className="space-y-2">
+            <p className="text-[#F5F5F5] text-sm">Unlimited dinners this month.</p>
+            <p className="text-[#77777B] text-xs">Renewal on {subscription.renewalDate}.</p>
           </div>
-          <div className="flex flex-col sm:flex-row gap-3">
-            {onManageSubscription && (
-              <button
-                onClick={onManageSubscription}
-                className="flex-1 bg-[#0F1419] border border-white text-[#F5F5F5] py-3 rounded-lg font-medium text-sm uppercase tracking-wide hover:bg-[#2F3A51] transition-colors"
-              >
-                Manage Subscription
-              </button>
-            )}
-            {onContactSupport && (
-              <button
-                onClick={onContactSupport}
-                className="flex-1 bg-[#0F1419] border border-white text-[#F5F5F5] py-3 rounded-lg font-medium text-sm uppercase tracking-wide hover:bg-[#2F3A51] transition-colors flex items-center justify-center gap-2"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                Contact Support
-              </button>
-            )}
-          </div>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="space-y-3">
+          {onManageSubscription && (
+            <button
+              onClick={onManageSubscription}
+              className="w-full bg-[#121212] border border-[#242428] rounded-lg py-3 px-4 flex items-center justify-center gap-2 hover:bg-[#1A1A1E] transition-colors"
+              style={{ boxShadow: '0 0 16px rgba(0, 0, 0, 0.12)' }}
+            >
+              <svg className="w-6 h-6 text-[#F5F5F5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+              </svg>
+              <span className="text-white text-sm font-medium">Manage Subscription</span>
+            </button>
+          )}
+          {onContactSupport && (
+            <button
+              onClick={onContactSupport}
+              className="w-full bg-[#121212] border border-[#242428] rounded-lg py-3 px-4 flex items-center justify-center gap-2 hover:bg-[#1A1A1E] transition-colors"
+              style={{ boxShadow: '0 0 16px rgba(0, 0, 0, 0.12)' }}
+            >
+              <svg className="w-6 h-6 text-[#F5F5F5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span className="text-white text-sm font-medium">Contact Support</span>
+            </button>
+          )}
         </div>
       </div>
     </div>

@@ -24,18 +24,18 @@ const HowItWorksModal = ({ isOpen, onClose, onNext, onBack }) => {
             </button>
           )}
           
-          {/* Close Button */}
-          {onClose && (
-            <button
-              onClick={onClose}
+        {/* Close Button */}
+        {onClose && (
+          <button
+            onClick={onClose}
               className="text-[#D9D9D9] hover:text-[#F5F5F5] transition-colors"
-              aria-label="Close modal"
-            >
+            aria-label="Close modal"
+          >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          )}
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        )}
         </div>
 
         {/* Header */}
