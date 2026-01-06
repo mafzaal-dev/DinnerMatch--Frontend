@@ -1,3 +1,0 @@
-module.exports=[62684,a=>{"use strict";var b=a.i(87924);function c(){return(0,b.jsxs)("div",{children:[(0,b.jsx)("h1",{className:"text-3xl font-bold text-[#F5F5F5] mb-6",children:"Bookings Management"}),(0,b.jsx)("div",{className:"bg-[#111121] border border-white rounded-lg p-6",children:(0,b.jsx)("p",{className:"text-[#E0E0E0]",children:"Bookings management interface coming soon..."})})]})}a.s(["default",()=>c])}];
-
-//# sourceMappingURL=src_app_admin_bookings_page_dec85711.js.map

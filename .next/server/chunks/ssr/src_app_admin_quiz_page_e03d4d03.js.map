@@ -1,1 +1,0 @@
-{"version":3,"sources":["../../../../src/app/admin/quiz/page.js"],"sourcesContent":["\"use client\";\n\nimport { QuizListPage } from '../../../components/admin';\n\nexport default function AdminQuiz() {\n  return <QuizListPage />;\n}\n\n"],"names":[],"mappings":"wDAEA,EAAA,CAAA,CAAA,2BAEe,SAAS,IACtB,MAAO,CAAA,EAAA,EAAA,GAAA,EAAC,EAAA,OAAY,CAAA,CAAA,EACtB"}
