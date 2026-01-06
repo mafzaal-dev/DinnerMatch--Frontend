@@ -85,7 +85,7 @@ const PersonalityQuiz = ({ isOpen, onClose, onComplete, onBack }) => {
   if (showResult) {
     return (
       <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div className="bg-[#080814] rounded-xl w-full max-w-[616px] p-10 relative shadow-2xl">
+        <div className="bg-[#080814] rounded-xl w-full max-w-154 p-10 relative shadow-2xl">
           {/* Close Button */}
           <button
             onClick={onClose}
@@ -125,7 +125,7 @@ const PersonalityQuiz = ({ isOpen, onClose, onComplete, onBack }) => {
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-[#080814] rounded-xl w-full max-w-[616px] p-10 relative shadow-2xl" style={{ maxHeight: '90vh', overflowY: 'auto' }}>
+      <div className="bg-[#080814] rounded-xl w-full max-w-154 p-10 relative shadow-2xl" style={{ maxHeight: '90vh', overflowY: 'auto' }}>
         {/* Close Button */}
         <button
           onClick={onClose}
@@ -173,8 +173,8 @@ const PersonalityQuiz = ({ isOpen, onClose, onComplete, onBack }) => {
 
         {/* Question */}
         <div className="mb-8">
-          <h3 className="text-2xl md:text-3xl font-bold text-[#F5F5F5] text-center mb-8">
-            {currentQ.question}
+          <h3 className="text-2xl md:text-3xl font-medium text-[#F5F5F5] text-center mb-8">
+            {currentQ.question} 
           </h3>
 
           {/* Choice Type Questions */}
@@ -186,10 +186,10 @@ const PersonalityQuiz = ({ isOpen, onClose, onComplete, onBack }) => {
                   <button
                     key={option.id}
                     onClick={() => handleAnswer(option.id)}
-                    className={`border-2 rounded-xl p-8 transition-all text-center group ${
+                    className={`border rounded-xl p-8 transition-all text-center group ${
                       isSelected
                         ? 'bg-[#FFAA55] border-[#FFAA55]'
-                        : 'bg-[#111121] border-white hover:border-[#FFAA55]'
+                        : 'bg-[#080814] border-white hover:border-[#FFAA55]'
                     }`}
                   >
                     <div className="text-4xl mb-4">{option.icon}</div>
@@ -206,8 +206,8 @@ const PersonalityQuiz = ({ isOpen, onClose, onComplete, onBack }) => {
           {currentQ.type === 'scale' && (
             <div>
               <div className="flex justify-between mb-6 text-sm text-[#E0E0E0]">
-                <span>{currentQ.scaleLabels.left}</span>
-                <span>{currentQ.scaleLabels.right}</span>
+                <span className='text-[#FFAA55]'>{currentQ.scaleLabels.left}</span>
+                <span className='text-[#FFAA55]'>{currentQ.scaleLabels.right}</span>
               </div>
               <div className="grid grid-cols-5 gap-3">
                 {Array.from({ length: 10 }, (_, i) => i + 1).map((value) => {
@@ -216,10 +216,10 @@ const PersonalityQuiz = ({ isOpen, onClose, onComplete, onBack }) => {
                     <button
                       key={value}
                       onClick={() => handleScaleAnswer(value)}
-                      className={`py-4 rounded-lg border-2 transition-all font-medium ${
+                      className={`py-5 rounded-lg border transition-all font-medium ${
                         isSelected
                           ? 'bg-[#FFAA55] border-[#FFAA55] text-white'
-                          : 'bg-[#111121] border-white text-[#E0E0E0] hover:border-[#FFAA55]'
+                          : 'bg-[#080814] border-white text-[#E0E0E0] hover:border-[#FFAA55]'
                       }`}
                     >
                       {value}

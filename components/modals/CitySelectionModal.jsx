@@ -12,7 +12,7 @@ const CitySelectionModal = ({ isOpen, onClose, onSelectCity }) => {
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-[#080814] rounded-xl w-full max-w-[616px] p-10 relative shadow-2xl" style={{ maxHeight: '90vh', overflowY: 'auto' }}>
+      <div className="bg-[#080814] rounded-xl w-full max-w-154 p-10 relative shadow-2xl" style={{ maxHeight: '90vh', overflowY: 'auto' }}>
         {/* Close Button */}
         <button
           onClick={onClose}
@@ -26,10 +26,10 @@ const CitySelectionModal = ({ isOpen, onClose, onSelectCity }) => {
 
         {/* Header */}
         <div className="mb-10">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-[23px] font-bold text-[#F5F5F5]">Select Your City</h2>
+          <div className="flex items-center  justify-center mb-2">
+            <h2 className="text-[23px] font-medium text-[#F5F5F5]">Select Your City</h2>
           </div>
-          <p className="text-[14px] text-[#E0E0E0]">Choose the city where you'd like to have dinner:</p>
+          <p className="text-[14px] text-[#E0E0E0] text-center">Choose the city where you'd like to have dinner:</p>
         </div>
 
         {/* City Options */}
@@ -38,11 +38,11 @@ const CitySelectionModal = ({ isOpen, onClose, onSelectCity }) => {
             <button
               key={city.id}
               onClick={() => onSelectCity(city)}
-              className="w-full bg-[#111121] border border-white rounded-lg p-4 hover:border-[#FFAA55] transition-colors text-left"
+              className="w-full bg-[#111121] border border-[#111121] rounded-lg p-4 hover:border-[#FFAA55] transition-colors text-left"
             >
               <div className="flex items-center gap-3">
                 <svg
-                  className="w-6 h-6 text-[#EEEEEE] flex-shrink-0"
+                  className="w-6 h-6 text-[#EEEEEE] shrink-"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -60,8 +60,8 @@ const CitySelectionModal = ({ isOpen, onClose, onSelectCity }) => {
                   />
                 </svg>
                 <div>
-                  <p className="text-[#F5F5F5] font-medium text-base leading-tight">{city.name}</p>
-                  <p className="text-[#E0E0E0] text-xs mt-2">{city.province}</p>
+                  <p className="text-[#F5F5F5]  text-base leading-tight">{city.name}</p>
+                  <p className="text-[#E0E0E0] text-xs font-light mt-2">{city.province}</p>
                 </div>
               </div>
             </button>

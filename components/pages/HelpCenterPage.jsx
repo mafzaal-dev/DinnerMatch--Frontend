@@ -4,8 +4,11 @@ import React, { useState } from 'react';
 
 const HelpCenterPage = ({ onSubmit, onBack }) => {
   const [formData, setFormData] = useState({
+    email:'',
     subject: '',
     message: '',
+    description:'',
+    reason:''
   });
 
   const faqData = [
@@ -69,9 +72,58 @@ const HelpCenterPage = ({ onSubmit, onBack }) => {
         </div>
 
         {/* Contact Form */}
-        <div className="bg-[#111121] border border-white rounded-lg p-6 mb-8">
+        <div className="bg-[#111121] border border-gray-700 rounded-lg p-6 mb-8">
           <h2 className="text-xl font-bold text-[#F5F5F5] mb-6">Contact Us</h2>
           <form onSubmit={handleSubmit} className="space-y-6">
+           
+            <div>
+              <label className="block text-[#E0E0E0] text-sm mb-2">
+                Your email address <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                placeholder="johnDoe@mail.com"
+                className="w-full px-4 py-3 bg-[#0F1419] border
+                 border-gray-700 rounded-lg text-[#F5F5F5] placeholder-gray-500  focus:outline-none focus:border-[#FFAA55]"
+                required
+              />
+            </div>
+
+
+            <div>
+              <label className="block text-[#E0E0E0] text-sm mb-2">
+                Your name <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                placeholder="Enter your full name"
+                className="w-full px-4 py-3 bg-[#0F1419] border
+                 border-gray-700 rounded-lg text-[#F5F5F5] placeholder-gray-500  focus:outline-none focus:border-[#FFAA55]"
+                required
+              />
+            </div>
+
+
+            <div>
+              <label className="block text-[#E0E0E0] text-sm mb-2">
+                Reason for contacting us<span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                value={formData.reason}
+                onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
+                placeholder="Reason"
+                className="w-full px-4 py-3 bg-[#0F1419] border
+                 border-gray-700 rounded-lg text-[#F5F5F5] placeholder-gray-500 focus:outline-none focus:border-[#FFAA55]"
+                required
+              />
+            </div>
+
+
             <div>
               <label className="block text-[#E0E0E0] text-sm mb-2">
                 Subject <span className="text-red-500">*</span>
@@ -81,23 +133,28 @@ const HelpCenterPage = ({ onSubmit, onBack }) => {
                 value={formData.subject}
                 onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
                 placeholder="Brief summary of your message"
-                className="w-full px-4 py-3 bg-[#0F1419] border border-white rounded-lg text-[#F5F5F5] placeholder-[#A0A0A0] focus:outline-none focus:border-[#FFAA55]"
+                className="w-full px-4 py-3 bg-[#0F1419] border
+                 border-gray-700 rounded-lg text-[#F5F5F5] placeholder-gray-500  focus:outline-none focus:border-[#FFAA55]"
                 required
               />
             </div>
+
             <div>
               <label className="block text-[#E0E0E0] text-sm mb-2">
-                Message <span className="text-red-500">*</span>
+               Description<span className="text-red-500">*</span>
               </label>
-              <textarea
-                value={formData.message}
-                onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                placeholder="Please provide detailed information about your inquiry or issue"
-                rows={6}
-                className="w-full px-4 py-3 bg-[#0F1419] border border-white rounded-lg text-[#F5F5F5] placeholder-[#A0A0A0] focus:outline-none focus:border-[#FFAA55] resize-none"
+              <input
+                type="text"
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                placeholder="Please provide detail information about your inquiry or issue"
+                className="w-full px-4 py-3 bg-[#0F1419] border
+                 border-gray-700 rounded-lg text-[#F5F5F5] placeholder-gray-500  focus:outline-none focus:border-[#FFAA55]"
                 required
               />
             </div>
+
+            
             <button
               type="submit"
               className="w-full bg-[#FFAA55] text-[#F5F5F5] py-4 rounded-lg font-bold text-sm uppercase tracking-wide hover:bg-[#FF9955] transition-colors"
@@ -108,7 +165,7 @@ const HelpCenterPage = ({ onSubmit, onBack }) => {
         </div>
 
         {/* FAQ Section */}
-        <div className="bg-[#111121] border border-white rounded-lg p-6">
+        <div className="bg-[#111121] border border-gray-600 rounded-lg p-6">
           <h2 className="text-xl font-bold text-[#F5F5F5] mb-6">Frequently Asked Questions</h2>
           <div className="space-y-3">
             {faqData.map((faq, index) => (

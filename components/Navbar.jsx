@@ -15,14 +15,14 @@ const Navbar = () => {
                     </div>
 
                     <div className="hidden md:flex items-center gap-8">
-                        <a href="#how-it-works" className="text-sm font-medium hover:opacity-80 transition-opacity">How It Works</a>
-                        <a href="#about-us" className="text-sm font-medium hover:opacity-80 transition-opacity">About Us</a>
-                        <a href="#faq" className="text-sm font-medium hover:opacity-80 transition-opacity">FAQ</a>
+                        <a href="#how-it-works" className="text-sm hover:opacity-80 transition-opacity">How It Works</a>
+                        <a href="#about-us" className="text-sm  hover:opacity-80 transition-opacity">About Us</a>
+                        <a href="#faq" className="text-sm  hover:opacity-80 transition-opacity">FAQ's</a>
                     </div>
 
                     <button 
                         onClick={() => setIsLoginOpen(true)}
-                        className="bg-white text-nav-bg px-5 py-2 rounded font-bold text-sm hover:bg-gray-100 transition-colors"
+                        className="bg-white text-nav-bg px-5 py-2 uppercase rounded font-bold text-sm hover:bg-gray-100 transition-colors"
                     >
                         Sign In
                     </button>

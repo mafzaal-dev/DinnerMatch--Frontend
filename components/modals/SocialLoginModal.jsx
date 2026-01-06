@@ -57,7 +57,7 @@ const SocialLoginModal = ({ isOpen, onClose, onSelectMethod, onBackToOptions, on
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-[#080814] rounded-xl w-full max-w-[616px] p-10 relative shadow-2xl">
+      <div className="bg-[#080814] rounded-xl w-full max-w-154 p-10 relative shadow-2xl">
         {/* Close Button */}
         <button
           onClick={onClose}
@@ -76,15 +76,20 @@ const SocialLoginModal = ({ isOpen, onClose, onSelectMethod, onBackToOptions, on
         </div>
 
         {/* Social Login Options */}
-        <div className="space-y-4 mb-10">
+        <div className="space-y-4 flex flex-col items-center mb-10">
           {socialOptions.map((option) => (
             <button
               key={option.id}
               onClick={() => onSelectMethod(option.id)}
-              className="w-full bg-[#111121] border border-white rounded-lg px-6 py-4 flex items-center gap-4 hover:border-[#FFAA55] transition-colors"
+              className=" bg-[#111121] border flex justify-center
+               items-center border-gray-700  w-62.5
+                rounded-lg py-5  hover:border-[#FFAA55] transition-colors"
             >
+            <div className='flex gap-4'>
               <div className="text-[#F5F5F5]">{option.icon}</div>
               <span className="text-[#F5F5F5] font-medium flex-1 text-left">{option.label}</span>
+            </div>
+              
             </button>
           ))}
         </div>
@@ -102,7 +107,7 @@ const SocialLoginModal = ({ isOpen, onClose, onSelectMethod, onBackToOptions, on
           {onSignIn && (
             <p className="text-[#E0E0E0] text-sm">
               Already have an account?{' '}
-              <button onClick={onSignIn} className="text-[#FFAA55] hover:underline">
+              <button onClick={onSignIn} className="text-[#E0E0E0] hover:underline">
                 Sign in
               </button>
             </p>

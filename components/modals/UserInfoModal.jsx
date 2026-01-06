@@ -17,7 +17,7 @@ const UserInfoModal = ({ isOpen, onClose, onContinue, onBack }) => {
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-[#080814] rounded-xl w-full max-w-[616px] p-10 relative shadow-2xl">
+      <div className="bg-[#080814] rounded-xl w-full max-w-154 p-10 relative shadow-2xl">
         {/* Close Button */}
         {onClose && (
           <button
@@ -58,7 +58,7 @@ const UserInfoModal = ({ isOpen, onClose, onContinue, onBack }) => {
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
               placeholder="First name"
-              className="w-full px-4 py-3 bg-[#111121] border border-[#2F3A51] rounded-lg text-[#F5F5F5] placeholder-[#E0E0E0] focus:outline-none focus:border-[#FFAA55] transition-colors"
+              className="w-full px-4 py-3 bg-[#111121] border border-[#2F3A51] rounded-lg text-[#F5F5F5] placeholder-zinc-600 focus:outline-none focus:border-[#FFAA55] transition-colors"
               required
             />
           </div>
@@ -69,14 +69,14 @@ const UserInfoModal = ({ isOpen, onClose, onContinue, onBack }) => {
               value={mobileNumber}
               onChange={(e) => setMobileNumber(e.target.value)}
               placeholder="Mobile number"
-              className="w-full px-4 py-3 bg-[#111121] border border-[#2F3A51] rounded-lg text-[#F5F5F5] placeholder-[#E0E0E0] focus:outline-none focus:border-[#FFAA55] transition-colors"
+              className="w-full px-4 py-3 bg-[#111121] border border-[#2F3A51] rounded-lg text-[#F5F5F5] placeholder-zinc-600 focus:outline-none focus:border-[#FFAA55] transition-colors"
               required
             />
           </div>
 
           <button
             type="submit"
-            className="w-full bg-[#FFAA55] text-white py-4 rounded-lg font-bold text-sm uppercase tracking-wide hover:bg-[#FF9955] transition-colors"
+            className="w-full bg-[#FFAA55] text-white py-4 rounded-lg font-medium text-sm uppercase tracking-wide hover:bg-[#FF9955] transition-colors"
           >
             Continue
           </button>

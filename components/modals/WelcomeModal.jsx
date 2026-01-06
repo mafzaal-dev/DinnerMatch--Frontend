@@ -7,7 +7,7 @@ const WelcomeModal = ({ isOpen, onClose, onNext, onBack }) => {
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-[#080814] rounded-xl w-full max-w-[616px] p-10 relative shadow-2xl flex flex-col" style={{ gap: '40px' }}>
+      <div className="bg-[#080814] rounded-xl w-full max-w-154 p-10 relative shadow-2xl flex flex-col" style={{ gap: '40px' }}>
         {/* Top Row - Back and Close */}
         <div className="flex items-center justify-between">
           {/* Back Button */}
@@ -39,13 +39,13 @@ const WelcomeModal = ({ isOpen, onClose, onNext, onBack }) => {
         </div>
 
         {/* Header */}
-        <div className="text-center flex flex-col" style={{ gap: '16px' }}>
+        <div className="text-center flex flex-col" style={{ gap: '6px' }}>
           <h2 className="text-[23px] font-bold text-[#F5F5F5]">DinnersMatch</h2>
           <p className="text-[10px] text-[#FFAA55] uppercase tracking-wide">Identity</p>
         </div>
 
         {/* Content */}
-        <div className="bg-[#111121] border border-[#2F3A51] rounded-lg p-6 flex flex-col shadow-lg" style={{ gap: '24px' }}>
+        <div className="bg-[#111121] border border-[#2F3A51] rounded-lg p-6 flex flex-col shadow-lg" style={{ gap: '15px' }}>
           <h3 className="text-sm font-bold text-[#FFAA55]">
             Welcome to DinnersMatch
           </h3>

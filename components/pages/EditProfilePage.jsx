@@ -48,7 +48,8 @@ const EditProfilePage = ({ onSave, onBack, initialData = {} }) => {
           {onBack && (
             <button
               onClick={onBack}
-              className="text-[#E0E0E0] hover:text-[#F5F5F5] transition-colors mb-4 flex items-center gap-2"
+              className="text-[#E0E0E0] hover:text-[#F5F5F5]
+               transition-colors mb-4 flex items-center gap-2"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -61,7 +62,7 @@ const EditProfilePage = ({ onSave, onBack, initialData = {} }) => {
         </div>
 
         {/* Basic Info Section */}
-        <div className="bg-[#111121] border border-white rounded-lg p-6 mb-6">
+        <div className="bg-[#111121] border border-gray-700 rounded-lg p-6 mb-6">
           <h2 className="text-lg font-bold text-[#F5F5F5] mb-6 uppercase">Basic Info</h2>
           <div className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -71,7 +72,7 @@ const EditProfilePage = ({ onSave, onBack, initialData = {} }) => {
                   type="text"
                   value={formData.firstName}
                   onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                  className="w-full px-4 py-3 bg-[#0F1419] border border-white rounded-lg text-[#F5F5F5] placeholder-[#A0A0A0] focus:outline-none focus:border-[#FFAA55]"
+                  className="w-full px-4 py-3 bg-[#0F1419] border border-gray-700 rounded-lg text-[#F5F5F5] placeholder-[#A0A0A0] focus:outline-none focus:border-[#FFAA55]"
                   placeholder="Enter first name"
                 />
               </div>
@@ -81,7 +82,7 @@ const EditProfilePage = ({ onSave, onBack, initialData = {} }) => {
                   type="text"
                   value={formData.lastName}
                   onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                  className="w-full px-4 py-3 bg-[#0F1419] border border-white rounded-lg text-[#F5F5F5] placeholder-[#A0A0A0] focus:outline-none focus:border-[#FFAA55]"
+                  className="w-full px-4 py-3 bg-[#0F1419] border border-gray-700 rounded-lg text-[#F5F5F5] placeholder-[#A0A0A0] focus:outline-none focus:border-[#FFAA55]"
                   placeholder="Enter last name"
                 />
               </div>
@@ -92,7 +93,7 @@ const EditProfilePage = ({ onSave, onBack, initialData = {} }) => {
                 type="email"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="w-full px-4 py-3 bg-[#0F1419] border border-white rounded-lg text-[#F5F5F5] placeholder-[#A0A0A0] focus:outline-none focus:border-[#FFAA55]"
+                className="w-full px-4 py-3 bg-[#0F1419] border border-gray-700 rounded-lg text-[#F5F5F5] placeholder-[#A0A0A0] focus:outline-none focus:border-[#FFAA55]"
                 placeholder="Enter email"
               />
             </div>
@@ -102,7 +103,7 @@ const EditProfilePage = ({ onSave, onBack, initialData = {} }) => {
                 type="tel"
                 value={formData.phoneNumber}
                 onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
-                className="w-full px-4 py-3 bg-[#0F1419] border border-white rounded-lg text-[#F5F5F5] placeholder-[#A0A0A0] focus:outline-none focus:border-[#FFAA55]"
+                className="w-full px-4 py-3 bg-[#0F1419] border border-gray-700 rounded-lg text-[#F5F5F5] placeholder-[#A0A0A0] focus:outline-none focus:border-[#FFAA55]"
                 placeholder="Enter phone number"
               />
             </div>
@@ -112,7 +113,7 @@ const EditProfilePage = ({ onSave, onBack, initialData = {} }) => {
                 type="date"
                 value={formData.dateOfBirth}
                 onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
-                className="w-full px-4 py-3 bg-[#0F1419] border border-white rounded-lg text-[#F5F5F5] focus:outline-none focus:border-[#FFAA55]"
+                className="w-full px-4 py-3 bg-[#0F1419] border border-gray-700 rounded-lg text-[#F5F5F5] focus:outline-none focus:border-[#FFAA55]"
               />
             </div>
             <div>
@@ -125,7 +126,7 @@ const EditProfilePage = ({ onSave, onBack, initialData = {} }) => {
                     className={`px-4 py-2 rounded-lg border-2 transition-all ${
                       formData.gender === gender
                         ? 'bg-[#FFAA55] border-[#FFAA55] text-[#F5F5F5]'
-                        : 'bg-[#0F1419] border-white text-[#E0E0E0] hover:border-[#FFAA55]'
+                        : 'bg-[#0F1419] border-gray-700 text-[#E0E0E0] hover:border-[#FFAA55]'
                     }`}
                   >
                     {gender}
@@ -137,7 +138,7 @@ const EditProfilePage = ({ onSave, onBack, initialData = {} }) => {
         </div>
 
         {/* Dinner Preferences Section */}
-        <div className="bg-[#111121] border border-white rounded-lg p-6 mb-6">
+        <div className="bg-[#111121] border border-gray-700 rounded-lg p-6 mb-6">
           <h2 className="text-lg font-bold text-[#F5F5F5] mb-6 uppercase">Dinner Preferences</h2>
           
           {/* Cuisine */}
@@ -151,7 +152,7 @@ const EditProfilePage = ({ onSave, onBack, initialData = {} }) => {
                   className={`px-4 py-2 rounded-lg border-2 transition-all ${
                     formData.cuisine.includes(cuisine)
                       ? 'bg-[#FFAA55] border-[#FFAA55] text-[#F5F5F5]'
-                      : 'bg-[#0F1419] border-white text-[#E0E0E0] hover:border-[#FFAA55]'
+                      : 'bg-[#0F1419] border-gray-700 text-[#E0E0E0] hover:border-[#FFAA55]'
                   }`}
                 >
                   {cuisine}
@@ -171,7 +172,7 @@ const EditProfilePage = ({ onSave, onBack, initialData = {} }) => {
                   className={`px-4 py-2 rounded-lg border-2 transition-all ${
                     formData.dietaryPreference.includes(option)
                       ? 'bg-[#FFAA55] border-[#FFAA55] text-[#F5F5F5]'
-                      : 'bg-[#0F1419] border-white text-[#E0E0E0] hover:border-[#FFAA55]'
+                      : 'bg-[#0F1419] border-gray-700 text-[#E0E0E0] hover:border-[#FFAA55]'
                   }`}
                 >
                   {option}
@@ -191,7 +192,7 @@ const EditProfilePage = ({ onSave, onBack, initialData = {} }) => {
                   className={`px-4 py-2 rounded-lg border-2 transition-all ${
                     formData.alcoholPreference.includes(option)
                       ? 'bg-[#FFAA55] border-[#FFAA55] text-[#F5F5F5]'
-                      : 'bg-[#0F1419] border-white text-[#E0E0E0] hover:border-[#FFAA55]'
+                      : 'bg-[#0F1419] border-gray-700 text-[#E0E0E0] hover:border-[#FFAA55]'
                   }`}
                 >
                   {option}
@@ -211,7 +212,7 @@ const EditProfilePage = ({ onSave, onBack, initialData = {} }) => {
                   className={`px-4 py-2 rounded-lg border-2 transition-all ${
                     formData.dayOfWeek.includes(day)
                       ? 'bg-[#FFAA55] border-[#FFAA55] text-[#F5F5F5]'
-                      : 'bg-[#0F1419] border-white text-[#E0E0E0] hover:border-[#FFAA55]'
+                      : 'bg-[#0F1419] border-gray-700 text-[#E0E0E0] hover:border-[#FFAA55]'
                   }`}
                 >
                   {day}
@@ -231,7 +232,7 @@ const EditProfilePage = ({ onSave, onBack, initialData = {} }) => {
                   className={`px-4 py-2 rounded-lg border-2 transition-all ${
                     formData.timeOfDay.includes(time)
                       ? 'bg-[#FFAA55] border-[#FFAA55] text-[#F5F5F5]'
-                      : 'bg-[#0F1419] border-white text-[#E0E0E0] hover:border-[#FFAA55]'
+                      : 'bg-[#0F1419] border-gray-700 text-[#E0E0E0] hover:border-[#FFAA55]'
                   }`}
                 >
                   {time}
@@ -250,7 +251,7 @@ const EditProfilePage = ({ onSave, onBack, initialData = {} }) => {
                 value={formData.budget}
                 onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
                 placeholder="Enter budget"
-                className="w-full pl-8 pr-4 py-3 bg-[#0F1419] border border-white rounded-lg text-[#F5F5F5] placeholder-[#A0A0A0] focus:outline-none focus:border-[#FFAA55]"
+                className="w-full pl-8 pr-4 py-3 bg-[#0F1419] border border-gray-700 rounded-lg text-[#F5F5F5] placeholder-[#A0A0A0] focus:outline-none focus:border-[#FFAA55]"
               />
             </div>
           </div>

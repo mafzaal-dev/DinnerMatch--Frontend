@@ -1,0 +1,1 @@
+{"version":3,"sources":["../../../../src/app/admin/dashboard/page.js"],"sourcesContent":["\"use client\";\n\nimport { AdminDashboardPage } from '../../../components/admin';\n\nexport default function AdminDashboard() {\n  return <AdminDashboardPage />;\n}\n"],"names":[],"mappings":"wDAEA,EAAA,CAAA,CAAA,4BAEe,SAAS,IACtB,MAAO,CAAA,EAAA,EAAA,GAAA,EAAC,EAAA,OAAkB,CAAA,CAAA,EAC5B"}

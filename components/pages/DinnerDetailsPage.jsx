@@ -52,8 +52,8 @@ const DinnerDetailsPage = ({
   };
 
   return (
-    <div className="min-h-screen bg-[#080814] p-4 md:p-8">
-      <div className="max-w-[616px] mx-auto" style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+    <div className="min-h-screen bg-black p-4 md:p-8">
+      <div className="max-w-154 mx-auto" style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
         {/* Header */}
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold text-[#F5F5F5]">DinnersMatch</h1>
@@ -88,7 +88,7 @@ const DinnerDetailsPage = ({
               <div className="flex-1" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 <p className="text-[#E3BF3B] text-xs uppercase tracking-wide">MEMBER SINCE {subscription.memberSince}</p>
                 <h2 className="text-[#E3BF3B] text-lg font-bold">DinnersMatch Pass</h2>
-                <p className="text-[#F5F5F5] text-sm">{subscription.type}</p>
+                <p className="text-[#F5F5F5] font-medium text-sm">{subscription.type}</p>
               </div>
               <div className="flex items-center gap-2 bg-[#162B2A] px-3 py-1.5 rounded-full">
                 <div className="w-2 h-2 bg-[#41B36E] rounded-full"></div>
@@ -123,7 +123,7 @@ const DinnerDetailsPage = ({
                 <svg className="w-6 h-6 text-[#E3BF3B]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
                 </svg>
-                <span className="text-white text-sm font-medium">Manage Subscription</span>
+                <span className="text-[#E3BF3B] text-sm font-medium">Manage Subscription</span>
               </button>
             )}
           </div>
@@ -282,8 +282,8 @@ const DinnerDetailsPage = ({
           {/* Group Status */}
           <div className="bg-[#080810] rounded-lg p-6" style={{ boxShadow: '0 0 16px rgba(0, 0, 0, 0.12)', display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <p className="text-[#757575] text-xs uppercase">GROUP STATUS (ANONYMOUS)</p>
-            <p className="text-white text-xs">
-              You: <span className={rsvpStatus ? 'text-white' : 'text-red-500'}>{rsvpStatus || 'Not Responded'}</span>
+            <p className="text-[#E3BF3B] text-xs">
+              You: <span className='text-white'>{rsvpStatus || 'Not Responded'}</span>
             </p>
             <p className="text-[#757575] text-xs">2 attending, 1 late, 3 not responded</p>
           </div>

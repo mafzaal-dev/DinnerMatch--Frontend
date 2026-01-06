@@ -24,7 +24,7 @@ const AreaSelectionModal = ({ isOpen, onClose, onSelectArea, city, selectedCityI
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-[#080814] rounded-xl w-full max-w-[616px] p-10 relative shadow-2xl" style={{ maxHeight: '90vh', overflowY: 'auto' }}>
+      <div className="bg-[#080814] rounded-xl w-full max-w-154 p-10 relative shadow-2xl" style={{ maxHeight: '90vh', overflowY: 'auto' }}>
         {/* Close Button */}
         <button
           onClick={onClose}
@@ -38,14 +38,15 @@ const AreaSelectionModal = ({ isOpen, onClose, onSelectArea, city, selectedCityI
 
         {/* Header */}
         <div className="mb-10">
-          <h2 className="text-[23px] font-bold text-[#F5F5F5] mb-4">Select Your Place</h2>
-          <p className="text-[14px] text-[#E0E0E0]">Choose a place in {city || 'Cape Town'}:</p>
+          <h2 className="text-[23px] text-center font-medium text-[#F5F5F5] mb-2">Select Your Place</h2>
+          <p className="text-[14px] text-center text-[#E0E0E0]">Choose the area place in {city || 'Cape Town'}:</p>
         </div>
 
         {/* Back Button */}
         <button
           onClick={onClose}
-          className="flex items-center gap-2 text-[#E0E0E0] hover:text-[#F5F5F5] transition-colors mb-10"
+          
+          className="flex items-center gap-2 text-orange-300 hover:text-[#F5F5F5] transition-colors mb-10"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -59,11 +60,11 @@ const AreaSelectionModal = ({ isOpen, onClose, onSelectArea, city, selectedCityI
             <button
               key={area.id}
               onClick={() => onSelectArea(area)}
-              className="w-full bg-[#111121] border border-white rounded-lg p-4 hover:border-[#FFAA55] transition-colors text-left"
+              className="w-full bg-[#111121]  rounded-lg p-4 hover:border-[#FFAA55] transition-colors text-left"
             >
               <div className="flex items-center gap-3">
                 <svg
-                  className="w-6 h-6 text-[#EEEEEE] flex-shrink-0"
+                  className="w-6 h-6 text-[#EEEEEE] shrink-0"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -85,6 +86,10 @@ const AreaSelectionModal = ({ isOpen, onClose, onSelectArea, city, selectedCityI
             </button>
           ))}
         </div>
+
+        <button className='uppercase text-center cursor-pointer text-white font-lg w-full h-12 rounded-lg mt-4 bg-orange-300'>
+          Continue to quiz
+        </button>
       </div>
     </div>
   );

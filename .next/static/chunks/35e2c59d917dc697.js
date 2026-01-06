@@ -1,0 +1,1 @@
+(globalThis.TURBOPACK||(globalThis.TURBOPACK=[])).push(["object"==typeof document?document.currentScript:void 0,53357,i=>{"use strict";var t=i.i(43476),e=i.i(932);i.i(73809);var u=i.i(67513),u=u,r=i.i(18566);function s(){let i,s=(0,e.c)(2),a=(0,r.useParams)().id;return s[0]!==a?(i=(0,t.jsx)(u.default,{quizId:a}),s[0]=a,s[1]=i):i=s[1],i}i.s(["default",()=>s],53357)}]);

@@ -1,0 +1,193 @@
+{
+  "version": 3,
+  "pages404": true,
+  "appType": "app",
+  "caseSensitive": false,
+  "basePath": "",
+  "redirects": [
+    {
+      "source": "/:path+/",
+      "destination": "/:path+",
+      "internal": true,
+      "priority": true,
+      "statusCode": 308,
+      "regex": "^(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))/$"
+    }
+  ],
+  "headers": [],
+  "rewrites": {
+    "beforeFiles": [],
+    "afterFiles": [],
+    "fallback": []
+  },
+  "dynamicRoutes": [
+    {
+      "page": "/admin/quiz/edit/[id]",
+      "regex": "^/admin/quiz/edit/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/admin/quiz/edit/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/admin/quiz/[id]",
+      "regex": "^/admin/quiz/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/admin/quiz/(?<nxtPid>[^/]+?)(?:/)?$"
+    }
+  ],
+  "staticRoutes": [
+    {
+      "page": "/",
+      "regex": "^/(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/(?:/)?$"
+    },
+    {
+      "page": "/_global-error",
+      "regex": "^/_global\\-error(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/_global\\-error(?:/)?$"
+    },
+    {
+      "page": "/_not-found",
+      "regex": "^/_not\\-found(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/_not\\-found(?:/)?$"
+    },
+    {
+      "page": "/account",
+      "regex": "^/account(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/account(?:/)?$"
+    },
+    {
+      "page": "/admin/bookings",
+      "regex": "^/admin/bookings(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/bookings(?:/)?$"
+    },
+    {
+      "page": "/admin/dashboard",
+      "regex": "^/admin/dashboard(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/dashboard(?:/)?$"
+    },
+    {
+      "page": "/admin/dinner-management",
+      "regex": "^/admin/dinner\\-management(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/dinner\\-management(?:/)?$"
+    },
+    {
+      "page": "/admin/email-manager",
+      "regex": "^/admin/email\\-manager(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/email\\-manager(?:/)?$"
+    },
+    {
+      "page": "/admin/group-attendees",
+      "regex": "^/admin/group\\-attendees(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/group\\-attendees(?:/)?$"
+    },
+    {
+      "page": "/admin/login",
+      "regex": "^/admin/login(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/login(?:/)?$"
+    },
+    {
+      "page": "/admin/quiz",
+      "regex": "^/admin/quiz(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/quiz(?:/)?$"
+    },
+    {
+      "page": "/admin/quiz/create",
+      "regex": "^/admin/quiz/create(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/quiz/create(?:/)?$"
+    },
+    {
+      "page": "/dinner-details",
+      "regex": "^/dinner\\-details(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/dinner\\-details(?:/)?$"
+    },
+    {
+      "page": "/edit-profile",
+      "regex": "^/edit\\-profile(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/edit\\-profile(?:/)?$"
+    },
+    {
+      "page": "/favicon.ico",
+      "regex": "^/favicon\\.ico(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/favicon\\.ico(?:/)?$"
+    },
+    {
+      "page": "/forgot-password",
+      "regex": "^/forgot\\-password(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/forgot\\-password(?:/)?$"
+    },
+    {
+      "page": "/help-center",
+      "regex": "^/help\\-center(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/help\\-center(?:/)?$"
+    },
+    {
+      "page": "/login",
+      "regex": "^/login(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/login(?:/)?$"
+    },
+    {
+      "page": "/preferences",
+      "regex": "^/preferences(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/preferences(?:/)?$"
+    },
+    {
+      "page": "/privacy-policy",
+      "regex": "^/privacy\\-policy(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/privacy\\-policy(?:/)?$"
+    },
+    {
+      "page": "/terms-conditions",
+      "regex": "^/terms\\-conditions(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/terms\\-conditions(?:/)?$"
+    },
+    {
+      "page": "/your-dinner",
+      "regex": "^/your\\-dinner(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/your\\-dinner(?:/)?$"
+    }
+  ],
+  "dataRoutes": [],
+  "rsc": {
+    "header": "rsc",
+    "varyHeader": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch",
+    "prefetchHeader": "next-router-prefetch",
+    "didPostponeHeader": "x-nextjs-postponed",
+    "contentTypeHeader": "text/x-component",
+    "suffix": ".rsc",
+    "prefetchSegmentHeader": "next-router-segment-prefetch",
+    "prefetchSegmentSuffix": ".segment.rsc",
+    "prefetchSegmentDirSuffix": ".segments",
+    "clientParamParsing": false,
+    "dynamicRSCPrerender": false
+  },
+  "rewriteHeaders": {
+    "pathHeader": "x-nextjs-rewritten-path",
+    "queryHeader": "x-nextjs-rewritten-query"
+  }
+}

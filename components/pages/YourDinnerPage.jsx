@@ -48,7 +48,7 @@ const YourDinnerPage = ({ dinners = [], onViewDetails, onMyAccount }) => {
           {displayDinners.map((dinner) => (
             <div
               key={dinner.id}
-              className="bg-[#111121] border border-white rounded-lg p-6 hover:border-[#FFAA55] transition-colors"
+              className="bg-[#111121] border border-gray-600 rounded-lg p-6 hover:border-[#FFAA55] transition-colors"
             >
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div className="flex-1">

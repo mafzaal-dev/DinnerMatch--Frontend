@@ -17,7 +17,7 @@ const EmailConfirmationModal = ({ isOpen, onClose, onContinue, onBack }) => {
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-[#080814] rounded-xl w-full max-w-[616px] p-10 relative shadow-2xl">
+      <div className="bg-[#080814] rounded-xl w-full max-w-154 p-10 relative shadow-2xl">
         {/* Close Button */}
         <button
           onClick={onClose}
@@ -56,7 +56,9 @@ const EmailConfirmationModal = ({ isOpen, onClose, onContinue, onBack }) => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter your email"
-              className="w-full px-4 py-3 bg-[#111121] border border-[#2F3A51] rounded-lg text-[#F5F5F5] placeholder-[#E0E0E0] focus:outline-none focus:border-[#FFAA55] transition-colors"
+              className="w-full px-4 py-3
+               bg-[#111121] border
+                border-[#2F3A51] rounded-lg text-[#F5F5F5] placeholder-zinc-600 focus:outline-none focus:border-[#FFAA55] transition-colors"
               required
             />
           </div>
@@ -67,7 +69,8 @@ const EmailConfirmationModal = ({ isOpen, onClose, onContinue, onBack }) => {
               value={confirmEmail}
               onChange={(e) => setConfirmEmail(e.target.value)}
               placeholder="Confirm your email"
-              className="w-full px-4 py-3 bg-[#111121] border border-[#2F3A51] rounded-lg text-[#F5F5F5] placeholder-[#E0E0E0] focus:outline-none focus:border-[#FFAA55] transition-colors"
+              className="w-full px-4 py-3 bg-[#111121]
+               border border-[#2F3A51] rounded-lg text-[#F5F5F5] placeholder-zinc-600 focus:outline-none focus:border-[#FFAA55] transition-colors"
               required
             />
           </div>
@@ -78,7 +81,7 @@ const EmailConfirmationModal = ({ isOpen, onClose, onContinue, onBack }) => {
 
           <button
             type="submit"
-            className="w-full bg-[#FFAA55] text-white py-4 rounded-lg font-bold text-sm uppercase tracking-wide hover:bg-[#FF9955] transition-colors"
+            className="w-full bg-[#FFAA55] text-white py-4 rounded-lg font-medium text-sm uppercase tracking-wide hover:bg-[#FF9955] transition-colors"
           >
             Continue
           </button>
@@ -96,7 +99,7 @@ const EmailConfirmationModal = ({ isOpen, onClose, onContinue, onBack }) => {
           )}
           <p className="text-[#E0E0E0] text-sm">
             Already have an account?{' '}
-            <button onClick={onBack} className="text-[#FFAA55] hover:underline">
+            <button onClick={onBack} className="text-[#E0E0E0] hover:underline">
               Sign in
             </button>
           </p>

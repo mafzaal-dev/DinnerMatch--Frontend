@@ -24,16 +24,16 @@ const LoginModal = ({ isOpen, onClose }) => {
         </button>
 
         {/* Header */}
-        <div className="mb-8">
-          <h2 className="text-3xl font-bold text-white mb-2">Welcome Back</h2>
-          <p className="text-gray-400 text-sm">Sign in to continue your dinner experience</p>
+        <div className="mb-8 y text-center">
+          <h2 className="text-3xl font-medium text-white mb-2">Welcome Back</h2>
+          <p className="text-gray-200 text-sm">Sign in to continue your dinner experience</p>
         </div>
 
         {/* Form */}
         <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
           {/* Email Input */}
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
+            <label htmlFor="email" className="block text-sm font-medium text-gray-400 mb-2">
               Email
             </label>
             <input
@@ -42,13 +42,13 @@ const LoginModal = ({ isOpen, onClose }) => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter your email"
-              className="w-full px-4 py-3 bg-[#0f1419] border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-[#F97315] focus:ring-1 focus:ring-[#F97315] transition-colors"
+              className="w-full px-4 py-3 bg-white border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-[#F97315] focus:ring-1 focus:ring-[#F97315] transition-colors"
             />
           </div>
 
           {/* Password Input */}
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">
+            <label htmlFor="password" className="block text-sm font-medium text-gray-400 mb-2">
               Password
             </label>
             <div className="relative">
@@ -58,7 +58,7 @@ const LoginModal = ({ isOpen, onClose }) => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter your password"
-                className="w-full px-4 py-3 bg-[#0f1419] border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-[#F97315] focus:ring-1 focus:ring-[#F97315] transition-colors pr-12"
+                className="w-full px-4 py-3 bg-white border border-gray-700 rounded-lg  placeholder-gray-500 focus:outline-none focus:border-[#F97315] focus:ring-1 focus:ring-[#F97315] transition-colors pr-12"
               />
               <button
                 type="button"
@@ -98,7 +98,7 @@ const LoginModal = ({ isOpen, onClose }) => {
           {/* Sign In Button */}
           <button
             type="submit"
-            className="w-full bg-[#F97315] text-white py-3 rounded-lg font-bold text-sm uppercase tracking-wide hover:bg-[#EA580C] transition-colors"
+            className="w-full bg-[#F97315]  text-white py-3 rounded-lg font-bold text-sm uppercase tracking-wide hover:bg-[#EA580C] transition-colors"
           >
             Sign In
           </button>
@@ -106,8 +106,8 @@ const LoginModal = ({ isOpen, onClose }) => {
           {/* Terms */}
           <p className="text-xs text-[#A0A0A0] text-center">
             By continuing, you agree to our{' '}
-            <a href="/terms-conditions" className="text-[#FFAA55] hover:underline">Terms of Service</a> and{' '}
-            <a href="/privacy-policy" className="text-[#FFAA55] hover:underline">Privacy Policy</a>.
+            <a href="/terms-conditions" className="hover:underline">Terms of Service</a> and{' '}
+            <a href="/privacy-policy" className="hover:underline">Privacy Policy</a>.
           </p>
         </form>
       </div>

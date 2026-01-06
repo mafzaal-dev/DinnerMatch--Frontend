@@ -132,7 +132,7 @@ const IdentityQuiz = ({ isOpen, onClose, onComplete, onBack }) => {
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-[#080814] rounded-xl w-full max-w-[616px] p-10 relative shadow-2xl max-h-[90vh] overflow-y-auto">
+      <div className="bg-[#080814] rounded-xl w-full max-w-154 p-10 relative shadow-2xl max-h-[90vh] overflow-y-auto">
         {/* Close Button */}
         <button
           onClick={onClose}
@@ -173,7 +173,7 @@ const IdentityQuiz = ({ isOpen, onClose, onComplete, onBack }) => {
 
         {/* Question */}
         <div className="mb-8">
-          <h3 className="text-2xl md:text-3xl font-bold text-[#F5F5F5] text-center mb-2">
+          <h3 className="text-2xl md:text-3xl font-medium text-[#F5F5F5] text-center mb-4">
             {currentQ.question}
           </h3>
           {currentQ.subtitle && (
@@ -182,17 +182,17 @@ const IdentityQuiz = ({ isOpen, onClose, onComplete, onBack }) => {
 
           {/* Single Select Questions */}
           {currentQ.type === 'single-select' && (
-            <div className="space-y-4 max-h-[400px] overflow-y-auto">
+            <div className="space-y-4  ">
               {currentQ.options.map((option) => {
                 const isSelected = currentAnswer === option.id;
                 return (
                   <button
                     key={option.id}
                     onClick={() => handleAnswer(option.id)}
-                    className={`w-full text-left px-6 py-4 rounded-lg border transition-all ${
+                    className={`w-full text-center px-6 py-4 rounded-lg border transition-all ${
                       isSelected
                         ? 'bg-[#111121] border-[#F5F5F5] text-[#F5F5F5]'
-                        : 'bg-[#111121] border-white text-[#E0E0E0] hover:border-[#FFAA55]'
+                        : 'bg-[#111121] border-gray-900 text-[#E0E0E0] hover:border-[#FFAA55]'
                     }`}
                   >
                     {option.label}
@@ -277,10 +277,15 @@ const IdentityQuiz = ({ isOpen, onClose, onComplete, onBack }) => {
         </div>
 
         {/* Question Counter */}
+
+           <div>
         <p className="text-center text-[#E0E0E0] text-sm">
           Question {currentQuestion + 1} of {totalQuestions}
         </p>
+        </div>
+       
       </div>
+    
     </div>
   );
 };

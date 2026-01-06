@@ -24,7 +24,7 @@ const TermsConditionsPage = ({ onBack }) => {
         </div>
 
         {/* Content */}
-        <div className="bg-[#111121] border border-white rounded-lg p-6 md:p-8 space-y-6">
+        <div className="bg-[#111121] border border-gray-600 rounded-lg p-6 md:p-8 space-y-6">
           <section>
             <h2 className="text-xl font-bold text-[#F5F5F5] mb-3">1. Acceptance of Terms</h2>
             <p className="text-[#E0E0E0] leading-relaxed">

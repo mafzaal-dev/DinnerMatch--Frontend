@@ -123,14 +123,14 @@ const AccountPage = ({
       className="w-full bg-[#111121] border border-[#2F3A51] rounded-lg p-6 flex items-center gap-4 hover:bg-[#1A1F2E] transition-colors text-left"
       style={{ boxShadow: '0 0 16px rgba(0, 0, 0, 0.12)' }}
     >
-      <div className={`${item.iconBg} rounded-lg w-10 h-10 flex items-center justify-center flex-shrink-0`}>
+      <div className={`${item.iconBg} rounded-lg w-10 h-10 flex items-center justify-center shrink-0`}>
         {item.icon}
       </div>
       <div className="flex-1">
-        <p className="text-[#F5F5F5] font-medium text-sm mb-3">{item.title}</p>
-        <p className="text-[#757575] text-xs">{item.subtitle}</p>
+        <p className="text-[#F5F5F5] font-medium text-lg ">{item.title}</p>
+        <p className="text-[#757575] text-xs font-medium">{item.subtitle}</p>
       </div>
-      <svg className="w-4 h-4 text-[#F5F5F5] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 20 20">
+      <svg className="w-4 h-4 text-[#F5F5F5] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 20 20">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 4l6 6-6 6" />
       </svg>
     </button>
@@ -138,7 +138,7 @@ const AccountPage = ({
 
   return (
     <div className="min-h-screen bg-[#010102] p-4 md:p-8">
-      <div className="max-w-[616px] mx-auto">
+      <div className="max-w-154 mx-auto">
         {/* Header */}
         <div className="mb-8 flex items-center justify-center relative">
           {onBack && (
@@ -164,13 +164,13 @@ const AccountPage = ({
 
           {/* Help & Support Section */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <h2 className="text-[#F5F5F5] text-sm font-normal">Help & Support</h2>
+            <h2 className="text-[#F5F5F5] text-lg font-medium">Help & Support</h2>
             {helpItems.map(renderMenuItem)}
           </div>
 
           {/* Legal Section */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <h2 className="text-[#F5F5F5] text-sm font-normal">Legal</h2>
+            <h2 className="text-[#F5F5F5] text-lg font-medium">Legal</h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               {legalItems.map(renderMenuItem)}
             </div>
