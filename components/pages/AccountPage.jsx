@@ -127,8 +127,8 @@ const AccountPage = ({
         {item.icon}
       </div>
       <div className="flex-1">
-        <p className="text-[#F5F5F5] font-medium text-lg ">{item.title}</p>
-        <p className="text-[#757575] text-xs font-medium">{item.subtitle}</p>
+        <p className="text-[#F5F5F5] font-bold text-xl ">{item.title}</p>
+        <p className="text-[#757575] text-sm font-semibold">{item.subtitle}</p>
       </div>
       <svg className="w-4 h-4 text-[#F5F5F5] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 20 20">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 4l6 6-6 6" />
@@ -149,10 +149,10 @@ const AccountPage = ({
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 20 20">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 4l-6 6 6 6" />
               </svg>
-              <span className="text-xs">Back</span>
+              <span className="text-sm">Back</span>
             </button>
           )}
-          <h1 className="text-[23px] font-bold text-[#FFAA55]">My Account</h1>
+          <h1 className="text-[32px] font-bold text-[#FFAA55]">My Account</h1>
         </div>
 
         {/* All sections in one container with 24px spacing */}
@@ -164,13 +164,13 @@ const AccountPage = ({
 
           {/* Help & Support Section */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <h2 className="text-[#F5F5F5] text-lg font-medium">Help & Support</h2>
+            <h2 className="text-[#F5F5F5] text-xl font-semibold ">Help & Support</h2>
             {helpItems.map(renderMenuItem)}
           </div>
 
           {/* Legal Section */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <h2 className="text-[#F5F5F5] text-lg font-medium">Legal</h2>
+            <h2 className="text-[#F5F5F5] text-xl font-semibold">Legal</h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               {legalItems.map(renderMenuItem)}
             </div>

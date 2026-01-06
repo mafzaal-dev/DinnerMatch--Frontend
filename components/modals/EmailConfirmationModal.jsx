@@ -16,8 +16,8 @@ const EmailConfirmationModal = ({ isOpen, onClose, onContinue, onBack }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-[#080814] rounded-xl w-full max-w-154 p-10 relative shadow-2xl">
+    <div className="fixed inset-0 bg-black md:bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div className="md:bg-[#080814] rounded-xl w-full md:max-w-154 md:p-10 relative shadow-2xl">
         {/* Close Button */}
         <button
           onClick={onClose}
@@ -44,7 +44,7 @@ const EmailConfirmationModal = ({ isOpen, onClose, onContinue, onBack }) => {
 
         {/* Header */}
         <div className="mb-10 text-center">
-          <h2 className="text-3xl font-bold text-[#F5F5F5] mb-2">DinnersMatch</h2>
+          <h2 className="text-[32px] font-bold text-[#F5F5F5] mb-2">DinnersMatch</h2>
           <p className="text-[#E0E0E0]">Let's get started.</p>
         </div>
 
@@ -56,9 +56,9 @@ const EmailConfirmationModal = ({ isOpen, onClose, onContinue, onBack }) => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter your email"
-              className="w-full px-4 py-3
+              className="w-full px-4 h-12
                bg-[#111121] border
-                border-[#2F3A51] rounded-lg text-[#F5F5F5] placeholder-zinc-600 focus:outline-none focus:border-[#FFAA55] transition-colors"
+                border-[#2F3A51] rounded-lg text-[#F5F5F5] placeholder-[#424242] focus:outline-none focus:border-[#FFAA55] transition-colors"
               required
             />
           </div>
@@ -70,7 +70,7 @@ const EmailConfirmationModal = ({ isOpen, onClose, onContinue, onBack }) => {
               onChange={(e) => setConfirmEmail(e.target.value)}
               placeholder="Confirm your email"
               className="w-full px-4 py-3 bg-[#111121]
-               border border-[#2F3A51] rounded-lg text-[#F5F5F5] placeholder-zinc-600 focus:outline-none focus:border-[#FFAA55] transition-colors"
+               border border-[#2F3A51] rounded-lg text-[#F5F5F5] placeholder-[#424242]  focus:outline-none focus:border-[#FFAA55] transition-colors"
               required
             />
           </div>
@@ -81,7 +81,8 @@ const EmailConfirmationModal = ({ isOpen, onClose, onContinue, onBack }) => {
 
           <button
             type="submit"
-            className="w-full bg-[#FFAA55] text-white py-4 rounded-lg font-medium text-sm uppercase tracking-wide hover:bg-[#FF9955] transition-colors"
+            className="w-full bg-[#FFAA55] text-white py-4 px-2
+             rounded-lg font-medium text-sm  tracking-wide hover:bg-[#FF9955] transition-colors"
           >
             Continue
           </button>

@@ -16,17 +16,17 @@ const PrivacyPolicyPage = ({ onBack }) => {
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
-              <span>Back</span>
+              <span className='text-sm'>Back</span>
             </button>
           )}
-          <h1 className="text-3xl font-bold text-[#FFAA55] flex-1 text-center">Privacy Policy</h1>
+          <h1 className="text-[32px] font-bold text-[#FFAA55] flex-1 text-center">Privacy Policy</h1>
           <div className="w-20"></div> {/* Spacer for centering */}
         </div>
 
         {/* Content */}
         <div className="bg-[#111121] border border-gray-600 rounded-lg p-6 md:p-8 space-y-6">
           {/* Last Updated */}
-          <p className="text-[#E0E0E0] text-sm">Last Updated: March 2025</p>
+          <p className="text-[#E0E0E0] text-base">Last Updated: March 2025</p>
 
           {/* Introductory Paragraph */}
           <p className="text-[#E0E0E0] leading-relaxed">
@@ -40,7 +40,7 @@ const PrivacyPolicyPage = ({ onBack }) => {
 
           {/* Section 1: Who We Are */}
           <section>
-            <h2 className="text-xl font-bold text-[#F5F5F5] mb-3">1. Who We Are</h2>
+            <h2 className="text-2xl font-bold text-[#F5F5F5] mb-3">1. Who We Are</h2>
             <p className="text-[#E0E0E0] leading-relaxed">
               DinnersMatch is a platform that organizes group dinners to help people connect socially. The platform is operated by the DinnersMatch team. For all data-related inquiries, please contact us through the Help Center in the app.
             </p>
@@ -48,7 +48,7 @@ const PrivacyPolicyPage = ({ onBack }) => {
 
           {/* Section 2: What Data We Collect */}
           <section>
-            <h2 className="text-xl font-bold text-[#F5F5F5] mb-3">2. What Data We Collect</h2>
+            <h2 className="text-2xl font-bold text-[#F5F5F5] mb-3">2. What Data We Collect</h2>
             <p className="text-[#E0E0E0] leading-relaxed mb-2">
               Depending on how you interact with the DinnersMatch platform, we may collect
 the followig categories of personal data:
@@ -67,13 +67,13 @@ used to improve future matches.</li>
 through the app.</li>
             </ul>
 
-            <p className='text-[#F5F5F5]  text-sm mt-2'>
+            <p className='text-[#F5F5F5] mt-2'>
 We do not knowingly collect data from individuals under the age of 18.</p>
           </section> 
 
           {/* Section 3: How We Collect Data */}
           <section>
-            <h2 className="text-xl font-bold text-[#F5F5F5] mb-3">3. How We Collect Data</h2>
+            <h2 className="text-2xl font-bold text-[#F5F5F5] mb-3">3. How We Collect Data</h2>
             <p className="text-[#E0E0E0] leading-relaxed">
               We collect data:
             </p>
@@ -90,7 +90,7 @@ We do not knowingly collect data from individuals under the age of 18.</p>
 
           {/* Section 4: Why We Collect Your Data */}
           <section>
-            <h2 className="text-xl font-bold text-[#F5F5F5] mb-3">4. Why We Collect Your Data</h2>
+            <h2 className="text-2xl font-bold text-[#F5F5F5] mb-3">4. Why We Collect Your Data</h2>
             <p className="text-[#E0E0E0] leading-relaxed">
              We use your data to:
             </p>
@@ -108,7 +108,7 @@ We do not knowingly collect data from individuals under the age of 18.</p>
 
           {/* Section 5: Legal Basis for Processing */}
           <section>
-            <h2 className="text-xl font-bold text-[#F5F5F5] mb-3">5. Legal Basis for Processing</h2>
+            <h2 className="text-2xl font-bold text-[#F5F5F5] mb-3">5. Legal Basis for Processing</h2>
             <p className="text-[#E0E0E0] leading-relaxed">
           We rely on the following legal bases:
             </p>
@@ -125,7 +125,7 @@ We do not knowingly collect data from individuals under the age of 18.</p>
 
           {/* Section 6: How Long We Keep Your Data */}
           <section>
-            <h2 className="text-xl font-bold text-[#F5F5F5] mb-3">6. How Long We Keep Your Data</h2>
+            <h2 className="text-2xl font-bold text-[#F5F5F5] mb-3">6. How Long We Keep Your Data</h2>
             <p className="text-[#E0E0E0] leading-relaxed">
               We retain your personal data for as long as necessary to fulfill the purposes outlined in this policy:
             </p>
@@ -143,7 +143,7 @@ We do not knowingly collect data from individuals under the age of 18.</p>
 
           {/* Section 7: Who We Share Your Data With */}
           <section>
-            <h2 className="text-xl font-bold text-[#F5F5F5] mb-3">7. Who We Share Your Data With</h2>
+            <h2 className="text-2xl font-bold text-[#F5F5F5] mb-3">7. Who We Share Your Data With</h2>
             <p className="text-[#E0E0E0] leading-relaxed">
               We may share your data with:
             </p>
@@ -155,7 +155,7 @@ We do not knowingly collect data from individuals under the age of 18.</p>
               <li>Analytics and product development services</li>
             </ul>
 
-            <p className='text-white text-sm mt-2'>
+            <p className='text-[#f5f5f5]  mt-2'>
 
 All service providers are bound by confidentiality agreements and only use data
 as instructed by DinnersMatch.</p>
@@ -163,7 +163,7 @@ as instructed by DinnersMatch.</p>
 
           {/* Section 8: How We Protect Your Data */}
           <section>
-            <h2 className="text-xl font-bold text-[#F5F5F5] mb-3">8. How We Protect Your Data</h2>
+            <h2 className="text-2xl font-bold text-[#F5F5F5] mb-3">8. How We Protect Your Data</h2>
             <p className="text-[#E0E0E0] leading-relaxed">
           We use technical and organizational safeguards such as:
             </p>
@@ -173,13 +173,13 @@ as instructed by DinnersMatch.</p>
               <li>Secure servers and access controls</li>
               <li>Regular audits and security testing</li>
             </ul>
-            <p className='text-white text-sm mt-2'>However, no platform is 100% secure. Please keep your login credentials private
+            <p className='text-[#f5f5f5] mt-2'>However, no platform is 100% secure. Please keep your login credentials private
 and log out when using shared devices.</p>
           </section>
 
           {/* Section 9: Your Rights */}
           <section>
-            <h2 className="text-xl font-bold text-[#F5F5F5] mb-3">9. Your Rights</h2>
+            <h2 className="text-2xl font-bold text-[#F5F5F5] mb-3">9. Your Rights</h2>
             <p className="text-[#E0E0E0] leading-relaxed mb-2">
 Depending on your jurisdiction, you may have the right to:
             </p>
@@ -191,14 +191,14 @@ Depending on your jurisdiction, you may have the right to:
               <li>Object to certain processing activities</li>
               <li>Request data portability</li>
             </ul>
-            <p className='text-white text-sm mt-2'>You can exercise your rights by contacting us through the Help Center in the
+            <p className='text-[#f5f5f5] mt-2'>You can exercise your rights by contacting us through the Help Center in the
 app.</p>
           </section>
 
 
           {/* Section 10: International Transfers */}
           <section>
-            <h2 className="text-xl font-bold text-[#F5F5F5] mb-3">10. International Transfers</h2>
+            <h2 className="text-2xl font-bold text-[#F5F5F5] mb-3">10. International Transfers</h2>
             <p className="text-[#E0E0E0] leading-relaxed">
             If we transfer your data outside your country, we will ensure adequate protection
 through safeguards like contractual clauses or equivalent legal frameworks.
@@ -207,7 +207,7 @@ through safeguards like contractual clauses or equivalent legal frameworks.
 
           {/* Section 11: Changes to This Policy */}
           <section>
-            <h2 className="text-xl font-bold text-[#F5F5F5] mb-3">11. Changes to This Policy</h2>
+            <h2 className="text-2xl font-bold text-[#F5F5F5] mb-3">11. Changes to This Policy</h2>
             <p className="text-[#E0E0E0] leading-relaxed">
             We may updatet is Privacy Policy rom time to time. You wil noti le in-app
 or by email of major changes. Continued use of the platform implies
@@ -217,7 +217,7 @@ acceptance of the revised policy,
 
           {/* Section 12: Cookies and Tracking */}
           <section>
-            <h2 className="text-xl font-bold text-[#F5F5F5] mb-3">12. Cookies and Tracking</h2>
+            <h2 className="text-2xl font-bold text-[#F5F5F5] mb-3">12. Cookies and Tracking</h2>
             <p className="text-[#E0E0E0] leading-relaxed">
               We use cookies and similar tracking technologies to track activity on our platform and hold certain information. You can instruct your browser to refuse all cookies or to indicate when a cookie is being sent.
             </p>
@@ -225,14 +225,14 @@ acceptance of the revised policy,
 
           {/* Section 13: Contact Us */}
           <section>
-            <h2 className="text-xl font-bold text-[#F5F5F5] mb-3">13. Contact Us</h2>
+            <h2 className="text-2xl font-bold text-[#F5F5F5] mb-3">13. Contact Us</h2>
             <p className="text-[#E0E0E0] leading-relaxed">
               If you have questions about this Privacy Policy or how we handle your data,
 please contact us through the Help Center in the DinnersMatch app.
             </p>
           </section>
-          <p className='text-white'>Thank you for trusting DinnersMatch to help you connect with new people over
-great food</p>
+          <i className='text-[#f5f5f5]'>Thank you for trusting DinnersMatch to help you connect with new people over
+great food</i>
         </div>
 
         

@@ -45,15 +45,15 @@ const BookDinnerModal = ({ isOpen, onClose, onSecureSpot, onBack, dinnerSlots = 
 
         {/* Header */}
         <div className="mb-10 text-center">
-          <h2 className="text-3xl font-bold text-[#F5F5F5] mb-1">DinnersMatch</h2>
-          <p className="text-sm text-[#FFAA55] uppercase tracking-wide">Identity</p>
+          <h2 className="text-[32px]font-bold text-[#F5F5F5] mb-1">DinnersMatch</h2>
+          <p className="text-base text-[#FFAA55] uppercase tracking-wide">Identity</p>
         </div>
 
         {/* Content */}
         <div className="mb-10">
           <div className="flex items-center justify-center gap-2 mb-2">
             <span className="text-2xl">✨</span>
-            <h3 className="text-3xl md:text-4xl font-medium text-center text-[#FFAA55]">
+            <h3 className="text-3xl md:text-3xl font-bold text-center text-[#FFAA55]">
               Book Your Next <span className='text-white'> Dinner</span>
             </h3>
           </div>
@@ -68,12 +68,12 @@ const BookDinnerModal = ({ isOpen, onClose, onSecureSpot, onBack, dinnerSlots = 
                 className={`w-full bg-[#111121] border rounded-lg p-6 flex items-center justify-between transition-all ${
                   selectedSlot === slot.id
                     ? 'border-[#FFAA55] bg-[#080814]'
-                    : 'border-gray-700 hover:border-[#FFAA55]'
+                    : 'border-[#2F3A51] hover:border-[#FFAA55]'
                 }`}
               >
                 <div className="text-left">
                   <p className="text-[#F5F5F5] font-medium text-lg">{slot.date}</p>
-                  <p className="text-[#E0E0E0]">{slot.time}</p>
+                  <p className="text-[#E0E0E0] text-sm">{slot.time}</p>
                 </div>
                 <div
                   className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${

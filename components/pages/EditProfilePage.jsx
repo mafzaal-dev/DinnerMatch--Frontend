@@ -63,8 +63,8 @@ const EditProfilePage = ({ onSave, onBack, initialData = {} }) => {
 
         {/* Basic Info Section */}
         <div className="bg-[#111121] border border-gray-700 rounded-lg p-6 mb-6">
-          <h2 className="text-lg font-bold text-[#F5F5F5] mb-6 uppercase">Basic Info</h2>
-          <div className="space-y-4">
+          <i className="text-xl font-bold text-[#F5F5F5]  uppercase">Basic Info</i>
+          <div className="space-y-4 mt-2">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-[#E0E0E0] text-sm mb-2">First Name</label>
@@ -72,7 +72,8 @@ const EditProfilePage = ({ onSave, onBack, initialData = {} }) => {
                   type="text"
                   value={formData.firstName}
                   onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                  className="w-full px-4 py-3 bg-[#0F1419] border border-gray-700 rounded-lg text-[#F5F5F5] placeholder-[#A0A0A0] focus:outline-none focus:border-[#FFAA55]"
+                  className="w-full px-4 py-3 bg-[#0F1419] border border-[#2F3A51]
+                   rounded-lg text-[#F5F5F5] placeholder-[#757575] focus:outline-none focus:border-[#FFAA55]"
                   placeholder="Enter first name"
                 />
               </div>
@@ -82,7 +83,8 @@ const EditProfilePage = ({ onSave, onBack, initialData = {} }) => {
                   type="text"
                   value={formData.lastName}
                   onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                  className="w-full px-4 py-3 bg-[#0F1419] border border-gray-700 rounded-lg text-[#F5F5F5] placeholder-[#A0A0A0] focus:outline-none focus:border-[#FFAA55]"
+                  className="w-full px-4 py-3 bg-[#0F1419
+                   border border-gray-700 rounded-lg text-[#F5F5F5] placeholder-[#757575] focus:outline-none focus:border-[#FFAA55]"
                   placeholder="Enter last name"
                 />
               </div>
@@ -93,7 +95,8 @@ const EditProfilePage = ({ onSave, onBack, initialData = {} }) => {
                 type="email"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="w-full px-4 py-3 bg-[#0F1419] border border-gray-700 rounded-lg text-[#F5F5F5] placeholder-[#A0A0A0] focus:outline-none focus:border-[#FFAA55]"
+                className="w-full px-4 py-3 bg-[#0F1419] border border-gray-700 
+                rounded-lg text-[#F5F5F5] placeholder-[#757575] focus:outline-none focus:border-[#FFAA55]"
                 placeholder="Enter email"
               />
             </div>
@@ -103,7 +106,8 @@ const EditProfilePage = ({ onSave, onBack, initialData = {} }) => {
                 type="tel"
                 value={formData.phoneNumber}
                 onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
-                className="w-full px-4 py-3 bg-[#0F1419] border border-gray-700 rounded-lg text-[#F5F5F5] placeholder-[#A0A0A0] focus:outline-none focus:border-[#FFAA55]"
+                className="w-full px-4 py-3 bg-[#0F1419] border
+                 border-gray-700 rounded-lg text-[#F5F5F5] placeholder-[#757575] focus:outline-none focus:border-[#FFAA55]"
                 placeholder="Enter phone number"
               />
             </div>
@@ -113,17 +117,18 @@ const EditProfilePage = ({ onSave, onBack, initialData = {} }) => {
                 type="date"
                 value={formData.dateOfBirth}
                 onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
-                className="w-full px-4 py-3 bg-[#0F1419] border border-gray-700 rounded-lg text-[#F5F5F5] focus:outline-none focus:border-[#FFAA55]"
+                className="w-full px-4 py-3 bg-[#0F1419] border border-gray-700 
+                rounded-lg text-[#F5F5F5] focus:outline-none focus:border-[#FFAA55]"
               />
             </div>
             <div>
-              <label className="block text-[#E0E0E0] text-sm mb-2">Gender</label>
+              <label className="block text-[#E0E0E0] text-sm font-semibold mb-2">Gender</label>
               <div className="flex flex-wrap gap-3">
                 {genders.map((gender) => (
                   <button
                     key={gender}
                     onClick={() => setFormData({ ...formData, gender })}
-                    className={`px-4 py-2 rounded-lg border-2 transition-all ${
+                    className={`px-4 py-2 rounded-lg border transition-all ${
                       formData.gender === gender
                         ? 'bg-[#FFAA55] border-[#FFAA55] text-[#F5F5F5]'
                         : 'bg-[#0F1419] border-gray-700 text-[#E0E0E0] hover:border-[#FFAA55]'
@@ -139,20 +144,20 @@ const EditProfilePage = ({ onSave, onBack, initialData = {} }) => {
 
         {/* Dinner Preferences Section */}
         <div className="bg-[#111121] border border-gray-700 rounded-lg p-6 mb-6">
-          <h2 className="text-lg font-bold text-[#F5F5F5] mb-6 uppercase">Dinner Preferences</h2>
+          <i className="text-lg font-bold text-[#F5F5F5] mb-6 uppercase">Dinner Preferences</i>
           
           {/* Cuisine */}
-          <div className="mb-6">
-            <label className="block text-[#E0E0E0] text-sm mb-3">Cuisine</label>
+          <div className="mb-6 mt-2">
+            <label className="block text-[#E0E0E0] font-semibold  text-sm mb-3">Cuisine</label>
             <div className="flex flex-wrap gap-3">
               {cuisines.map((cuisine) => (
                 <button
                   key={cuisine}
                   onClick={() => toggleArrayItem('cuisine', cuisine)}
-                  className={`px-4 py-2 rounded-lg border-2 transition-all ${
+                  className={`px-4 py-2 rounded-lg border transition-all ${
                     formData.cuisine.includes(cuisine)
                       ? 'bg-[#FFAA55] border-[#FFAA55] text-[#F5F5F5]'
-                      : 'bg-[#0F1419] border-gray-700 text-[#E0E0E0] hover:border-[#FFAA55]'
+                      : 'bg-[#0F1419] border-[#2F3A51] text-[#E0E0E0] hover:border-[#FFAA55]'
                   }`}
                 >
                   {cuisine}
@@ -163,16 +168,16 @@ const EditProfilePage = ({ onSave, onBack, initialData = {} }) => {
 
           {/* Dietary Preference */}
           <div className="mb-6">
-            <label className="block text-[#E0E0E0] text-sm mb-3">Dietary Preference</label>
+            <label className="block text-[#E0E0E0] font-semibold  text-sm mb-3">Dietary Preference</label>
             <div className="flex flex-wrap gap-3">
               {dietaryOptions.map((option) => (
                 <button
                   key={option}
                   onClick={() => toggleArrayItem('dietaryPreference', option)}
-                  className={`px-4 py-2 rounded-lg border-2 transition-all ${
+                  className={`px-4 py-2 rounded-lg border transition-all ${
                     formData.dietaryPreference.includes(option)
                       ? 'bg-[#FFAA55] border-[#FFAA55] text-[#F5F5F5]'
-                      : 'bg-[#0F1419] border-gray-700 text-[#E0E0E0] hover:border-[#FFAA55]'
+                      : 'bg-[#0F1419] border-[#2F3A51] text-[#E0E0E0] hover:border-[#FFAA55]'
                   }`}
                 >
                   {option}
@@ -183,16 +188,16 @@ const EditProfilePage = ({ onSave, onBack, initialData = {} }) => {
 
           {/* Alcohol Preference */}
           <div className="mb-6">
-            <label className="block text-[#E0E0E0] text-sm mb-3">Alcohol Preference</label>
+            <label className="block text-[#E0E0E0] font-semibold  text-sm mb-3">Alcohol Preference</label>
             <div className="flex flex-wrap gap-3">
               {alcoholOptions.map((option) => (
                 <button
                   key={option}
                   onClick={() => toggleArrayItem('alcoholPreference', option)}
-                  className={`px-4 py-2 rounded-lg border-2 transition-all ${
+                  className={`px-4 py-2 rounded-lg border transition-all ${
                     formData.alcoholPreference.includes(option)
                       ? 'bg-[#FFAA55] border-[#FFAA55] text-[#F5F5F5]'
-                      : 'bg-[#0F1419] border-gray-700 text-[#E0E0E0] hover:border-[#FFAA55]'
+                      : 'bg-[#0F1419] border-[#2F3A51] text-[#E0E0E0] hover:border-[#FFAA55]'
                   }`}
                 >
                   {option}
@@ -203,16 +208,16 @@ const EditProfilePage = ({ onSave, onBack, initialData = {} }) => {
 
           {/* Day of Week */}
           <div className="mb-6">
-            <label className="block text-[#E0E0E0] text-sm mb-3">Day of the Week</label>
+            <label className="block text-[#E0E0E0] font-semibold  text-sm mb-3">Day of the Week</label>
             <div className="flex flex-wrap gap-3">
               {daysOfWeek.map((day) => (
                 <button
                   key={day}
                   onClick={() => toggleArrayItem('dayOfWeek', day)}
-                  className={`px-4 py-2 rounded-lg border-2 transition-all ${
+                  className={`px-4 py-2 rounded-lg border transition-all ${
                     formData.dayOfWeek.includes(day)
                       ? 'bg-[#FFAA55] border-[#FFAA55] text-[#F5F5F5]'
-                      : 'bg-[#0F1419] border-gray-700 text-[#E0E0E0] hover:border-[#FFAA55]'
+                      : 'bg-[#0F1419] border-[#2F3A51] text-[#E0E0E0] hover:border-[#FFAA55]'
                   }`}
                 >
                   {day}
@@ -223,16 +228,16 @@ const EditProfilePage = ({ onSave, onBack, initialData = {} }) => {
 
           {/* Time of Day */}
           <div className="mb-6">
-            <label className="block text-[#E0E0E0] text-sm mb-3">Time of Day</label>
+            <label className="block text-[#E0E0E0] font-semibold text-sm mb-3">Time of Day</label>
             <div className="flex flex-wrap gap-3">
               {timesOfDay.map((time) => (
                 <button
                   key={time}
                   onClick={() => toggleArrayItem('timeOfDay', time)}
-                  className={`px-4 py-2 rounded-lg border-2 transition-all ${
+                  className={`px-4 py-2 rounded-lg border transition-all ${
                     formData.timeOfDay.includes(time)
                       ? 'bg-[#FFAA55] border-[#FFAA55] text-[#F5F5F5]'
-                      : 'bg-[#0F1419] border-gray-700 text-[#E0E0E0] hover:border-[#FFAA55]'
+                      : 'bg-[#0F1419] border-[#2F3A51] text-[#E0E0E0] hover:border-[#FFAA55]'
                   }`}
                 >
                   {time}
@@ -243,7 +248,7 @@ const EditProfilePage = ({ onSave, onBack, initialData = {} }) => {
 
           {/* Budget */}
           <div>
-            <label className="block text-[#E0E0E0] text-sm mb-2">Budget</label>
+            <label className="block text-[#E0E0E0] font-semibold  text-sm mb-2">Budget</label>
             <div className="relative">
               <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#E0E0E0]">$</span>
               <input
@@ -260,7 +265,8 @@ const EditProfilePage = ({ onSave, onBack, initialData = {} }) => {
         {/* Save Button */}
         <button
           onClick={handleSave}
-          className="w-full bg-[#FFAA55] text-[#F5F5F5] py-4 rounded-lg font-bold text-sm uppercase tracking-wide hover:bg-[#FF9955] transition-colors"
+          className="w-full bg-[#FFAA55] text-[#212121] py-4 px-2
+           rounded-lg  text-sm uppercase tracking-wide hover:bg-[#FF9955] transition-colors"
         >
           Save Changes
         </button>

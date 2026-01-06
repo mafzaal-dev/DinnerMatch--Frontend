@@ -132,7 +132,8 @@ const IdentityQuiz = ({ isOpen, onClose, onComplete, onBack }) => {
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-[#080814] rounded-xl w-full max-w-154 p-10 relative shadow-2xl max-h-[90vh] overflow-y-auto">
+      <div className="bg-[#080814] rounded-xl w-full
+       max-w-154 p-10 relative shadow-2xl max-h-[90vh] overflow-y-auto">
         {/* Close Button */}
         <button
           onClick={onClose}
@@ -157,8 +158,8 @@ const IdentityQuiz = ({ isOpen, onClose, onComplete, onBack }) => {
 
         {/* Header */}
         <div className="mb-6">
-          <h2 className="text-2xl font-bold text-[#F5F5F5] mb-1 text-center">DinnersMatch</h2>
-          <p className="text-sm text-[#FFAA55] uppercase tracking-wide text-center">Identity</p>
+          <h2 className="text-[32px] font-bold text-[#F5F5F5] mb-1 text-center">DinnersMatch</h2>
+          <p className="text-base text-[#FFAA55] uppercase tracking-wide text-center">Identity</p>
         </div>
 
         {/* Progress Bar */}
@@ -173,7 +174,7 @@ const IdentityQuiz = ({ isOpen, onClose, onComplete, onBack }) => {
 
         {/* Question */}
         <div className="mb-8">
-          <h3 className="text-2xl md:text-3xl font-medium text-[#F5F5F5] text-center mb-4">
+          <h3 className="text-2xl md:text-4xl font-bold text-[#F5F5F5] text-center mb-4">
             {currentQ.question}
           </h3>
           {currentQ.subtitle && (
@@ -189,10 +190,10 @@ const IdentityQuiz = ({ isOpen, onClose, onComplete, onBack }) => {
                   <button
                     key={option.id}
                     onClick={() => handleAnswer(option.id)}
-                    className={`w-full text-center px-6 py-4 rounded-lg border transition-all ${
+                    className={`w-full text-center font-semibold text-xl p-4 rounded-lg border transition-all ${
                       isSelected
-                        ? 'bg-[#111121] border-[#F5F5F5] text-[#F5F5F5]'
-                        : 'bg-[#111121] border-gray-900 text-[#E0E0E0] hover:border-[#FFAA55]'
+                        ? 'bg-[#111121] border-[#eeeeee] text-[#F5F5F5]'
+                        : 'bg-[#111121] border-[#2f3a51] text-[#E0E0E0] hover:border-[#FFAA55]'
                     }`}
                   >
                     {option.label}
@@ -215,7 +216,8 @@ const IdentityQuiz = ({ isOpen, onClose, onComplete, onBack }) => {
                   }}
                   onFocus={() => setShowDropdown(true)}
                   placeholder={currentQ.placeholder}
-                  className="w-full px-4 py-3 bg-[#111121] border border-[#2F3A51] rounded-lg text-[#F5F5F5] placeholder-[#E0E0E0] focus:outline-none focus:border-[#FFAA55] pr-12"
+                  className="w-full px-4 py-3 bg-[#111121] border
+                   border-[#2F3A51] rounded-lg text-[#F5F5F5] placeholder-[#424242] focus:outline-none focus:border-[#FFAA55] pr-12"
                 />
                 <svg
                   className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#E0E0E0] pointer-events-none"

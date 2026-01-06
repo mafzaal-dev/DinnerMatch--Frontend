@@ -11,7 +11,7 @@ const LoginModal = ({ isOpen, onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-[#1a1f2e] rounded-2xl w-full max-w-md p-8 relative shadow-2xl">
+      <div className="bg-[#1a1f2e] rounded-2xl max-w-154 w-full max-h-103.5 p-6 relative shadow-2xl">
         {/* Close Button */}
         <button
           onClick={onClose}
@@ -24,16 +24,16 @@ const LoginModal = ({ isOpen, onClose }) => {
         </button>
 
         {/* Header */}
-        <div className="mb-8 y text-center">
-          <h2 className="text-3xl font-medium text-white mb-2">Welcome Back</h2>
+        <div className="space-y-2 mb-1 text-center">
+          <h2 className="text-xl font-bold text-white">Welcome Back</h2>
           <p className="text-gray-200 text-sm">Sign in to continue your dinner experience</p>
         </div>
 
         {/* Form */}
-        <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
+        <form className="space-y-5" onSubmit={(e) => e.preventDefault()}>
           {/* Email Input */}
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-400 mb-2">
+            <label htmlFor="email" className="block text-sm font-medium text-[#757575] mb-1">
               Email
             </label>
             <input
@@ -42,13 +42,13 @@ const LoginModal = ({ isOpen, onClose }) => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter your email"
-              className="w-full px-4 py-3 bg-white border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-[#F97315] focus:ring-1 focus:ring-[#F97315] transition-colors"
+              className="w-full h-12 px-3 bg-white border border-gray-500 rounded-lg text-white placeholder-[#bdbdbd] focus:outline-none focus:border-[#F97315] focus:ring-1 focus:ring-[#F97315] transition-colors"
             />
           </div>
 
           {/* Password Input */}
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-400 mb-2">
+            <label htmlFor="password" className="block text-sm font-medium text-[#757575] mb-1">
               Password
             </label>
             <div className="relative">
@@ -58,7 +58,8 @@ const LoginModal = ({ isOpen, onClose }) => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter your password"
-                className="w-full px-4 py-3 bg-white border border-gray-700 rounded-lg  placeholder-gray-500 focus:outline-none focus:border-[#F97315] focus:ring-1 focus:ring-[#F97315] transition-colors pr-12"
+                className="w-full h-12 px-3 bg-white border border-gray-700
+                 rounded-lg  placeholder-[#bdbdbd] focus:outline-none focus:border-[#F97315] focus:ring-1 focus:ring-[#F97315] transition-colors pr-12"
               />
               <button
                 type="button"
@@ -98,7 +99,9 @@ const LoginModal = ({ isOpen, onClose }) => {
           {/* Sign In Button */}
           <button
             type="submit"
-            className="w-full bg-[#F97315]  text-white py-3 rounded-lg font-bold text-sm uppercase tracking-wide hover:bg-[#EA580C] transition-colors"
+            className="w-full bg-[#FFAA55]  text-white h-12 rounded-lg
+             font-normal text-sm  tracking-wide flex justify-center
+              items-center hover:bg-[#EA580C] transition-colors"
           >
             Sign In
           </button>

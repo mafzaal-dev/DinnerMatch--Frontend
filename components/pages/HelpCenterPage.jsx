@@ -64,11 +64,11 @@ const HelpCenterPage = ({ onSubmit, onBack }) => {
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
-              <span>Back</span>
+              <span className='text-sm'>Back</span>
             </button>
           )}
-          <h1 className="text-3xl font-bold text-[#F5F5F5] mb-2">DinnersMatch</h1>
-          <p className="text-sm text-[#FFAA55] uppercase tracking-wide">HELP CENTER</p>
+          
+          <p className="font-bold text-center text-[#FFAA55] uppercase tracking-wide text-[32px]">HELP CENTER</p>
         </div>
 
         {/* Contact Form */}
@@ -86,7 +86,7 @@ const HelpCenterPage = ({ onSubmit, onBack }) => {
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 placeholder="johnDoe@mail.com"
                 className="w-full px-4 py-3 bg-[#0F1419] border
-                 border-gray-700 rounded-lg text-[#F5F5F5] placeholder-gray-500  focus:outline-none focus:border-[#FFAA55]"
+                 border-[#2F3A51] placeholder-[#424242]  rounded-lg text-[#F5F5F5] focus:outline-none focus:border-[#FFAA55]"
                 required
               />
             </div>
@@ -102,7 +102,7 @@ const HelpCenterPage = ({ onSubmit, onBack }) => {
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 placeholder="Enter your full name"
                 className="w-full px-4 py-3 bg-[#0F1419] border
-                 border-gray-700 rounded-lg text-[#F5F5F5] placeholder-gray-500  focus:outline-none focus:border-[#FFAA55]"
+                  border-[#2F3A51] placeholder-[#424242]  rounded-lg text-[#F5F5F5]   focus:outline-none focus:border-[#FFAA55]"
                 required
               />
             </div>
@@ -118,7 +118,7 @@ const HelpCenterPage = ({ onSubmit, onBack }) => {
                 onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
                 placeholder="Reason"
                 className="w-full px-4 py-3 bg-[#0F1419] border
-                 border-gray-700 rounded-lg text-[#F5F5F5] placeholder-gray-500 focus:outline-none focus:border-[#FFAA55]"
+                 border-[#2F3A51] placeholder-[#424242] rounded-lg text-[#F5F5F5]  focus:outline-none focus:border-[#FFAA55]"
                 required
               />
             </div>
@@ -134,7 +134,7 @@ const HelpCenterPage = ({ onSubmit, onBack }) => {
                 onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
                 placeholder="Brief summary of your message"
                 className="w-full px-4 py-3 bg-[#0F1419] border
-                 border-gray-700 rounded-lg text-[#F5F5F5] placeholder-gray-500  focus:outline-none focus:border-[#FFAA55]"
+                 border-[#2F3A51] placeholder-[#424242]  rounded-lg text-[#F5F5F5]   focus:outline-none focus:border-[#FFAA55]"
                 required
               />
             </div>
@@ -149,7 +149,7 @@ const HelpCenterPage = ({ onSubmit, onBack }) => {
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 placeholder="Please provide detail information about your inquiry or issue"
                 className="w-full px-4 py-3 bg-[#0F1419] border
-                 border-gray-700 rounded-lg text-[#F5F5F5] placeholder-gray-500  focus:outline-none focus:border-[#FFAA55]"
+                 border-[#2F3A51] placeholder-[#424242]  rounded-lg text-[#F5F5F5]  focus:outline-none focus:border-[#FFAA55]"
                 required
               />
             </div>
@@ -157,7 +157,8 @@ const HelpCenterPage = ({ onSubmit, onBack }) => {
             
             <button
               type="submit"
-              className="w-full bg-[#FFAA55] text-[#F5F5F5] py-4 rounded-lg font-bold text-sm uppercase tracking-wide hover:bg-[#FF9955] transition-colors"
+              className="w-full bg-[#FFAA55] text-[#212121] py-4 px-2 rounded-lg 
+               text-sm uppercase tracking-wide hover:bg-[#FF9955] transition-colors"
             >
               Send Message
             </button>

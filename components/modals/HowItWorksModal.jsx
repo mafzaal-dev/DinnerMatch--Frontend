@@ -40,16 +40,16 @@ const HowItWorksModal = ({ isOpen, onClose, onNext, onBack }) => {
 
         {/* Header */}
         <div className="text-center flex flex-col" style={{ gap: '6px' }}>
-          <h2 className="text-[23px] font-bold text-[#F5F5F5]">DinnersMatch</h2>
-          <p className="text-[10px] text-[#FFAA55] uppercase tracking-wide">Identity</p>
+          <h2 className="text-[32px] font-bold text-[#F5F5F5]">DinnersMatch</h2>
+          <p className="text-[14px] text-[#FFAA55] uppercase tracking-wide">Identity</p>
         </div>
 
         {/* Content */}
         <div className="bg-[#111121] border border-[#2F3A51] rounded-lg p-6 flex flex-col shadow-lg" style={{ gap: '15px', boxShadow: '0px 0px 16px rgba(0, 0, 0, 0.12)' }}>
-          <h3 className="text-sm font-bold text-[#FFAA55]">
+          <h3 className="text-xl font-bold text-[#FFAA55]">
             How It Works
           </h3>
-          <p className="text-sm text-[#F5F5F5] leading-relaxed">
+          <p className="text-base text-[#F5F5F5] leading-relaxed">
             This isn't just dinner - it's your invitation to connect with other interesting people
             who say yes to life. Share unforgettable meals, conversations, and moments with
             strangers who won't feel like strangers for long.
@@ -59,7 +59,7 @@ const HowItWorksModal = ({ isOpen, onClose, onNext, onBack }) => {
         {/* Next Button */}
         <button
           onClick={onNext}
-          className="w-full bg-[#FFAA55] text-[#F5F5F5] py-3 rounded-lg font-medium text-sm uppercase tracking-wide hover:bg-[#FF9955] transition-colors"
+          className="w-full bg-[#FFAA55] text-[#F5F5F5] py-4 px-2 rounded-lg font-medium text-sm uppercase tracking-wide hover:bg-[#FF9955] transition-colors"
         >
           Next
         </button>

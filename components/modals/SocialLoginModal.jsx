@@ -56,8 +56,8 @@ const SocialLoginModal = ({ isOpen, onClose, onSelectMethod, onBackToOptions, on
   ];
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-[#080814] rounded-xl w-full max-w-154 p-10 relative shadow-2xl">
+    <div className="fixed inset-0 bg-black md:bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div className="md:bg-[#080814] rounded-xl w-full max-w-154 md:p-10 relative shadow-2xl">
         {/* Close Button */}
         <button
           onClick={onClose}
@@ -71,23 +71,23 @@ const SocialLoginModal = ({ isOpen, onClose, onSelectMethod, onBackToOptions, on
 
         {/* Header */}
         <div className="mb-10 text-center">
-          <h2 className="text-3xl font-bold text-[#F5F5F5] mb-2">DinnersMatch</h2>
+          <h2 className="text-[32px] font-bold text-[#F5F5F5] mb-2">DinnersMatch</h2>
           <p className="text-[#E0E0E0]">Let's get started.</p>
         </div>
 
         {/* Social Login Options */}
-        <div className="space-y-4 flex flex-col items-center mb-10">
+        <div className="space-y-4 flex flex-col items-center mb-8">
           {socialOptions.map((option) => (
             <button
               key={option.id}
               onClick={() => onSelectMethod(option.id)}
-              className=" bg-[#111121] border flex justify-center
-               items-center border-gray-700  w-62.5
-                rounded-lg py-5  hover:border-[#FFAA55] transition-colors"
+              className=" border flex justify-center
+               items-center border-[#2F3A51]  w-62.5
+                rounded-lg p-4  hover:border-[#FFAA55] transition-colors"
             >
-            <div className='flex gap-4'>
+            <div className='flex gap-2'>
               <div className="text-[#F5F5F5]">{option.icon}</div>
-              <span className="text-[#F5F5F5] font-medium flex-1 text-left">{option.label}</span>
+              <span className="text-[#e0e0e0] font-normal flex-1 text-left">{option.label}</span>
             </div>
               
             </button>
@@ -99,7 +99,7 @@ const SocialLoginModal = ({ isOpen, onClose, onSelectMethod, onBackToOptions, on
           {onBackToOptions && (
             <button
               onClick={onBackToOptions}
-              className="text-[#E0E0E0] hover:text-[#F5F5F5] transition-colors text-sm"
+              className="text-[#E0E0E0] hover:text-[#F5F5F5] transition-colors text-xs"
             >
               Back to Options
             </button>
