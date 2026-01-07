@@ -8,11 +8,11 @@ const Hero = () => {
         <section className="bg-[#F3F4F6] py-8 md:py-12 min-h-[45vh] flex items-center">
             <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-12 items-center">
                 <div className="flex flex-col gap-5">
-                    <h1 className="text-2xl md:text-5xl font-bold leading-[0.95] tracking-tighter text-black max-w-xl">
+                    <h1 className="text-3xl md:text-5xl font-bold leading-[0.95] text-[#212121] max-w-xl">
                         WANT TO MEET YOUR PEOPLE?
                     </h1>
 
-                    <p className="text-xl md:text-[1.1rem] text-gray-800 max-w-lg font-light leading-tight">
+                    <p className="text-lg md:text-xl text-[#424242] max-w-lg  leading-tight">
                         Get matched by personality for a dinner you'll never forget.
                     </p>
 
@@ -23,17 +23,18 @@ const Hero = () => {
                                     window.dispatchEvent(new CustomEvent('openQuiz'));
                                 }
                             }}
-                            className="bg-[#FFAA55] text-white px-6 py-3 rounded-md font-bold text-[0.8rem] tracking-wide w-fit uppercase hover:bg-[#FF9955] transition-colors cursor-pointer"
+                            className="bg-[#F97316] text-[#F5F5F5] px-2 py-4
+                             rounded-md font-semibold text-sm  md:w-fit uppercase hover:bg-[#FF9955] transition-colors cursor-pointer"
                         >
                             Take the Quiz
                         </button>
-                        <p className="text-sm text-gray-500 font-medium">
+                        <p className="text-sm text-[#757575] font-normal">
                             14000+ people have taken the quiz. It only takes 2 minutes.
                         </p>
                     </div>
 
                     <div className="mt-1 flex flex-col gap-4">
-                        <span className="text-xs text-gray-600">As featured on</span>
+                        <span className="text-xs text-[#757575]">As featured on</span>
                         <div className="flex flex-wrap items-center gap-3 md:gap-4">
                             <Image src="/enca.png" alt="eNCA" width={120} height={40} className="h-12 w-auto object-contain" />
                             <Image src="/good-hope-fm.png" alt="Good Hope FM" width={120} height={40} className="h-12 w-auto object-contain" />
@@ -47,13 +48,13 @@ const Hero = () => {
                             <div className="w-7 h-7 rounded-full bg-gray-200 flex items-center justify-center text-[1rem]">
 
                             </div>
-                            <span className="font-medium text-[0.8rem] text-gray-800">Vibe-Matched Groups</span>
+                            <span className="font-semibold text-sm text-[#212121]">Vibe-Matched Groups</span>
                         </div>
                         <div className="flex items-center gap-3">
                             <div className="w-7 h-7 rounded-full bg-gray-200 flex items-center justify-center text-xl">
 
                             </div>
-                            <span className="font-medium text-[0.8rem] text-gray-800">Budget-Friendly</span>
+                            <span className="font-semibold text-sm text-[#212121]">Budget-Friendly</span>
                         </div>
                     </div>
                 </div>
@@ -66,7 +67,7 @@ const Hero = () => {
                             alt="Dinner Party"
                             width={1900}
                             height={900}
-                            className="w-full h-auto object-cover"
+                            className="w-full rounded-xl h-auto object-cover"
                             priority
                         />
 

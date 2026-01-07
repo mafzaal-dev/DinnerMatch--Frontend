@@ -32,7 +32,8 @@ const Testimonials = () => {
     return (
         <section className="bg-white py-24 px-6">
             <div className="max-w-5xl mx-auto">
-                <h2 className="text-2xl md:text-3xl font-bold text-center mb-20 tracking-tight text-black">
+                <h2 className="text-[32px] md:text-4xl font-bold 
+                text-center mb-20  text-[#212121]">
                     REAL PEOPLE. UNREAL NIGHTS.
                 </h2>
 
@@ -40,13 +41,13 @@ const Testimonials = () => {
                     {testimonials.map((item, index) => (
                         <div
                             key={index}
-                            className={`w-full md:w-[520px] bg-white p-10 rounded-xl shadow-[0_15px_50px_rgba(0,0,0,0.05)] border border-gray-100/50 transition-all duration-500 hover:shadow-[0_20px_60px_rgba(0,0,0,0.08)] ${item.align === 'right' ? 'md:ml-auto' : 'md:mr-auto'
+                            className={`w-full md:w-114.5 bg-white p-6 rounded-xl shadow-[0_15px_50px_rgba(0,0,0,0.05)] border border-gray-100/50 transition-all duration-500 hover:shadow-[0_20px_60px_rgba(0,0,0,0.08)] ${item.align === 'right' ? 'md:ml-auto' : 'md:mr-auto'
                                 } relative`}
                         >
-                            <p className="text-[1.05rem] leading-[1.6] text-gray-700 mb-6 font-normal">
+                            <p className="text-base leading-[1.6] text-[#757575] mb-6 font-normal">
                                 "{item.text}"
                             </p>
-                            <p className="text-[0.75rem] text-gray-400 font-semibold uppercase tracking-widest">
+                            <p className="text-sm text-[#424242]  ">
                                 — {item.author}
                             </p>
                         </div>

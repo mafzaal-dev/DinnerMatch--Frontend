@@ -39,10 +39,10 @@ const FAQ = () => {
         <section id="faq" className="bg-[#F9FAFB] py-24 px-6">
             <div className="max-w-3xl mx-auto">
                 <div className="text-center mb-16">
-                    <h2 className="text-3xl md:text-[2.5rem] font-bold text-black mb-4 tracking-tight">
+                    <h2 className="text-[32px] md:text-[32px] font-bold text-[#212121] mb-4">
                         Frequently Asked Questions
                     </h2>
-                    <p className="text-gray-500 text-lg font-medium">
+                    <p className="text-[#424242] text-lg">
                         Get answers to the most common questions about DinnerMatch
                     </p>
                 </div>
@@ -51,13 +51,14 @@ const FAQ = () => {
                     {faqData.map((item, index) => (
                         <div
                             key={index}
-                            className="bg-white rounded-md shadow-[0_1px_3px_rgba(0,0,0,0.05)] border border-gray-100/50 overflow-hidden transition-all duration-300"
+                            className="bg-white rounded-md shadow-[0_1px_3px_rgba(0,0,0,0.05)] 
+                            border border-gray-100/50 overflow-hidden transition-all duration-300"
                         >
                             <button
                                 onClick={() => toggleFAQ(index)}
-                                className="w-full px-8 py-4 text-left flex justify-between items-center hover:bg-gray-50/50 transition-colors"
+                                className="w-full p-4 text-left flex justify-between items-center hover:bg-gray-50/50 transition-colors"
                             >
-                                <span className="font-semibold text-[#111827] text-[1.05rem] tracking-tight">
+                                <span className="font-semibold text-[#424242] text-base">
                                     {item.question}
                                 </span>
                                 <svg

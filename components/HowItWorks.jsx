@@ -9,8 +9,8 @@ const steps = [
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
             </svg>
         ),
-        bgColor: "bg-[#FFF5ED]",
-        textColor: "text-[#C2410C]",
+        bgColor: "bg-[#FFF2E6]",
+        textColor: "text-[#C76A00]",
         iconColor: "text-[#FB923C]"
     },
     {
@@ -21,8 +21,8 @@ const steps = [
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
             </svg>
         ),
-        bgColor: "bg-[#F0F9FF]",
-        textColor: "text-[#0369A1]",
+        bgColor: "bg-[#F2F8F6]",
+        textColor: "text-[#2A6258]",
         iconColor: "text-[#38BDF8]"
     },
     {
@@ -34,8 +34,8 @@ const steps = [
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
         ),
-        bgColor: "bg-[#FFF1F2]",
-        textColor: "text-[#BE123C]",
+        bgColor: "bg-[#FFF7FA]",
+        textColor: "text-[#994056]",
         iconColor: "text-[#FB7185]"
     },
     {
@@ -46,8 +46,8 @@ const steps = [
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
             </svg>
         ),
-        bgColor: "bg-[#F0FDF4]",
-        textColor: "text-[#15803D]",
+        bgColor: "bg-[#F7FBFB]",
+        textColor: "text-[#3D7B77]",
         iconColor: "text-[#4ADE80]"
     },
     {
@@ -58,8 +58,8 @@ const steps = [
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M14 10h4.704a1 1 0 01.94 1.315l-2.288 6.537A2 2 0 0115.47 19.25h-5.72a2 2 0 01-1.992-1.699l-.866-5.417a1 1 0 01.992-1.134H12a1 1 0 001-1V4.5a1.5 1.5 0 113 0V10z" />
             </svg>
         ),
-        bgColor: "bg-[#FEFCE8]",
-        textColor: "text-[#A16207]",
+        bgColor: "bg-[#FFF8ED]",
+        textColor: "text-[#9E7B38]",
         iconColor: "text-[#FACC15]"
     }
 ];
@@ -68,8 +68,8 @@ const HowItWorks = () => {
     return (
         <section id="how-it-works" className="bg-white py-12 px-6">
             <div className="max-w-7xl mx-auto text-center">
-                <h2 className="text-3xl md:text-4xl font-bold mb-4 text-black tracking-tight">How Does It Work?</h2>
-                <p className="text-gray-400 mb-16 text-lg font-medium">
+                <h2 className="text-3xl md:text-4xl font-bold mb-4 text-[#212121] ">How Does It Work?</h2>
+                <p className="text-[#424242] mb-16 text-lg ">
                     It's dining, made simple. We handle everything, you just show up!
                 </p>
 
@@ -77,19 +77,21 @@ const HowItWorks = () => {
                     {steps.map((step, index) => (
                         <div
                             key={index}
-                            className={`${step.bgColor} p-8 rounded-2xl flex flex-col items-center text-center transition-all hover:shadow-lg duration-300`}
+                            className={`${step.bgColor} py-6 px-5  rounded-2xl flex flex-col 
+                            items-center text-center transition-all hover:shadow-lg duration-300`}
                         >
                             <div className={`mb-6 ${step.iconColor}`}>{step.icon}</div>
-                            <h3 className={`font-bold text-lg mb-4 ${step.textColor}`}>{step.title}</h3>
-                            <p className="text-gray-500 text-[0.85rem] leading-relaxed font-medium">
+                            <h3 className={`font-bold text-xl mb-4 ${step.textColor}`}>{step.title}</h3>
+                            <p className={` text-base leading-relaxed ${step.textColor}`}>
                                 {step.description}
                             </p>
                         </div>
                     ))}
                 </div>
 
-                <button className="bg-[#FFAA55] text-white px-8 py-3 rounded-md font-bold text-[0.85rem] tracking-wide hover:bg-[#FF9955] transition-all flex items-center gap-2 mx-auto uppercase">
-                    Take the Quiz <span className="text-lg">→</span>
+                <button className="bg-[#FFAA55] text-[#F5F5F5] px-2 py-4 
+                rounded-md  text-sm  hover:bg-[#FF9955] transition-all flex items-center gap-2 mx-auto uppercase">
+                    Take the Quiz
                 </button>
             </div>
         </section>
