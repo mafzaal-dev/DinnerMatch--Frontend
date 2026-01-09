@@ -1,127 +1,135 @@
-/**
- * API Utilities
- * Centralized API client with error handling and authentication
- */
+import axios from 'axios';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
+// Define the base URL from the provided API details
+// In a real project, this should be in process.env.NEXT_PUBLIC_API_URL
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://13.247.250.146/api/v1';
 
-class ApiError extends Error {
-  constructor(message, status, data) {
-    super(message);
-    this.name = 'ApiError';
-    this.status = status;
-    this.data = data;
-  }
-}
+// Create axios instance
+const axiosInstance = axios.create({
+  baseURL: API_BASE_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
 
-const getAuthToken = () => {
+// Helper to get tokens
+const getAccessToken = () => {
   if (typeof window !== 'undefined') {
-    return localStorage.getItem('auth_token');
+    return localStorage.getItem('access_token');
   }
   return null;
 };
 
-const buildHeaders = (customHeaders = {}) => {
-  const headers = {
-    'Content-Type': 'application/json',
-    ...customHeaders,
-  };
-
-  const token = getAuthToken();
-  if (token) {
-    headers.Authorization = `Bearer ${token}`;
+const getRefreshToken = () => {
+  if (typeof window !== 'undefined') {
+    return localStorage.getItem('refresh_token');
   }
-
-  return headers;
+  return null;
 };
 
-const handleResponse = async (response) => {
-  const contentType = response.headers.get('content-type');
-  const isJson = contentType && contentType.includes('application/json');
-
-  const data = isJson ? await response.json() : await response.text();
-
-  if (!response.ok) {
-    throw new ApiError(
-      data.message || `HTTP error! status: ${response.status}`,
-      response.status,
-      data
-    );
+// Request interceptor
+axiosInstance.interceptors.request.use(
+  (config) => {
+    const token = getAccessToken();
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
   }
+);
 
-  return data;
-};
+// Response interceptor
+axiosInstance.interceptors.response.use(
+  (response) => {
+    return response.data;
+  },
+  async (error) => {
+    const originalRequest = error.config;
+
+    // Prevent infinite loops
+    if (error.response?.status === 401 && !originalRequest._retry && !originalRequest.url.includes('/auth/login')) {
+      originalRequest._retry = true;
+
+      try {
+        const refreshToken = getRefreshToken();
+        if (!refreshToken) {
+          throw new Error('No refresh token available');
+        }
+
+        // Call refresh endpoint
+        const response = await axios.post(`${API_BASE_URL}/auth/refresh/`, {
+          refresh: refreshToken,
+        });
+
+        const { access } = response.data.data;
+        
+        if (access) {
+          localStorage.setItem('access_token', access);
+          // Update the header for the original request
+          originalRequest.headers.Authorization = `Bearer ${access}`;
+          // Retry the original request
+          return axiosInstance(originalRequest);
+        }
+      } catch (refreshError) {
+        // If refresh fails, logout user
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('access_token');
+          localStorage.removeItem('refresh_token');
+          localStorage.removeItem('user_data');
+          // Redirect to login or dispatch an event
+          window.location.href = '/login';
+        }
+        return Promise.reject(refreshError);
+      }
+    }
+
+    // Standard error handling
+    const message = error.response?.data?.message || error.message || 'Something went wrong';
+    const status = error.response?.status;
+    const data = error.response?.data;
+
+    // Create a custom error object matching the previous structure if needed, 
+    // or just reject with the axios error enhanced.
+    const customError = new Error(message);
+    customError.status = status;
+    customError.data = data;
+    customError.originalError = error;
+
+    return Promise.reject(customError);
+  }
+);
 
 export const api = {
-  get: async (endpoint, options = {}) => {
-    const url = `${API_BASE_URL}${endpoint}`;
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: buildHeaders(options.headers),
-      ...options,
-    });
-
-    return handleResponse(response);
-  },
-
-  post: async (endpoint, data, options = {}) => {
-    const url = `${API_BASE_URL}${endpoint}`;
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: buildHeaders(options.headers),
-      body: JSON.stringify(data),
-      ...options,
-    });
-
-    return handleResponse(response);
-  },
-
-  put: async (endpoint, data, options = {}) => {
-    const url = `${API_BASE_URL}${endpoint}`;
-    const response = await fetch(url, {
-      method: 'PUT',
-      headers: buildHeaders(options.headers),
-      body: JSON.stringify(data),
-      ...options,
-    });
-
-    return handleResponse(response);
-  },
-
-  delete: async (endpoint, options = {}) => {
-    const url = `${API_BASE_URL}${endpoint}`;
-    const response = await fetch(url, {
-      method: 'DELETE',
-      headers: buildHeaders(options.headers),
-      ...options,
-    });
-
-    return handleResponse(response);
-  },
+  get: (endpoint, config = {}) => axiosInstance.get(endpoint, config),
+  post: (endpoint, data, config = {}) => axiosInstance.post(endpoint, data, config),
+  put: (endpoint, data, config = {}) => axiosInstance.put(endpoint, data, config),
+  delete: (endpoint, config = {}) => axiosInstance.delete(endpoint, config),
+  patch: (endpoint, data, config = {}) => axiosInstance.patch(endpoint, data, config),
 };
 
-// API endpoints
 export const API_ENDPOINTS = {
   // Auth
-  LOGIN: '/auth/login',
-  LOGOUT: '/auth/logout',
-  REGISTER: '/auth/register',
-  FORGOT_PASSWORD: '/auth/forgot-password',
-  RESET_PASSWORD: '/auth/reset-password',
+  LOGIN: '/auth/login/',
+  REGISTER: '/auth/register/',
+  REFRESH: '/auth/refresh/',
+  LOGOUT: '/auth/logout/', 
+  AUTH_ME: '/auth/me/',
   
   // User
-  USER_PROFILE: '/user/profile',
-  USER_PREFERENCES: '/user/preferences',
+  USER_PROFILE: '/profile/me/',
   
-  // Dinners
-  DINNERS: '/dinners',
-  DINNER_DETAILS: (id) => `/dinners/${id}`,
-  BOOK_DINNER: '/dinners/book',
+  // Quiz
+  QUIZ_QUESTIONS: '/quiz/questions/',
+  QUIZ_QUESTION_DETAIL: (id) => `/quiz/questions/${id}/`,
+  QUIZ_OPTIONS: '/quiz/options/',
+  QUIZ_OPTION_DETAIL: (id) => `/quiz/options/${id}/`,
   
-  // Admin
-  ADMIN_USERS: '/admin/users',
-  ADMIN_DINNERS: '/admin/dinners',
-  ADMIN_BOOKINGS: '/admin/bookings',
-  ADMIN_STATS: '/admin/stats',
+  // Others
+  DINNERS: '/dinners/',
+  BOOKINGS: '/bookings/',
 };
 
+export default axiosInstance;

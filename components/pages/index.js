@@ -8,4 +8,4 @@ export { default as YourDinnerPage } from './YourDinnerPage';
 export { default as ForgotPasswordPage } from './ForgotPasswordPage';
 export { default as PrivacyPolicyPage } from './PrivacyPolicyPage';
 export { default as TermsConditionsPage } from './TermsConditionsPage';
-
+export { default as SignupPage } from './SignupPage';

@@ -8,7 +8,9 @@ const AccountPage = ({
   onHelpCenter,
   onPrivacyPolicy,
   onTermsConditions,
+  onLogOut,
   onBack,
+  user,
 }) => {
   const menuItems = [
     {
@@ -155,6 +157,21 @@ const AccountPage = ({
           <h1 className="text-[32px] font-bold text-[#FFAA55]">My Account</h1>
         </div>
 
+        {/* User Info Section */}
+        {user && (
+            <div className="bg-[#111121] border border-[#2F3A51] rounded-lg p-6 mb-8 flex items-center gap-4">
+                <div className="w-16 h-16 bg-[#FFAA55] rounded-full flex items-center justify-center text-[#212121] text-2xl font-bold">
+                    {user.first_name?.[0]}{user.last_name?.[0]}
+                </div>
+                <div>
+                    <h2 className="text-[#F5F5F5] text-xl font-bold">
+                        {user.first_name} {user.last_name}
+                    </h2>
+                    <p className="text-[#757575] text-sm">{user.email}</p>
+                </div>
+            </div>
+        )}
+
         {/* All sections in one container with 24px spacing */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
           {/* Menu Items - No Section Header */}
@@ -174,6 +191,25 @@ const AccountPage = ({
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               {legalItems.map(renderMenuItem)}
             </div>
+          </div>
+
+          {/* Logout Section */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+             <button
+                onClick={onLogOut}
+                className="w-full bg-[#111121] border border-[#2F3A51] rounded-lg p-6 flex items-center gap-4 hover:bg-[#1A1F2E] transition-colors text-left"
+                style={{ boxShadow: '0 0 16px rgba(0, 0, 0, 0.12)' }}
+            >
+                <div className="bg-red-500/10 rounded-lg w-10 h-10 flex items-center justify-center shrink-0">
+                    <svg className="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                </div>
+                <div className="flex-1">
+                    <p className="font-bold text-xl text-red-500">Log Out</p>
+                    <p className="text-[#757575] text-sm font-semibold">Sign out of your account</p>
+                </div>
+            </button>
           </div>
         </div>
       </div>

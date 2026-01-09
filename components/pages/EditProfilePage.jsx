@@ -1,15 +1,16 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const EditProfilePage = ({ onSave, onBack, initialData = {} }) => {
   const [formData, setFormData] = useState({
-    firstName: initialData.firstName || '',
-    lastName: initialData.lastName || '',
+    firstName: initialData.first_name || initialData.firstName || '',
+    lastName: initialData.last_name || initialData.lastName || '',
     email: initialData.email || '',
-    phoneNumber: initialData.phoneNumber || '',
-    dateOfBirth: initialData.dateOfBirth || '',
+    phoneNumber: initialData.phone_number || initialData.phoneNumber || '', 
+    dateOfBirth: initialData.date_of_birth || initialData.dateOfBirth || '',
     gender: initialData.gender || '',
+    cityId: initialData.city_id || initialData.cityId || '', 
     cuisine: initialData.cuisine || [],
     dietaryPreference: initialData.dietaryPreference || [],
     alcoholPreference: initialData.alcoholPreference || [],
@@ -18,7 +19,21 @@ const EditProfilePage = ({ onSave, onBack, initialData = {} }) => {
     budget: initialData.budget || '',
   });
 
-  const genders = ['Woman', 'Man', 'Non-binary', 'Prefer not to say'];
+  // Update form data when initialData changes
+  useEffect(() => {
+    setFormData((prev) => ({
+        ...prev,
+        firstName: initialData.first_name || initialData.firstName || prev.firstName,
+        lastName: initialData.last_name || initialData.lastName || prev.lastName,
+        email: initialData.email || prev.email,
+        phoneNumber: initialData.phone_number || initialData.phoneNumber || prev.phoneNumber,
+        dateOfBirth: initialData.date_of_birth || initialData.dateOfBirth || prev.dateOfBirth,
+        gender: initialData.gender || prev.gender,
+        cityId: initialData.city_id || initialData.cityId || prev.cityId,
+    }));
+  }, [initialData]);
+
+  const genders = ['Male', 'Female', 'Non-binary', 'Prefer not to say'];
   const cuisines = ['Italian', 'Mexican', 'Asian', 'French', 'Mediterranean', 'American', 'Indian', 'Japanese', 'Thai', 'Other'];
   const dietaryOptions = ['Vegetarian', 'Vegan', 'Gluten-free', 'Dairy-free', 'Keto', 'Paleo', 'Halal', 'Kosher', 'No restrictions'];
   const alcoholOptions = ['Wine', 'Beer', 'Spirits', 'Non-alcoholic', 'No preference'];
@@ -36,7 +51,21 @@ const EditProfilePage = ({ onSave, onBack, initialData = {} }) => {
 
   const handleSave = () => {
     if (onSave) {
-      onSave(formData);
+      // Map frontend state to API expected format if needed
+      // Based on Postman: { gender: "Male", city_id: "..." }
+      // We should send everything that changed or is relevant
+      
+      const apiData = {
+          first_name: formData.firstName,
+          last_name: formData.lastName,
+          // email: formData.email, // Email usually not editable directly without verification
+          gender: formData.gender,
+          date_of_birth: formData.dateOfBirth || null,
+          // Add other fields as supported by API
+          // ...formData
+      };
+      
+      onSave(apiData);
     }
   };
 

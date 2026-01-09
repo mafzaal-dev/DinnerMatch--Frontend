@@ -2,6 +2,7 @@ import "./globals.css";
 import MetaPixel from "../../components/MetaPixel";
 import UTMTracker from "../../components/UTMTracker";
 import NoSSR from "@/components/common/NoSSR";
+import { Toaster } from 'react-hot-toast';
 
 export const metadata = {
   title: "DinnerMatch",
@@ -16,6 +17,12 @@ export default function RootLayout({ children }) {
           <MetaPixel />
           <UTMTracker />
         </NoSSR>
+        <Toaster position="top-center" toastOptions={{
+          style: {
+            background: '#333',
+            color: '#fff',
+          },
+        }} />
         {children}
       </body>
     </html>

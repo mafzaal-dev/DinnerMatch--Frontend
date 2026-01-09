@@ -1,24 +1,22 @@
 "use client";
 
 import AdminLoginPage from '@/components/admin/AdminLoginPage';
-import { useRouter } from 'next/navigation';
+import { useAuth } from '@/hooks/useAuth';
+import { toast } from 'react-hot-toast';
 
 export default function AdminLogin() {
-  const router = useRouter();
+  const { login, isLoading, error } = useAuth();
 
-  const handleAdminLogin = ({ email, password }) => {
-    console.log('Admin login attempt:', { email, password });
-    // Here you would typically call an API to authenticate the admin
-    // For now, we'll simulate a successful login and redirect
-    if (email && password) {
-      // In a real app, you would validate credentials against your backend
-      // For demo purposes, we'll just redirect to the dashboard
-      router.push('/admin/dashboard');
-    } else {
-      alert('Please enter valid credentials.');
+  const handleAdminLogin = async (credentials) => {
+    try {
+      await login(credentials, '/admin/dashboard');
+      toast.success('Welcome back, Admin!');
+    } catch (err) {
+      console.error('Admin login failed:', err);
+      // Error is handled in useAuth, but showing toast here as well
+      // toast.error(err.response?.data?.detail || 'Invalid credentials');
     }
   };
 
-  return <AdminLoginPage onLogin={handleAdminLogin} />;
+  return <AdminLoginPage onLogin={handleAdminLogin} isLoading={isLoading} error={error} />;
 }
-

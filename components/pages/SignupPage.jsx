@@ -2,15 +2,27 @@
 
 import React, { useState } from 'react';
 
-const LoginPage = ({ onLogin, onSignUp, isLoading, error }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+const SignupPage = ({ onRegister, onLogin, isLoading, error }) => {
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+    first_name: '',
+    last_name: ''
+  });
   const [showPassword, setShowPassword] = useState(false);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (onLogin) {
-      onLogin({ email, password });
+    if (onRegister) {
+      onRegister(formData);
     }
   };
 
@@ -24,8 +36,8 @@ const LoginPage = ({ onLogin, onSignUp, isLoading, error }) => {
 
         {/* Main Content */}
         <div className="bg-[#111121] border border-white rounded-xl p-8 shadow-2xl">
-          <h2 className="text-2xl font-bold text-[#F5F5F5] mb-2 text-center">WANT TO MEET YOUR PEOPLE?</h2>
-          <p className="text-[#E0E0E0] text-center mb-8">Welcome back!</p>
+          <h2 className="text-2xl font-bold text-[#F5F5F5] mb-2 text-center">JOIN THE CLUB</h2>
+          <p className="text-[#E0E0E0] text-center mb-8">Create your account</p>
           
           {error && (
             <div className="bg-red-500/10 border border-red-500 text-red-500 px-4 py-2 rounded-lg mb-6 text-sm text-center">
@@ -34,7 +46,46 @@ const LoginPage = ({ onLogin, onSignUp, isLoading, error }) => {
           )}
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Name Fields Row */}
+            <div className="grid grid-cols-2 gap-4">
+              {/* First Name */}
+              <div>
+                <label htmlFor="first_name" className="block text-sm font-medium text-[#E0E0E0] mb-2">
+                  First Name
+                </label>
+                <input
+                  type="text"
+                  id="first_name"
+                  name="first_name"
+                  value={formData.first_name}
+                  onChange={handleChange}
+                  placeholder="First name"
+                  className="w-full px-4 py-3 bg-[#0F1419] border border-white rounded-lg text-[#F5F5F5] placeholder-[#A0A0A0] focus:outline-none focus:border-[#FFAA55] transition-colors disabled:opacity-50"
+                  required
+                  disabled={isLoading}
+                />
+              </div>
+
+              {/* Last Name */}
+              <div>
+                <label htmlFor="last_name" className="block text-sm font-medium text-[#E0E0E0] mb-2">
+                  Last Name
+                </label>
+                <input
+                  type="text"
+                  id="last_name"
+                  name="last_name"
+                  value={formData.last_name}
+                  onChange={handleChange}
+                  placeholder="Last name"
+                  className="w-full px-4 py-3 bg-[#0F1419] border border-white rounded-lg text-[#F5F5F5] placeholder-[#A0A0A0] focus:outline-none focus:border-[#FFAA55] transition-colors disabled:opacity-50"
+                  required
+                  disabled={isLoading}
+                />
+              </div>
+            </div>
+
             {/* Email Input */}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-[#E0E0E0] mb-2">
@@ -43,8 +94,9 @@ const LoginPage = ({ onLogin, onSignUp, isLoading, error }) => {
               <input
                 type="email"
                 id="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
                 placeholder="Enter your email"
                 className="w-full px-4 py-3 bg-[#0F1419] border border-white rounded-lg text-[#F5F5F5] placeholder-[#A0A0A0] focus:outline-none focus:border-[#FFAA55] transition-colors disabled:opacity-50"
                 required
@@ -61,9 +113,10 @@ const LoginPage = ({ onLogin, onSignUp, isLoading, error }) => {
                 <input
                   type={showPassword ? 'text' : 'password'}
                   id="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter your password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  placeholder="Create a password"
                   className="w-full px-4 py-3 bg-[#0F1419] border border-white rounded-lg text-[#F5F5F5] placeholder-[#A0A0A0] focus:outline-none focus:border-[#FFAA55] transition-colors pr-12 disabled:opacity-50"
                   required
                   disabled={isLoading}
@@ -88,44 +141,29 @@ const LoginPage = ({ onLogin, onSignUp, isLoading, error }) => {
               </div>
             </div>
 
-            {/* Forgot Password */}
-            <div className="flex justify-end">
-              <button
-                type="button"
-                onClick={() => {
-                  if (typeof window !== 'undefined') {
-                    window.location.href = '/forgot-password';
-                  }
-                }}
-                className="text-sm text-[#FFAA55] hover:underline transition-colors"
-              >
-                Forgot password?
-              </button>
-            </div>
-
-            {/* Login Button */}
+            {/* Register Button */}
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-[#FFAA55] text-[#F5F5F5] py-4 rounded-lg font-bold text-sm uppercase tracking-wide hover:bg-[#FF9955] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center"
+              className="w-full bg-[#FFAA55] text-[#F5F5F5] py-4 rounded-lg font-bold text-sm uppercase tracking-wide hover:bg-[#FF9955] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center mt-6"
             >
               {isLoading ? (
                  <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
-              ) : 'Login'}
+              ) : 'Sign Up'}
             </button>
 
-            {/* Sign Up Link */}
-            <p className="text-center text-[#E0E0E0] text-sm">
-              Don't have an account?{' '}
+            {/* Login Link */}
+            <p className="text-center text-[#E0E0E0] text-sm mt-4">
+              Already have an account?{' '}
               <button
                 type="button"
-                onClick={onSignUp}
+                onClick={onLogin}
                 className="text-[#FFAA55] hover:underline"
               >
-                Sign up
+                Login
               </button>
             </p>
 
@@ -147,5 +185,5 @@ const LoginPage = ({ onLogin, onSignUp, isLoading, error }) => {
   );
 };
 
-export default LoginPage;
+export default SignupPage;
 

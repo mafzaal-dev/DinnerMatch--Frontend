@@ -2,9 +2,11 @@
 
 import AccountPage from '../../../components/pages/AccountPage';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function Account() {
   const router = useRouter();
+  const { logout, user } = useAuth();
 
   const handleEditProfile = () => {
     router.push('/edit-profile');
@@ -27,9 +29,7 @@ export default function Account() {
   };
 
   const handleLogOut = () => {
-    // Handle logout logic
-    console.log('Logout');
-    router.push('/');
+    logout();
   };
 
   const handleBack = () => {
@@ -45,6 +45,7 @@ export default function Account() {
       onTermsConditions={handleTermsConditions}
       onLogOut={handleLogOut}
       onBack={handleBack}
+      user={user}
     />
   );
 }
