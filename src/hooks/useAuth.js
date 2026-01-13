@@ -110,6 +110,26 @@ export const useAuth = () => {
     }
   }, []);
 
+  const registerWithQuiz = useCallback(async (data) => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      
+      const response = await api.post(API_ENDPOINTS.REGISTER_WITH_QUIZ, data);
+      
+      return response;
+    } catch (err) {
+      console.error('Registration with quiz failed:', err);
+      const message = err.response?.data?.detail || 
+                      (err.response?.data ? JSON.stringify(err.response.data) : err.message) || 
+                      'Registration failed';
+      setError(message);
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
   const logout = useCallback(() => {
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
@@ -172,5 +192,6 @@ export const useAuth = () => {
     logout,
     getProfile,
     updateProfile,
+    registerWithQuiz,
   };
 };

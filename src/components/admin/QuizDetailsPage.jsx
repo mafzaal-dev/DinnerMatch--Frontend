@@ -5,10 +5,9 @@ import { toast } from 'react-hot-toast';
 
 const QuizDetailsPage = ({ quizId }) => {
   const router = useRouter();
-  const { getQuestion, deleteQuestion, getOptions, createOption, deleteOption, loading } = useQuiz();
+  const { getQuestion, deleteQuestion, loading } = useQuiz();
   const [question, setQuestion] = useState(null);
   const [options, setOptions] = useState([]);
-  const [newOption, setNewOption] = useState({ label: '', value: '' });
 
   useEffect(() => {
     if (quizId) {
@@ -21,10 +20,9 @@ const QuizDetailsPage = ({ quizId }) => {
       const qData = await getQuestion(quizId);
       setQuestion(qData);
       
-      // If question type supports options, fetch them
-      if (qData && (qData.answer_type === 'select' || qData.answer_type === 'boolean')) {
-          const oData = await getOptions(quizId);
-          setOptions(oData || []);
+      // If question type supports options, use them from the question object
+      if (qData && (qData.answer_type === 'choice' || qData.answer_type === 'boolean')) {
+          setOptions(qData.options || []);
       }
     } catch (error) {
       console.error('Failed to load details:', error);
@@ -47,30 +45,6 @@ const QuizDetailsPage = ({ quizId }) => {
       }
     }
   };
-
-  const handleAddOption = async (e) => {
-    e.preventDefault();
-    try {
-        await createOption(quizId, newOption);
-        toast.success('Option added');
-        setNewOption({ label: '', value: '' });
-        loadData(); // Refresh options
-    } catch (error) {
-        toast.error('Failed to add option');
-    }
-  };
-
-  const handleDeleteOption = async (optionId) => {
-      if(confirm('Delete this option?')) {
-          try {
-              await deleteOption(optionId);
-              toast.success('Option deleted');
-              loadData();
-          } catch(error) {
-              toast.error('Failed to delete option');
-          }
-      }
-  }
 
   const handleBack = () => {
     router.push('/admin/quiz');
@@ -144,51 +118,25 @@ const QuizDetailsPage = ({ quizId }) => {
                 )}
             </div>
 
-            {/* Options Management */}
-            {(question.answer_type === 'select' || question.answer_type === 'boolean') && (
+            {/* Options Display */}
+            {(question.answer_type === 'choice' || question.answer_type === 'boolean') && (
                 <div className="mt-8 pt-6 border-t border-gray-200">
                     <h3 className="text-lg font-semibold text-[#111827] mb-4">Options</h3>
                     
-                    {/* Add Option Form */}
-                    <form onSubmit={handleAddOption} className="flex gap-2 mb-6">
-                        <input 
-                            type="text" 
-                            placeholder="Label (e.g. Yes)" 
-                            value={newOption.label}
-                            onChange={e => setNewOption({...newOption, label: e.target.value})}
-                            className="flex-1 px-4 py-2 border rounded-lg text-sm"
-                            required
-                        />
-                        <input 
-                            type="text" 
-                            placeholder="Value (e.g. true)" 
-                            value={newOption.value}
-                            onChange={e => setNewOption({...newOption, value: e.target.value})}
-                            className="flex-1 px-4 py-2 border rounded-lg text-sm"
-                            required
-                        />
-                        <button type="submit" className="px-4 py-2 bg-gray-800 text-white rounded-lg text-sm hover:bg-gray-700">
-                            Add Option
-                        </button>
-                    </form>
-
                     {/* Options List */}
                     <div className="space-y-2">
                         {options.length === 0 ? (
                             <p className="text-gray-500 italic text-sm">No options added yet.</p>
                         ) : (
                             options.map(opt => (
-                                <div key={opt.id} className="flex items-center justify-between p-3 bg-gray-50 border border-gray-200 rounded-lg">
+                                <div key={opt.id || opt.value} className="flex items-center justify-between p-3 bg-gray-50 border border-gray-200 rounded-lg">
                                     <div>
                                         <span className="font-medium text-gray-800">{opt.label}</span>
                                         <span className="text-gray-500 text-sm ml-2">({opt.value})</span>
                                     </div>
-                                    <button 
-                                        onClick={() => handleDeleteOption(opt.id)}
-                                        className="text-red-500 hover:text-red-700 p-1"
-                                    >
-                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-                                    </button>
+                                    <div className="text-gray-400 text-xs">
+                                        Order: {opt.sort_order}
+                                    </div>
                                 </div>
                             ))
                         )}
@@ -203,4 +151,3 @@ const QuizDetailsPage = ({ quizId }) => {
 };
 
 export default QuizDetailsPage;
-

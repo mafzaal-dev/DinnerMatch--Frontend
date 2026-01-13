@@ -2,10 +2,75 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQuiz } from '@/hooks/useQuiz';
 import { toast } from 'react-hot-toast';
+import {
+  DndContext, 
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+  useSortable,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+
+const SortableOption = ({ id, index, option, handleOptionChange, handleDeleteOption }) => {
+    const {
+        attributes,
+        listeners,
+        setNodeRef,
+        transform,
+        transition,
+    } = useSortable({ id });
+
+    const style = {
+        transform: CSS.Transform.toString(transform),
+        transition,
+    };
+
+    return (
+        <div ref={setNodeRef} style={style} className="flex items-center gap-4 mb-4">
+            <div 
+                {...attributes} 
+                {...listeners}
+                className="cursor-grab text-gray-400 hover:text-gray-600 mt-6"
+            >
+                <svg className="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M7 2a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 2zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 8zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 14zm6-8a2 2 0 1 0-.001-4.001A2 2 0 0 0 13 6zm0 2a2 2 0 1 0 .001 4.001A2 2 0 0 0 13 8zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 13 14z"></path>
+                </svg>
+            </div>
+            <div className="flex-1">
+                <label className="block text-sm font-bold text-[#374151] mb-2">Option {index + 1}</label>
+                <div className="flex items-center gap-3">
+                    <input
+                        type="text"
+                        placeholder="Select Language" 
+                        value={option?.label || ''}
+                        onChange={(e) => handleOptionChange(index, e.target.value)}
+                        className="w-full px-4 py-2.5 border border-[#D1D5DB] rounded-lg text-sm focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316] outline-none"
+                    />
+                    <button 
+                        type="button"
+                        onClick={() => handleDeleteOption(index)}
+                        className="text-red-500 hover:text-red-700 p-2 rounded-lg hover:bg-red-50 mt-1"
+                        title="Delete Option"
+                    >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
 
 const CreateQuizPage = ({ quizId = null, isEdit = false }) => {
   const router = useRouter();
-  const { createQuestion, updateQuestion, getQuestion, getOptions, createOption, updateOption, deleteOption, loading } = useQuiz();
+  const { createQuestion, updateQuestion, getQuestion, deleteQuestion, loading } = useQuiz();
   const [initialLoading, setInitialLoading] = useState(isEdit);
   const [formData, setFormData] = useState({
     code: '',
@@ -19,9 +84,22 @@ const CreateQuizPage = ({ quizId = null, isEdit = false }) => {
   });
   
   // Options state
-  const [options, setOptions] = useState(Array(4).fill({ label: '', value: '' }));
-  const [initialOptions, setInitialOptions] = useState([]); // Track original options for deletion
-  const [numberOfOptions, setNumberOfOptions] = useState(4);
+  // Initialize with unique IDs for dnd-kit
+  const [options, setOptions] = useState(
+      Array(4).fill(null).map((_, i) => ({ 
+          id: `temp-${Date.now()}-${i}`, 
+          label: '', 
+          value: '',
+          sort_order: i + 1 
+      }))
+  );
+  
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
   useEffect(() => {
     if (isEdit && quizId) {
@@ -47,13 +125,16 @@ const CreateQuizPage = ({ quizId = null, isEdit = false }) => {
         });
 
         // Fetch options if type supports it
-        if (data.answer_type === 'choice' || data.answer_type === 'boolean') {
-            const optionsData = await getOptions(quizId);
-            if (optionsData) {
-                setOptions(optionsData);
-                setInitialOptions(optionsData); // Store original options
-                setNumberOfOptions(Math.max(optionsData.length, 4));
-            }
+        if ((data.answer_type === 'choice' || data.answer_type === 'boolean') && data.options) {
+            const formattedOptions = data.options.map(opt => ({
+                ...opt,
+                // Ensure we have a string ID for DndKit if the API id is missing (unlikely)
+                id: opt.id || `temp-${Date.now()}-${Math.random()}` 
+            }));
+            // Sort by sort_order
+            formattedOptions.sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
+            
+            setOptions(formattedOptions);
         }
       }
     } catch (error) {
@@ -75,58 +156,67 @@ const CreateQuizPage = ({ quizId = null, isEdit = false }) => {
   // Handle Option Changes
   const handleOptionChange = (index, value) => {
       const newOptions = [...options];
-      if (!newOptions[index]) {
-          newOptions[index] = { label: '', value: '', sort_order: index + 1 };
-      }
-      newOptions[index] = { ...newOptions[index], label: value, value: value, sort_order: index + 1 };
+      newOptions[index] = { ...newOptions[index], label: value, value: value };
+      setOptions(newOptions);
+  };
+  
+  const handleAddNewOption = () => {
+      const newOption = {
+          id: `temp-${Date.now()}`,
+          label: '',
+          value: '',
+          sort_order: options.length + 1
+      };
+      setOptions([...options, newOption]);
+  };
+  
+  const handleDeleteOptionItem = (index) => {
+      const newOptions = options.filter((_, i) => i !== index);
       setOptions(newOptions);
   };
 
-  const handleNumberOfOptionsChange = (e) => {
-      setNumberOfOptions(parseInt(e.target.value));
+  const handleDragEnd = (event) => {
+      const { active, over } = event;
+      
+      if (active.id !== over.id) {
+          setOptions((items) => {
+              const oldIndex = items.findIndex((item) => item.id === active.id);
+              const newIndex = items.findIndex((item) => item.id === over.id);
+              return arrayMove(items, oldIndex, newIndex);
+          });
+      }
   };
 
   const handleSubmit = async () => {
     try {
+      // Prepare options payload
+      const formattedOptions = options.map((opt, index) => {
+          const optionPayload = {
+              value: opt.value || opt.label, // Use label if value is empty
+              label: opt.label,
+              sort_order: index + 1
+          };
+          // Include ID only if it's not a temp ID
+          if (opt.id && !String(opt.id).startsWith('temp-')) {
+              optionPayload.id = opt.id;
+          }
+          return optionPayload;
+      }).filter(opt => opt.label); // Ensure we don't send empty options
+
       const payload = {
         ...formData,
         min_value: formData.min_value ? parseInt(formData.min_value) : null,
         max_value: formData.max_value ? parseInt(formData.max_value) : null,
-        sort_order: parseInt(formData.sort_order)
+        sort_order: parseInt(formData.sort_order),
+        options: formattedOptions
       };
-
-      let currentQuizId = quizId;
 
       if (isEdit && quizId) {
         await updateQuestion(quizId, payload);
         toast.success('Question updated successfully');
       } else {
-        const newQuestion = await createQuestion(payload);
-        currentQuizId = newQuestion.id;
+        await createQuestion(payload);
         toast.success('Question created successfully');
-      }
-
-      // Handle Options Saving
-      if ((formData.answer_type === 'choice' || formData.answer_type === 'boolean') && currentQuizId) {
-          // 1. Identify valid options from current state
-          const validOptions = options.slice(0, numberOfOptions).filter(opt => opt && opt.label);
-          const validOptionIds = validOptions.map(opt => opt.id).filter(id => id);
-
-          // 2. Delete options that were present initially but are not in validOptions anymore
-          const optionsToDelete = initialOptions.filter(initOpt => !validOptionIds.includes(initOpt.id));
-          for (const optToDelete of optionsToDelete) {
-              await deleteOption(optToDelete.id);
-          }
-          
-          // 3. Create or Update valid options
-          for (let i = 0; i < validOptions.length; i++) {
-              const opt = validOptions[i];
-              if (opt.id) {
-                  await updateOption(opt.id, { label: opt.label, value: opt.value || opt.label, sort_order: i + 1 });
-              } else {
-                  await createOption(currentQuizId, { label: opt.label, value: opt.value || opt.label, sort_order: i + 1 });
-              }
-          }
       }
       
       router.push('/admin/quiz');
@@ -172,9 +262,12 @@ const CreateQuizPage = ({ quizId = null, isEdit = false }) => {
         sort_order: 1,
         is_active: true
       });
-      setOptions(Array(4).fill({ label: '', value: '' }));
-      setNumberOfOptions(4);
-      setInitialOptions([]); // Clear initial options for new question
+      setOptions(Array(4).fill(null).map((_, i) => ({ 
+          id: `temp-${Date.now()}-${i}`, 
+          label: '', 
+          value: '',
+          sort_order: i + 1 
+      })));
       if (isEdit) {
           router.push('/admin/quiz/create');
       }
@@ -220,15 +313,6 @@ const CreateQuizPage = ({ quizId = null, isEdit = false }) => {
                 />
             </div>
 
-            {/* Questions Header (Visual only as per design) */}
-            <div className="pt-4">
-                <h3 className="text-lg font-bold text-[#111827]">Questions</h3>
-            </div>
-
-            {/* Question 1 Block */}
-            <div className="border border-[#E5E7EB] rounded-lg p-6 bg-white">
-                <h4 className="text-base font-semibold text-[#6B21A8] mb-4">Question 1</h4>
-                
                 {/* Section and Type Row */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
                     <div>
@@ -275,48 +359,51 @@ const CreateQuizPage = ({ quizId = null, isEdit = false }) => {
                       />
                     </div>
 
-                    {/* No. of Options */}
+                    {/* No. of Options Display */}
                     {(formData.answer_type === 'choice' || formData.answer_type === 'boolean') && (
                         <div className="w-full md:w-48">
                             <label className="block text-sm font-medium text-[#374151] mb-2">No. of Options</label>
-                            <select
-                                value={numberOfOptions}
-                                onChange={handleNumberOfOptionsChange}
-                                className="w-full px-4 py-2.5 border border-[#D1D5DB] rounded-lg text-sm focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316] outline-none bg-white"
-                            >
-                                {[2, 3, 4, 5, 6, 7, 8, 9, 10].map(num => (
-                                    <option key={num} value={num}>{num}</option>
-                                ))}
-                            </select>
+                            <div className="px-4 py-2.5 border border-[#D1D5DB] rounded-lg text-sm bg-gray-50 text-gray-600">
+                                {options.length}
+                            </div>
                         </div>
                     )}
                 </div>
 
                 {/* Upload Icon (UI Only) */}
-                <div className="mb-6">
+                {/* <div className="mb-6">
                     <div className="w-32 h-32 border border-dashed border-[#E5E7EB] rounded-lg flex flex-col items-center justify-center text-center cursor-pointer hover:border-[#F97316] transition-colors bg-white group">
                         <div className="w-8 h-8 mb-2 text-gray-800 border-2 border-gray-800 rounded-full flex items-center justify-center group-hover:border-[#F97316] group-hover:text-[#F97316] transition-colors">
                             <span className="font-serif italic font-bold">i</span>
                         </div>
                         <span className="text-xs text-gray-500 group-hover:text-[#F97316] transition-colors">Upload Icon</span>
                     </div>
-                </div>
+                </div> */}
 
-                {/* Options Inputs */}
+                {/* Options Inputs with DnD */}
                 {(formData.answer_type === 'choice' || formData.answer_type === 'boolean') && (
-                    <div className="space-y-4">
-                        {Array.from({ length: numberOfOptions }).map((_, idx) => (
-                            <div key={idx}>
-                                <label className="block text-sm font-bold text-[#374151] mb-2">Option {idx + 1}</label>
-                                <input
-                                    type="text"
-                                    placeholder="Select Language" 
-                                    value={options[idx]?.label || ''}
-                                    onChange={(e) => handleOptionChange(idx, e.target.value)}
-                                    className="w-full px-4 py-2.5 border border-[#D1D5DB] rounded-lg text-sm focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316] outline-none"
-                                />
-                            </div>
-                        ))}
+                    <div className="space-y-2">
+                        <DndContext 
+                            sensors={sensors}
+                            collisionDetection={closestCenter}
+                            onDragEnd={handleDragEnd}
+                        >
+                            <SortableContext 
+                                items={options.map(o => o.id)}
+                                strategy={verticalListSortingStrategy}
+                            >
+                                {options.map((option, idx) => (
+                                    <SortableOption 
+                                        key={option.id}
+                                        id={option.id}
+                                        index={idx}
+                                        option={option}
+                                        handleOptionChange={handleOptionChange}
+                                        handleDeleteOption={handleDeleteOptionItem}
+                                    />
+                                ))}
+                            </SortableContext>
+                        </DndContext>
                     </div>
                 )}
 
@@ -346,27 +433,19 @@ const CreateQuizPage = ({ quizId = null, isEdit = false }) => {
                     </div>
                 )}
 
-                {/* Remove Question */}
-                <button 
-                    type="button"
-                    onClick={handleRemoveQuestion}
-                    className="flex items-center gap-2 text-[#EF4444] mt-8 hover:text-red-700 transition-colors"
-                >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                    <span className="text-sm font-medium">Remove Question</span>
-                </button>
-            </div>
-
-            {/* Add Another Question */}
-            <button 
-                type="button"
-                onClick={handleAddAnother}
-                className="flex items-center gap-2 text-[#111827] font-medium hover:text-[#F97316] transition-colors"
-            >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
-                <span>Add Another Question</span>
-            </button>
-
+                <div className="flex justify-between items-center mt-6">
+                    {(formData.answer_type === 'choice' || formData.answer_type === 'boolean') && (
+                        <button 
+                            type="button"
+                            onClick={handleAddNewOption}
+                            className="flex items-center gap-2 text-[#F97316] hover:text-[#EA580C] transition-colors font-semibold"
+                        >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
+                            <span className="text-sm">Add Another Option</span>
+                        </button>
+                    )}
+                </div>
+            
           </div>
 
           {/* Action Buttons */}
@@ -389,7 +468,7 @@ const CreateQuizPage = ({ quizId = null, isEdit = false }) => {
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
               )}
-              {isEdit ? 'Update Quiz' : 'Create Quiz'}
+              {isEdit ? 'Update Question' : 'Create Question'}
             </button>
           </div>
         </div>
@@ -399,4 +478,3 @@ const CreateQuizPage = ({ quizId = null, isEdit = false }) => {
 };
 
 export default CreateQuizPage;
-

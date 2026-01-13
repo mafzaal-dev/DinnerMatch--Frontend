@@ -114,6 +114,7 @@ export const API_ENDPOINTS = {
   // Auth
   LOGIN: '/auth/login/',
   REGISTER: '/auth/register/',
+  REGISTER_WITH_QUIZ: '/register-with-quiz/',
   REFRESH: '/auth/refresh/',
   LOGOUT: '/auth/logout/', 
   AUTH_ME: '/auth/me/',
@@ -122,10 +123,12 @@ export const API_ENDPOINTS = {
   USER_PROFILE: '/profile/me/',
   
   // Quiz
-  QUIZ_QUESTIONS: '/quiz/questions/',
-  QUIZ_QUESTION_DETAIL: (id) => `/quiz/questions/${id}/`,
-  QUIZ_OPTIONS: '/quiz/options/',
-  QUIZ_OPTION_DETAIL: (id) => `/quiz/options/${id}/`,
+  QUIZ_QUESTIONS_LIST: '/quiz/questions/list',
+  QUIZ_QUESTION_DETAIL: (id) => `/quiz/questions/list?question_id=${id}`,
+  QUIZ_QUESTIONS_CREATE: '/quiz/questions/create',
+  QUIZ_QUESTIONS_UPDATE: '/quiz/questions/update',
+  QUIZ_QUESTIONS_DELETE: (id) => `/quiz/questions/delete/${id}`,
+  QUIZ_QUESTION_ORDER: '/quiz/update-question-order',
   
   // Others
   DINNERS: '/dinners/',

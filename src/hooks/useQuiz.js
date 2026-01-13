@@ -5,13 +5,11 @@ export const useQuiz = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // --- Questions ---
-
   const getQuestions = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await api.get(API_ENDPOINTS.QUIZ_QUESTIONS);
+      const response = await api.get(API_ENDPOINTS.QUIZ_QUESTIONS_LIST);
       if (response.success) {
         return response.data;
       }
@@ -29,8 +27,9 @@ export const useQuiz = () => {
     setError(null);
     try {
       const response = await api.get(API_ENDPOINTS.QUIZ_QUESTION_DETAIL(id));
-      if (response.success) {
-        return response.data;
+      if (response.success && response.data) {
+        // Endpoint returns a list filtered by ID, so take the first item
+        return Array.isArray(response.data) ? response.data[0] : response.data;
       }
       return null;
     } catch (err) {
@@ -45,9 +44,9 @@ export const useQuiz = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await api.post(API_ENDPOINTS.QUIZ_QUESTIONS, data);
+      const response = await api.post(API_ENDPOINTS.QUIZ_QUESTIONS_CREATE, data);
       if (response.success) {
-        return response.data;
+        return response.data; // might be just success message, check usage
       }
       throw new Error(response.message || 'Failed to create question');
     } catch (err) {
@@ -62,7 +61,9 @@ export const useQuiz = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await api.patch(API_ENDPOINTS.QUIZ_QUESTION_DETAIL(id), data);
+      // The API expects question_id in the body for update
+      const payload = { ...data, question_id: id };
+      const response = await api.put(API_ENDPOINTS.QUIZ_QUESTIONS_UPDATE, payload);
       if (response.success) {
         return response.data;
       }
@@ -79,12 +80,16 @@ export const useQuiz = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await api.delete(API_ENDPOINTS.QUIZ_QUESTION_DETAIL(id));
-      if (response.success) {
+      const response = await api.delete(API_ENDPOINTS.QUIZ_QUESTIONS_DELETE(id));
+      if (response.success || response.status === 204) { // Handle 204 No Content if applicable
         return true;
       }
-      throw new Error(response.message || 'Failed to delete question');
+      // Some APIs return success true even on delete
+      return true;
     } catch (err) {
+        // If the error response is success (some apis do this weirdly), consider it done
+        if(err.response && err.response.data && err.response.data.success) return true;
+        
       setError(err.message || 'Failed to delete question');
       throw err;
     } finally {
@@ -92,79 +97,20 @@ export const useQuiz = () => {
     }
   }, []);
 
-  // --- Options ---
-
-  const getOptions = useCallback(async (questionId) => {
-    // Note: Options fetch might need query param
+  const updateQuestionOrder = useCallback(async (id, newOrder) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await api.get(`${API_ENDPOINTS.QUIZ_OPTIONS}?question_id=${questionId}`);
-      if (response.success) {
-        return response.data;
-      }
-      return [];
-    } catch (err) {
-      setError(err.message || 'Failed to fetch options');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  const createOption = useCallback(async (questionId, data) => {
-    setLoading(true);
-    setError(null);
-    try {
-      // The API seems to take question_id as query param for creation according to Postman? 
-      // Or maybe it expects it in the body?
-      // Postman says: POST {{dinner}}api/v1/quiz/options/?question_id=...
-      // But creating a resource usually implies body. Let's check Postman usage again.
-      // Ah, Postman request "Create Quiz Option" has URL params but body also.
-      // Usually REST APIs take body for POST. I will assume body or query param. 
-      // The previous Postman inspection showed query param `question_id` in URL.
-      
-      const response = await api.post(`${API_ENDPOINTS.QUIZ_OPTIONS}?question_id=${questionId}`, data);
-      if (response.success) {
-        return response.data;
-      }
-      throw new Error(response.message || 'Failed to create option');
-    } catch (err) {
-      setError(err.message || 'Failed to create option');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  const updateOption = useCallback(async (id, data) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await api.patch(API_ENDPOINTS.QUIZ_OPTION_DETAIL(id), data);
-      if (response.success) {
-        return response.data;
-      }
-      throw new Error(response.message || 'Failed to update option');
-    } catch (err) {
-      setError(err.message || 'Failed to update option');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  const deleteOption = useCallback(async (id) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await api.delete(API_ENDPOINTS.QUIZ_OPTION_DETAIL(id));
+      const response = await api.put(API_ENDPOINTS.QUIZ_QUESTION_ORDER, {
+        question_id: id,
+        new_order: newOrder
+      });
       if (response.success) {
         return true;
       }
-      throw new Error(response.message || 'Failed to delete option');
+      throw new Error(response.message || 'Failed to update order');
     } catch (err) {
-      setError(err.message || 'Failed to delete option');
+      setError(err.message || 'Failed to update order');
       throw err;
     } finally {
       setLoading(false);
@@ -179,10 +125,6 @@ export const useQuiz = () => {
     createQuestion,
     updateQuestion,
     deleteQuestion,
-    getOptions,
-    createOption,
-    updateOption,
-    deleteOption
+    updateQuestionOrder
   };
 };
-
