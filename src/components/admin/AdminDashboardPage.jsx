@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { api, API_ENDPOINTS } from '../../utils/api';
 
 const AdminDashboardPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -9,13 +10,17 @@ const AdminDashboardPage = () => {
   const [selectedCity, setSelectedCity] = useState('All Cities');
   const [selectedUpcomingDinner, setSelectedUpcomingDinner] = useState('Any Upcoming Dinner');
   const [selectedStatus, setSelectedStatus] = useState('All Users');
+  const [users, setUsers] = useState([]);
+  const [totalUsers, setTotalUsers] = useState('0');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  // Sample data
+  // Stats cards data
   const stats = [
     {
       id: 'total-users',
       label: 'Total Users',
-      value: '42K',
+      value: totalUsers,
       change: '1.3%',
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -74,75 +79,60 @@ const AdminDashboardPage = () => {
     },
   ];
 
-  const users = [
-    {
-      id: 1,
-      name: 'Theodore Roth',
-      email: 'theodore.roth@email.com',
-      mobile: '+27 (1) 954-8715',
-      city: 'johannesburg',
-      tickets: 'Rem: 05',
-      membership: 'Subscribed',
-      status: 'None',
-      nextDinner: 'Not Booked',
-      pastDinner: 'Not Booked',
-    },
-    {
-      id: 2,
-      name: 'Arlo Reichert',
-      email: 'arlo.reichert@email.com',
-      mobile: '+27 (23) 658-9632',
-      city: 'cape_town',
-      tickets: 'Rem: 05',
-      membership: 'Free',
-      status: 'None',
-      nextDinner: 'Not Booked',
-      pastDinner: 'Not Booked',
-    },
-    {
-      id: 3,
-      name: 'Shea Sanford',
-      email: 'shea.sanford@email.com',
-      mobile: '+27 (23) 852-7419',
-      city: 'cape_town',
-      tickets: 'Rem: 05',
-      membership: 'Rem: 05',
-      status: 'None',
-      nextDinner: 'Not Booked',
-      pastDinner: 'Not Booked',
-    },
-    {
-      id: 4,
-      name: 'Kobe Crona',
-      email: 'kobe.crona@email.com',
-      mobile: '+27 (21) 753-4826',
-      city: 'cape_town',
-      tickets: 'Rem: 05',
-      membership: 'Rem: 05',
-      status: 'None',
-      nextDinner: 'Not Booked',
-      pastDinner: 'Not Booked',
-    },
-    {
-      id: 5,
-      name: 'Kobe Crona',
-      email: 'kobe.crona@email.com',
-      mobile: '+27 (21) 753-4826',
-      city: 'cape_town',
-      tickets: 'Rem: 05',
-      membership: 'Rem: 05',
-      status: 'None',
-      nextDinner: 'Not Booked',
-      pastDinner: 'Not Booked',
-    },
-  ];
-
-  const handleSearch = () => {
-    console.log('Searching:', searchQuery);
+  const fetchUsers = async (query = '') => {
+    setLoading(true);
+    setError(null);
+    try {
+      const endpoint = query 
+        ? `${API_ENDPOINTS.USER_LIST}?search=${encodeURIComponent(query)}`
+        : API_ENDPOINTS.USER_LIST;
+      
+      const response = await api.get(endpoint);
+      // Based on API response: { success: true, message: "...", data: { users: [...], total: N } }
+      // The interceptor returns response.data, so response here is the outer object.
+      const userData = response.data?.users || [];
+      const total = response.data?.total || 0;
+      
+      setUsers(userData);
+      setTotalUsers(total.toString());
+    } catch (err) {
+      console.error('Error fetching users:', err);
+      setError('Failed to fetch users. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleExportCSV = () => {
-    console.log('Exporting CSV');
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const handleSearch = () => {
+    fetchUsers(searchQuery);
+  };
+
+  const handleExportCSV = async () => {
+    try {
+      // Use axiosInstance directly from api to handle responseType: 'blob'
+      // Or if the utility doesn't expose the instance, we might need to handle it in api.js
+      // Let's check api.js again.
+      const response = await api.get(API_ENDPOINTS.USER_EXPORT_CSV, {
+        responseType: 'blob'
+      });
+      
+      // Create a link to download the blob
+      const url = window.URL.createObjectURL(new Blob([response]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `users-export-${new Date().toISOString().split('T')[0]}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error('Error exporting CSV:', err);
+      alert('Failed to export CSV. Please try again.');
+    }
   };
 
   return (
@@ -348,44 +338,70 @@ const AdminDashboardPage = () => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-[#F3F4F6]">
-                {users.map((user) => (
-                  <tr key={user.id} className="hover:bg-[#F9FAFB] transition-colors">
-                    <td className="px-4 py-3.5 whitespace-nowrap text-sm text-[#111827] font-medium">
-                      {user.name}
-                    </td>
-                    <td className="px-4 py-3.5 whitespace-nowrap text-sm text-[#6B7280]">
-                      {user.email}
-                    </td>
-                    <td className="px-4 py-3.5 whitespace-nowrap text-sm text-[#6B7280]">
-                      {user.mobile}
-                    </td>
-                    <td className="px-4 py-3.5 whitespace-nowrap text-sm text-[#6B7280]">
-                      {user.city}
-                    </td>
-                    <td className="px-4 py-3.5 whitespace-nowrap text-sm text-[#6B7280]">
-                      {user.tickets}
-                    </td>
-                    <td className="px-4 py-3.5 whitespace-nowrap text-sm text-[#6B7280]">
-                      {user.membership}
-                    </td>
-                    <td className="px-4 py-3.5 whitespace-nowrap text-sm text-[#6B7280]">
-                      {user.status}
-                    </td>
-                    <td className="px-4 py-3.5 whitespace-nowrap text-sm text-[#6B7280]">
-                      {user.nextDinner}
-                    </td>
-                    <td className="px-4 py-3.5 whitespace-nowrap text-sm text-[#6B7280]">
-                      {user.pastDinner}
-                    </td>
-                    <td className="px-4 py-3.5 whitespace-nowrap text-sm text-[#6B7280]">
-                      <button className="p-1 hover:bg-[#F3F4F6] rounded transition-colors">
-                        <svg className="w-5 h-5 text-[#6B7280]" fill="currentColor" viewBox="0 0 24 24">
-                          <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
+                {loading ? (
+                  <tr>
+                    <td colSpan="10" className="px-4 py-8 text-center text-sm text-[#6B7280]">
+                      <div className="flex items-center justify-center gap-2">
+                        <svg className="animate-spin h-5 w-5 text-[#F97316]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                         </svg>
-                      </button>
+                        Loading users...
+                      </div>
                     </td>
                   </tr>
-                ))}
+                ) : error ? (
+                  <tr>
+                    <td colSpan="10" className="px-4 py-8 text-center text-sm text-red-500">
+                      {error}
+                    </td>
+                  </tr>
+                ) : users.length === 0 ? (
+                  <tr>
+                    <td colSpan="10" className="px-4 py-8 text-center text-sm text-[#6B7280]">
+                      No users found.
+                    </td>
+                  </tr>
+                ) : (
+                  users.map((user) => (
+                    <tr key={user.id || user.email} className="hover:bg-[#F9FAFB] transition-colors">
+                      <td className="px-4 py-3.5 whitespace-nowrap text-sm text-[#111827] font-medium">
+                        {user.name || `${user.first_name || ''} ${user.last_name || ''}`.trim() || 'N/A'}
+                      </td>
+                      <td className="px-4 py-3.5 whitespace-nowrap text-sm text-[#6B7280]">
+                        {user.email || 'N/A'}
+                      </td>
+                      <td className="px-4 py-3.5 whitespace-nowrap text-sm text-[#6B7280]">
+                        {user.mobile || user.phone_number || user.profile?.phone_number || 'N/A'}
+                      </td>
+                      <td className="px-4 py-3.5 whitespace-nowrap text-sm text-[#6B7280]">
+                        {user.city || user.profile?.city_id || 'N/A'}
+                      </td>
+                      <td className="px-4 py-3.5 whitespace-nowrap text-sm text-[#6B7280]">
+                        {user.tickets || 'N/A'}
+                      </td>
+                      <td className="px-4 py-3.5 whitespace-nowrap text-sm text-[#6B7280]">
+                        {user.membership || 'N/A'}
+                      </td>
+                      <td className="px-4 py-3.5 whitespace-nowrap text-sm text-[#6B7280]">
+                        {user.status || 'N/A'}
+                      </td>
+                      <td className="px-4 py-3.5 whitespace-nowrap text-sm text-[#6B7280]">
+                        {user.nextDinner || user.next_dinner || 'Not Booked'}
+                      </td>
+                      <td className="px-4 py-3.5 whitespace-nowrap text-sm text-[#6B7280]">
+                        {user.pastDinner || user.past_dinner || 'Not Booked'}
+                      </td>
+                      <td className="px-4 py-3.5 whitespace-nowrap text-sm text-[#6B7280]">
+                        <button className="p-1 hover:bg-[#F3F4F6] rounded transition-colors">
+                          <svg className="w-5 h-5 text-[#6B7280]" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
+                          </svg>
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>

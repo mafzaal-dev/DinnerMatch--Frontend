@@ -121,6 +121,8 @@ export const API_ENDPOINTS = {
   
   // User
   USER_PROFILE: '/profile/me/',
+  USER_LIST: '/auth/users/list/',
+  USER_EXPORT_CSV: '/auth/users/export-csv/',
   
   // Quiz
   QUIZ_QUESTIONS_LIST: '/quiz/questions/list',

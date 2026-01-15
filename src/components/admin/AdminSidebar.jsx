@@ -4,7 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-const AdminSidebar = ({ onLogout }) => {
+const AdminSidebar = ({ onLogout, isOpen, onClose }) => {
   const pathname = usePathname();
 
   const menuItems = [
@@ -61,16 +61,32 @@ const AdminSidebar = ({ onLogout }) => {
   ];
 
   return (
-    <aside className="w-56 bg-white min-h-screen flex flex-col border-r border-[#E5E7EB]">
+    <aside 
+      className={`
+        fixed inset-y-0 left-0 z-30 w-64 bg-white border-r border-[#E5E7EB] transform transition-transform duration-300 ease-in-out flex flex-col
+        lg:translate-x-0 lg:static lg:inset-auto lg:h-auto
+        ${isOpen ? 'translate-x-0' : '-translate-x-full'}
+      `}
+    >
       {/* Logo */}
-      <div className="px-4 py-6">
-        <h1 className="text-base font-semibold">
+      <div className="flex items-center justify-between px-6 py-6 border-b border-gray-100 lg:border-none">
+        <h1 className="text-xl font-bold">
           Dinner<span className="text-[#F97316]">Match</span>
         </h1>
+        
+        {/* Close button for mobile */}
+        <button 
+          onClick={onClose}
+          className="lg:hidden text-gray-500 hover:text-gray-700 focus:outline-none"
+        >
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-3">
+      <nav className="flex-1 px-4 py-4 overflow-y-auto">
         <ul className="space-y-1">
           {menuItems.map((item) => {
             const isActive = pathname === item.href;
@@ -78,6 +94,7 @@ const AdminSidebar = ({ onLogout }) => {
               <li key={item.id}>
                 <Link
                   href={item.href}
+                  onClick={onClose}
                   className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors text-sm ${
                     isActive
                       ? 'bg-[#F97316] text-white'
@@ -94,7 +111,7 @@ const AdminSidebar = ({ onLogout }) => {
       </nav>
 
       {/* Logout */}
-      <div className="p-3 mb-4">
+      <div className="p-4 border-t border-gray-100 lg:border-none">
         <button
           onClick={onLogout}
           className="flex items-center gap-3 px-3 py-2.5 text-[#EF4444] hover:bg-[#FEF2F2] rounded-lg transition-colors w-full text-sm"
