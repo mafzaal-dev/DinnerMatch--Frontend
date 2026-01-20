@@ -2,21 +2,20 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useDinner } from '@/hooks/useDinner';
+import { useRestaurant } from '@/hooks/useRestaurant';
 import toast from 'react-hot-toast';
 
-const DinnerManagementPage = () => {
+const RestaurantManagementPage = () => {
   const router = useRouter();
-  const { getDinners, deleteDinner, loading } = useDinner();
+  const { getRestaurants, deleteRestaurant, loading } = useRestaurant();
   const [searchQuery, setSearchQuery] = useState('');
-  const [dinners, setDinners] = useState([]);
+  const [restaurants, setRestaurants] = useState([]);
   const [total, setTotal] = useState(0);
   const [currentPage, setCurrentPage] = useState(0);
   const [pageSize] = useState(10);
-  const [startDate, setStartDate] = useState('');
 
-  // Fetch dinners from API
-  const fetchDinners = async () => {
+  // Fetch restaurants from API
+  const fetchRestaurants = async () => {
     try {
       const params = {
         index: currentPage,
@@ -26,62 +25,49 @@ const DinnerManagementPage = () => {
       if (searchQuery) {
         params.search = searchQuery;
       }
-      
-      if (startDate) {
-        params.start_date = startDate;
-      }
 
-      const result = await getDinners(params);
-      setDinners(result.data);
+      const result = await getRestaurants(params);
+      setRestaurants(result.data);
       setTotal(result.total);
     } catch (error) {
-      console.error('Error fetching dinners:', error);
-      toast.error('Failed to fetch dinners');
+      console.error('Error fetching restaurants:', error);
+      toast.error('Failed to fetch restaurants');
     }
   };
 
   useEffect(() => {
-    fetchDinners();
-  }, [currentPage, searchQuery, startDate]); // eslint-disable-line react-hooks/exhaustive-deps
+    fetchRestaurants();
+  }, [currentPage, searchQuery]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Handle Create Dinner - Navigate to create page
-  const handleCreateDinner = () => {
-    router.push('/admin/dinner-management/create');
+  // Handle Create Restaurant - Navigate to create page
+  const handleCreateRestaurant = () => {
+    router.push('/admin/restaurants/create');
   };
 
-  // Handle Edit Dinner - Navigate to edit page
-  const handleEditDinner = (dinnerId) => {
-    router.push(`/admin/dinner-management/edit/${dinnerId}`);
+  // Handle Edit Restaurant - Navigate to edit page
+  const handleEditRestaurant = (restaurantId) => {
+    router.push(`/admin/restaurants/edit/${restaurantId}`);
   };
 
-  // Handle Delete Dinner
-  const handleDeleteDinner = async (dinnerId) => {
-    if (!confirm('Are you sure you want to delete this dinner?')) {
+  // Handle Delete Restaurant
+  const handleDeleteRestaurant = async (restaurantId) => {
+    if (!confirm('Are you sure you want to delete this restaurant?')) {
       return;
     }
 
     try {
-      await deleteDinner(dinnerId);
-      toast.success('Dinner deleted successfully!');
-      fetchDinners();
+      await deleteRestaurant(restaurantId);
+      toast.success('Restaurant deleted successfully!');
+      fetchRestaurants();
     } catch (error) {
-      console.error('Error deleting dinner:', error);
-      toast.error(error.message || 'Failed to delete dinner');
+      console.error('Error deleting restaurant:', error);
+      toast.error(error.message || 'Failed to delete restaurant');
     }
   };
 
-  // Format date for display
-  const formatDate = (dateString) => {
-    if (!dateString) return 'Select Date';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
-  };
-
-  // Format time for display
-  const formatTime = (dateString) => {
-    if (!dateString) return 'Select Time';
-    const date = new Date(dateString);
-    return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+  // Format price for display
+  const formatPrice = (price) => {
+    return `R ${parseFloat(price).toFixed(2)}`;
   };
 
   return (
@@ -94,27 +80,15 @@ const DinnerManagementPage = () => {
 
       {/* Main Content */}
       <div className="p-6">
-        {/* Section Header */}
-       
-
         <div className="bg-white rounded-xl shadow-sm border border-[#E5E7EB] overflow-hidden">
           {/* Controls */}
           <div className="p-4 border-b border-[#E5E7EB] flex items-center justify-between gap-3">
             <div className="mb-4">
-              <h2 className="text-xl font-semibold text-[#111827]">Dinner Management</h2>
-              <p className="text-sm text-[#6B7280] mt-0.5">Manage your existing dinners.</p>
+              <h2 className="text-xl font-semibold text-[#111827]">Restaurants</h2>
+              <p className="text-sm text-[#6B7280] mt-0.5">Manage all of the restaurants</p>
             </div>
             
             <div className="flex items-center gap-3">
-              <div className="relative">
-                <input
-                  type="date"
-                  value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
-                  className="pl-4 pr-4 py-2 border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-orange-500 bg-white"
-                  placeholder="Start Date"
-                />
-              </div>
               <div className="relative">
                 <input
                   type="text"
@@ -127,11 +101,17 @@ const DinnerManagementPage = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
               </div>
+              <button className="flex items-center gap-2 px-4 py-2 border border-[#E5E7EB] rounded-lg text-sm text-[#374151] hover:bg-gray-50 bg-white">
+                <span>Sort by</span>
+                <svg className="w-4 h-4 text-[#6B7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
               <button 
-                onClick={handleCreateDinner}
+                onClick={handleCreateRestaurant}
                 className="px-4 py-2 bg-[#F97316] hover:bg-[#EA580C] text-white rounded-lg text-sm font-medium transition-colors"
               >
-                Create Dinner
+                Add Restaurant
               </button>
             </div>
           </div>
@@ -140,60 +120,48 @@ const DinnerManagementPage = () => {
           <div className="overflow-x-auto">
             {loading ? (
               <div className="p-8 text-center text-[#6B7280]">Loading...</div>
-            ) : dinners.length === 0 ? (
-              <div className="p-8 text-center text-[#6B7280]">No dinners found</div>
+            ) : restaurants.length === 0 ? (
+              <div className="p-8 text-center text-[#6B7280]">No restaurants found</div>
             ) : (
               <table className="w-full min-w-max">
                 <thead className="bg-[#F9FAFB] border-b border-[#E5E7EB]">
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-[#9CA3AF] uppercase tracking-wide w-24">ID</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-[#9CA3AF] uppercase tracking-wide">Title</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-[#9CA3AF] uppercase tracking-wide">Restaurant</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-[#9CA3AF] uppercase tracking-wide">Location</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-[#9CA3AF] uppercase tracking-wide">Date</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-[#9CA3AF] uppercase tracking-wide">Time</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-[#9CA3AF] uppercase tracking-wide">Type</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-[#9CA3AF] uppercase tracking-wide">Contact No</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-[#9CA3AF] uppercase tracking-wide">Date Added</th>
                     <th className="px-6 py-3 text-right text-xs font-medium text-[#9CA3AF] uppercase tracking-wide w-10">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#F3F4F6]">
-                  {dinners.map((dinner) => (
-                    <tr key={dinner.id} className="hover:bg-[#F9FAFB] transition-colors">
+                  {restaurants.map((restaurant) => (
+                    <tr key={restaurant.id} className="hover:bg-[#F9FAFB] transition-colors">
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-[#6B7280]">
-                        {dinner.id.split('-')[0]}
+                        {restaurant.id.split('-')[0]}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-[#374151] font-medium">
-                        {dinner.title}
+                        {restaurant.name}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-[#374151]">
-                        {dinner.location}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm">
-                        <span className={!dinner.date ? 'text-[#F97316]' : 'text-[#374151]'}>
-                          {formatDate(dinner.date)}
-                        </span>
+                        {restaurant.location}, {restaurant.city}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-[#374151]">
-                        {formatTime(dinner.date)}
+                        {restaurant.number}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          dinner.dinner_type === 'Public' 
-                            ? 'bg-green-100 text-green-800' 
-                            : 'bg-blue-100 text-blue-800'
-                        }`}>
-                          {dinner.dinner_type}
-                        </span>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-[#374151]">
+                        {restaurant.created_at ? new Date(restaurant.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : '-'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right">
                         <div className="flex items-center justify-end gap-2">
                           <button 
-                            onClick={() => handleEditDinner(dinner.id)}
+                            onClick={() => handleEditRestaurant(restaurant.id)}
                             className="text-[#3B82F6] hover:text-[#2563EB] text-sm font-medium"
                           >
                             Edit
                           </button>
                           <button 
-                            onClick={() => handleDeleteDinner(dinner.id)}
+                            onClick={() => handleDeleteRestaurant(restaurant.id)}
                             className="text-[#EF4444] hover:text-[#DC2626] text-sm font-medium"
                           >
                             Delete
@@ -237,4 +205,4 @@ const DinnerManagementPage = () => {
   );
 };
 
-export default DinnerManagementPage;
+export default RestaurantManagementPage;

@@ -132,6 +132,23 @@ export const API_ENDPOINTS = {
   QUIZ_QUESTIONS_DELETE: (id) => `/quiz/questions/delete/${id}`,
   QUIZ_QUESTION_ORDER: '/quiz/update-question-order',
   
+  // Dinner Management
+  DINNER_CREATE: '/dinner/create/',
+  DINNER_UPDATE: '/dinner/update/',
+  DINNER_LIST: '/dinner/list/',
+  DINNER_DELETE: (id) => `/dinner/delete/${id}/`,
+  
+  // Restaurant Management
+  RESTAURANT_CREATE: '/restaurant/create/',
+  RESTAURANT_UPDATE: '/restaurant/update/',
+  RESTAURANT_LIST: '/restaurant/list/',
+  RESTAURANT_DELETE: (id) => `/restaurant/delete/${id}/`,
+  
+  // Group Management
+  GROUP_CREATE: '/groups/create/',
+  GROUP_LIST: '/groups/list/',
+  GROUP_MARK_BOOKED: '/group/mark-as-booked/',
+  
   // Others
   DINNERS: '/dinners/',
   BOOKINGS: '/bookings/',

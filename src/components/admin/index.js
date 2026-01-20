@@ -6,3 +6,6 @@ export { default as CreateQuizPage } from './CreateQuizPage';
 export { default as QuizDetailsPage } from './QuizDetailsPage';
 export { default as GroupAttendeesPage } from './GroupAttendeesPage';
 export { default as DinnerManagementPage } from './DinnerManagementPage';
+export { default as CreateEditDinnerPage } from './CreateEditDinnerPage';
+export { default as RestaurantManagementPage } from './RestaurantManagementPage';
+export { default as CreateEditRestaurantPage } from './CreateEditRestaurantPage';
