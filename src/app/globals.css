@@ -1,16 +1,16 @@
 @import "tailwindcss";
 
 html {
-    scroll-behavior: smooth;
+  scroll-behavior: smooth;
 }
 
 @theme {
-    --color-primary-orange: #e67e22;
-    --color-nav-bg: #0b0e14;
-    --color-hero-bg: #f8f9fa;
+  --color-primary-orange: #e67e22;
+  --color-nav-bg: #0b0e14;
+  --color-hero-bg: #f8f9fa;
 }
 
 body {
-    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-    @apply antialiased text-[#0b0e14];
+  font-family: "Roboto", sans-serif;
+  @apply antialiased text-[#0b0e14];
 }

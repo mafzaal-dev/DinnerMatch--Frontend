@@ -30,21 +30,21 @@ const testimonials = [
 
 const Testimonials = () => {
     return (
-        <section className="bg-white py-24 px-6">
+        <section className="bg-white pt-20 px-6 md:px-20 lg:px-60">
             <div className="max-w-5xl mx-auto">
-                <h2 className="text-[32px] md:text-4xl font-bold 
-                text-center mb-20  text-[#212121]">
+                <h2 className="text-[2rem] md:text-[2rem] font-bold 
+                text-center  text-[#212121]">
                     REAL PEOPLE. UNREAL NIGHTS.
                 </h2>
 
-                <div className="flex flex-col gap-10 md:gap-10 relative max-w-4xl mx-auto">
+                <div className="flex flex-col gap-5 md:gap-5 relative max-w-4xl mx-auto">
                     {testimonials.map((item, index) => (
                         <div
                             key={index}
-                            className={`w-full md:w-114.5 bg-white p-6 rounded-xl shadow-[0_15px_50px_rgba(0,0,0,0.05)] border border-gray-100/50 transition-all duration-500 hover:shadow-[0_20px_60px_rgba(0,0,0,0.08)] ${item.align === 'right' ? 'md:ml-auto' : 'md:mr-auto'
+                            className={`w-full md:w-114.5 bg-white p-5 rounded-xl shadow-[0_15px_50px_rgba(0,0,0,0.05)] border border-gray-100/50 transition-all duration-500 hover:shadow-[0_20px_60px_rgba(0,0,0,0.08)] ${item.align === 'right' ? 'md:ml-auto' : 'md:mr-auto'
                                 } relative`}
                         >
-                            <p className="text-base leading-[1.6] text-[#757575] mb-6 font-normal">
+                            <p className="text-base leading-[1.6] text-[#757575] mb-1 font-normal">
                                 "{item.text}"
                             </p>
                             <p className="text-sm text-[#424242]  ">
@@ -59,3 +59,5 @@ const Testimonials = () => {
 };
 
 export default Testimonials;
+
+

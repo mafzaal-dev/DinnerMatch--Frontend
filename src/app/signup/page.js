@@ -11,6 +11,8 @@ export default function Signup() {
 
   const handleRegister = async (formData) => {
     try {
+      console.log({formData});
+      
       await register(formData);
       toast.success('Account created successfully!');
       // After registration, you might want to auto-login or redirect to login

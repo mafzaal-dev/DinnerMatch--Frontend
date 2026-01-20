@@ -7,7 +7,7 @@ const SignupPage = ({ onRegister, onLogin, isLoading, error }) => {
     email: '',
     password: '',
     first_name: '',
-    last_name: ''
+    last_name: '',
   });
   const [showPassword, setShowPassword] = useState(false);
 
@@ -27,7 +27,7 @@ const SignupPage = ({ onRegister, onLogin, isLoading, error }) => {
   };
 
   return (
-    <div className="min-h-screen bg-[#080814] flex items-center justify-center p-4">
+    <div className="min-h-screen bg-[#080714] flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
@@ -35,7 +35,7 @@ const SignupPage = ({ onRegister, onLogin, isLoading, error }) => {
         </div>
 
         {/* Main Content */}
-        <div className="bg-[#111121] border border-white rounded-xl p-8 shadow-2xl">
+        <div className="bg-[#111121] border border-[#2F3A51] rounded-xl p-8 shadow-2xl">
           <h2 className="text-2xl font-bold text-[#F5F5F5] mb-2 text-center">JOIN THE CLUB</h2>
           <p className="text-[#E0E0E0] text-center mb-8">Create your account</p>
           
@@ -51,7 +51,7 @@ const SignupPage = ({ onRegister, onLogin, isLoading, error }) => {
             <div className="grid grid-cols-2 gap-4">
               {/* First Name */}
               <div>
-                <label htmlFor="first_name" className="block text-sm font-medium text-[#E0E0E0] mb-2">
+                <label htmlFor="first_name" className="block text-sm font-semibold text-[#757575] mb-2">
                   First Name
                 </label>
                 <input
@@ -61,7 +61,7 @@ const SignupPage = ({ onRegister, onLogin, isLoading, error }) => {
                   value={formData.first_name}
                   onChange={handleChange}
                   placeholder="First name"
-                  className="w-full px-4 py-3 bg-[#0F1419] border border-white rounded-lg text-[#F5F5F5] placeholder-[#A0A0A0] focus:outline-none focus:border-[#FFAA55] transition-colors disabled:opacity-50"
+                  className="w-full px-4 py-3 bg-[#111121] border border-[#2F3A51] rounded-lg text-[#F5F5F5] placeholder-[#424242] focus:outline-none focus:border-[#FFAA55] transition-colors disabled:opacity-50"
                   required
                   disabled={isLoading}
                 />
@@ -69,7 +69,7 @@ const SignupPage = ({ onRegister, onLogin, isLoading, error }) => {
 
               {/* Last Name */}
               <div>
-                <label htmlFor="last_name" className="block text-sm font-medium text-[#E0E0E0] mb-2">
+                <label htmlFor="last_name" className="block text-sm font-semibold text-[#757575] mb-2">
                   Last Name
                 </label>
                 <input
@@ -79,7 +79,7 @@ const SignupPage = ({ onRegister, onLogin, isLoading, error }) => {
                   value={formData.last_name}
                   onChange={handleChange}
                   placeholder="Last name"
-                  className="w-full px-4 py-3 bg-[#0F1419] border border-white rounded-lg text-[#F5F5F5] placeholder-[#A0A0A0] focus:outline-none focus:border-[#FFAA55] transition-colors disabled:opacity-50"
+                  className="w-full px-4 py-3 bg-[#111121] border border-[#2F3A51] rounded-lg text-[#F5F5F5] placeholder-[#424242] focus:outline-none focus:border-[#FFAA55] transition-colors disabled:opacity-50"
                   required
                   disabled={isLoading}
                 />
@@ -88,7 +88,7 @@ const SignupPage = ({ onRegister, onLogin, isLoading, error }) => {
 
             {/* Email Input */}
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-[#E0E0E0] mb-2">
+              <label htmlFor="email" className="block text-sm font-semibold text-[#757575] mb-2">
                 Email
               </label>
               <input
@@ -98,7 +98,7 @@ const SignupPage = ({ onRegister, onLogin, isLoading, error }) => {
                 value={formData.email}
                 onChange={handleChange}
                 placeholder="Enter your email"
-                className="w-full px-4 py-3 bg-[#0F1419] border border-white rounded-lg text-[#F5F5F5] placeholder-[#A0A0A0] focus:outline-none focus:border-[#FFAA55] transition-colors disabled:opacity-50"
+                className="w-full px-4 py-3 bg-[#111121] border border-[#2F3A51] rounded-lg text-[#F5F5F5] placeholder-[#424242] focus:outline-none focus:border-[#FFAA55] transition-colors disabled:opacity-50"
                 required
                 disabled={isLoading}
               />
@@ -106,7 +106,7 @@ const SignupPage = ({ onRegister, onLogin, isLoading, error }) => {
 
             {/* Password Input */}
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-[#E0E0E0] mb-2">
+              <label htmlFor="password" className="block text-sm font-semibold text-[#757575] mb-2">
                 Password
               </label>
               <div className="relative">
@@ -117,7 +117,7 @@ const SignupPage = ({ onRegister, onLogin, isLoading, error }) => {
                   value={formData.password}
                   onChange={handleChange}
                   placeholder="Create a password"
-                  className="w-full px-4 py-3 bg-[#0F1419] border border-white rounded-lg text-[#F5F5F5] placeholder-[#A0A0A0] focus:outline-none focus:border-[#FFAA55] transition-colors pr-12 disabled:opacity-50"
+                  className="w-full px-4 py-3 bg-[#111121] border border-[#2F3A51] rounded-lg text-[#F5F5F5] placeholder-[#424242] focus:outline-none focus:border-[#FFAA55] transition-colors pr-12 disabled:opacity-50"
                   required
                   disabled={isLoading}
                 />

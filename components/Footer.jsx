@@ -5,25 +5,25 @@ const Footer = () => {
     return (
         <div className="flex flex-col">
             <section className="bg-[#FFFBF7] py-20 px-6">
-                <div className="max-w-4xl mx-auto bg-white rounded-3xl p-12 md:p-16 shadow-[0_20px_50px_rgba(0,0,0,0.04)] text-center border border-[#F3F4F6]">
+                <div className="max-w-5xl mx-auto bg-white rounded-3xl p-12 md:p-16 shadow-[0_20px_50px_rgba(0,0,0,0.04)] text-center border border-[#F3F4F6]">
                     <div className="inline-block bg-[#FFFAE6] text-[#FFAA55]
-                     text-sm font-semibold py-4 px-3 rounded-full mb-8 ">
+                     text-sm font-semibold py-3 px-4 rounded-full mb-8 ">
                         Limited Spots Available
                     </div>
 
-                    <h2 className="text-[32px] md:text-4xl font-bold text-[#212121] mb-6 ">
+                    <h2 className="text-[32px] md:text-4xl font-bold text-[#212121] mb-4 ">
                         Start Your Journey <span className="text-[#FFAA55]">Today</span>
                     </h2>
 
-                    <p className="text-[#757575] text-lg  max-w-2xl mx-auto mb-8 ">
+                    <p className="text-[#757575] text-[1rem]  max-w-2xl mx-auto mb-4 ">
                         Imagine showing up to dinner every week with 5 interesting strangers who just get you. No awkward small talk — just good vibes, shared laughs, and food that fits your budget.
                     </p>
 
-                    <p className="font-semibold text-[#424242] mb-10 text-base">
+                    <p className="font-semibold text-[#424242] mb-4 text-base">
                         Spaces are limited — take the quiz to secure your spot.
                     </p>
 
-                    <div className="flex flex-wrap justify-center gap-6 md:gap-10 mb-12 ">
+                    <div className="flex flex-wrap justify-center gap-4 md:gap-6 mb-6 ">
                         <div className="flex items-center gap-2 text-sm text-[#757575]">
                             <span className="w-1.5 h-1.5 rounded-full bg-[#F97315]"></span>
                             Personality Matching
@@ -39,8 +39,8 @@ const Footer = () => {
                     </div>
 
                     <button className="bg-[#FFAA55] text-white
-                     px-2 py-4 rounded-xl text-sm 
-                      transition-all flex items-center gap-2 mx-auto mb-6 uppercase">
+                     px-3 py-3 rounded-xl text-sm 
+                      transition-all flex items-center gap-2 mx-auto mb-4 uppercase">
                         Take the Quiz 
                     </button>
 
@@ -117,3 +117,5 @@ const Footer = () => {
 };
 
 export default Footer;
+
+

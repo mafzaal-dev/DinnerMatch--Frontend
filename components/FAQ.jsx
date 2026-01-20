@@ -36,10 +36,10 @@ const FAQ = () => {
     };
 
     return (
-        <section id="faq" className="bg-[#F9FAFB] py-24 px-6">
+        <section id="faq" className="bg-[#F9FAFB] py-16 px-6">
             <div className="max-w-3xl mx-auto">
-                <div className="text-center mb-16">
-                    <h2 className="text-[32px] md:text-[32px] font-bold text-[#212121] mb-4">
+                <div className="text-center mb-10">
+                    <h2 className="text-[32px] md:text-[32px] font-bold text-[#212121]">
                         Frequently Asked Questions
                     </h2>
                     <p className="text-[#424242] text-lg">
@@ -88,3 +88,5 @@ const FAQ = () => {
 };
 
 export default FAQ;
+
+

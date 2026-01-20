@@ -52,19 +52,19 @@ const HelpCenterPage = ({ onSubmit, onBack }) => {
   };
 
   return (
-    <div className="min-h-screen bg-[#080814] p-4 md:p-8">
+    <div className="min-h-screen bg-[#080714] p-4 md:p-8">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
-        <div className="mb-8">
+        <div className="mb-8 flex items-center justify-center relative">
           {onBack && (
             <button
               onClick={onBack}
-              className="text-[#E0E0E0] hover:text-[#F5F5F5] transition-colors mb-4 flex items-center gap-2"
+              className="absolute left-0 text-[#F5F5F5] hover:text-[#FFAA55] transition-colors flex items-center gap-1"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
-              <span className='text-sm'>Back</span>
+              <span className="text-sm">Back</span>
             </button>
           )}
           
@@ -72,12 +72,12 @@ const HelpCenterPage = ({ onSubmit, onBack }) => {
         </div>
 
         {/* Contact Form */}
-        <div className="bg-[#111121] border border-gray-700 rounded-lg p-6 mb-8">
+        <div className="bg-[#111121] border border-[#2F3A51] rounded-lg p-6 mb-8 shadow-lg">
           <h2 className="text-xl font-bold text-[#F5F5F5] mb-6">Contact Us</h2>
           <form onSubmit={handleSubmit} className="space-y-6">
            
             <div>
-              <label className="block text-[#E0E0E0] text-sm mb-2">
+              <label className="block text-[#757575] font-semibold text-sm mb-2">
                 Your email address <span className="text-red-500">*</span>
               </label>
               <input
@@ -85,15 +85,15 @@ const HelpCenterPage = ({ onSubmit, onBack }) => {
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 placeholder="johnDoe@mail.com"
-                className="w-full px-4 py-3 bg-[#0F1419] border
-                 border-[#2F3A51] placeholder-[#424242]  rounded-lg text-[#F5F5F5] focus:outline-none focus:border-[#FFAA55]"
+                className="w-full px-4 py-3 bg-[#111121] border
+                 border-[#2F3A51] placeholder-[#424242]  rounded-lg text-[#F5F5F5] focus:outline-none focus:border-[#FFAA55] transition-colors"
                 required
               />
             </div>
 
 
             <div>
-              <label className="block text-[#E0E0E0] text-sm mb-2">
+              <label className="block text-[#757575] font-semibold text-sm mb-2">
                 Your name <span className="text-red-500">*</span>
               </label>
               <input
@@ -101,15 +101,15 @@ const HelpCenterPage = ({ onSubmit, onBack }) => {
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 placeholder="Enter your full name"
-                className="w-full px-4 py-3 bg-[#0F1419] border
-                  border-[#2F3A51] placeholder-[#424242]  rounded-lg text-[#F5F5F5]   focus:outline-none focus:border-[#FFAA55]"
+                className="w-full px-4 py-3 bg-[#111121] border
+                  border-[#2F3A51] placeholder-[#424242]  rounded-lg text-[#F5F5F5]   focus:outline-none focus:border-[#FFAA55] transition-colors"
                 required
               />
             </div>
 
 
             <div>
-              <label className="block text-[#E0E0E0] text-sm mb-2">
+              <label className="block text-[#757575] font-semibold text-sm mb-2">
                 Reason for contacting us<span className="text-red-500">*</span>
               </label>
               <input
@@ -117,15 +117,15 @@ const HelpCenterPage = ({ onSubmit, onBack }) => {
                 value={formData.reason}
                 onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
                 placeholder="Reason"
-                className="w-full px-4 py-3 bg-[#0F1419] border
-                 border-[#2F3A51] placeholder-[#424242] rounded-lg text-[#F5F5F5]  focus:outline-none focus:border-[#FFAA55]"
+                className="w-full px-4 py-3 bg-[#111121] border
+                 border-[#2F3A51] placeholder-[#424242] rounded-lg text-[#F5F5F5]  focus:outline-none focus:border-[#FFAA55] transition-colors"
                 required
               />
             </div>
 
 
             <div>
-              <label className="block text-[#E0E0E0] text-sm mb-2">
+              <label className="block text-[#757575] font-semibold text-sm mb-2">
                 Subject <span className="text-red-500">*</span>
               </label>
               <input
@@ -133,23 +133,22 @@ const HelpCenterPage = ({ onSubmit, onBack }) => {
                 value={formData.subject}
                 onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
                 placeholder="Brief summary of your message"
-                className="w-full px-4 py-3 bg-[#0F1419] border
-                 border-[#2F3A51] placeholder-[#424242]  rounded-lg text-[#F5F5F5]   focus:outline-none focus:border-[#FFAA55]"
+                className="w-full px-4 py-3 bg-[#111121] border
+                 border-[#2F3A51] placeholder-[#424242]  rounded-lg text-[#F5F5F5]   focus:outline-none focus:border-[#FFAA55] transition-colors"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-[#E0E0E0] text-sm mb-2">
+              <label className="block text-[#757575] font-semibold text-sm mb-2">
                Description<span className="text-red-500">*</span>
               </label>
-              <input
-                type="text"
+              <textarea
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 placeholder="Please provide detail information about your inquiry or issue"
-                className="w-full px-4 py-3 bg-[#0F1419] border
-                 border-[#2F3A51] placeholder-[#424242]  rounded-lg text-[#F5F5F5]  focus:outline-none focus:border-[#FFAA55]"
+                className="w-full px-4 py-3 bg-[#111121] border
+                 border-[#2F3A51] placeholder-[#424242]  rounded-lg text-[#F5F5F5]  focus:outline-none focus:border-[#FFAA55] transition-colors min-h-[120px]"
                 required
               />
             </div>
@@ -158,7 +157,7 @@ const HelpCenterPage = ({ onSubmit, onBack }) => {
             <button
               type="submit"
               className="w-full bg-[#FFAA55] text-[#212121] py-4 px-2 rounded-lg 
-               text-sm uppercase tracking-wide hover:bg-[#FF9955] transition-colors"
+               text-sm uppercase tracking-wide font-bold hover:bg-[#FF9955] transition-colors shadow-lg"
             >
               Send Message
             </button>
@@ -166,7 +165,7 @@ const HelpCenterPage = ({ onSubmit, onBack }) => {
         </div>
 
         {/* FAQ Section */}
-        <div className="bg-[#111121] border border-gray-600 rounded-lg p-6">
+        <div className="bg-[#111121] border border-[#2F3A51] rounded-lg p-6 shadow-lg">
           <h2 className="text-xl font-bold text-[#F5F5F5] mb-6">Frequently Asked Questions</h2>
           <div className="space-y-3">
             {faqData.map((faq, index) => (

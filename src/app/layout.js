@@ -1,8 +1,15 @@
+import { Roboto } from 'next/font/google';
 import "./globals.css";
 import MetaPixel from "../../components/MetaPixel";
 import UTMTracker from "../../components/UTMTracker";
 import NoSSR from "@/components/common/NoSSR";
 import { Toaster } from 'react-hot-toast';
+
+const roboto = Roboto({
+  weight: ['300', '400', '500', '700'],
+  subsets: ['latin'],
+  display: 'swap',
+});
 
 export const metadata = {
   title: "DinnerMatch",
@@ -12,7 +19,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="antialiased" suppressHydrationWarning>
+      <body className={`${roboto.className} antialiased`} suppressHydrationWarning>
         <NoSSR>
           <MetaPixel />
           <UTMTracker />

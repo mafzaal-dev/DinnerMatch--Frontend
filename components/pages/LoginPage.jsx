@@ -15,7 +15,7 @@ const LoginPage = ({ onLogin, onSignUp, isLoading, error }) => {
   };
 
   return (
-    <div className="min-h-screen bg-[#080814] flex items-center justify-center p-4">
+    <div className="min-h-screen bg-[#080714] flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
@@ -23,7 +23,7 @@ const LoginPage = ({ onLogin, onSignUp, isLoading, error }) => {
         </div>
 
         {/* Main Content */}
-        <div className="bg-[#111121] border border-white rounded-xl p-8 shadow-2xl">
+        <div className="bg-[#111121] border border-[#2F3A51] rounded-xl p-8 shadow-2xl">
           <h2 className="text-2xl font-bold text-[#F5F5F5] mb-2 text-center">WANT TO MEET YOUR PEOPLE?</h2>
           <p className="text-[#E0E0E0] text-center mb-8">Welcome back!</p>
           
@@ -37,7 +37,7 @@ const LoginPage = ({ onLogin, onSignUp, isLoading, error }) => {
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Email Input */}
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-[#E0E0E0] mb-2">
+              <label htmlFor="email" className="block text-sm font-semibold text-[#757575] mb-2">
                 Email
               </label>
               <input
@@ -46,7 +46,7 @@ const LoginPage = ({ onLogin, onSignUp, isLoading, error }) => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email"
-                className="w-full px-4 py-3 bg-[#0F1419] border border-white rounded-lg text-[#F5F5F5] placeholder-[#A0A0A0] focus:outline-none focus:border-[#FFAA55] transition-colors disabled:opacity-50"
+                className="w-full px-4 py-3 bg-[#111121] border border-[#2F3A51] rounded-lg text-[#F5F5F5] placeholder-[#424242] focus:outline-none focus:border-[#FFAA55] transition-colors disabled:opacity-50"
                 required
                 disabled={isLoading}
               />
@@ -54,7 +54,7 @@ const LoginPage = ({ onLogin, onSignUp, isLoading, error }) => {
 
             {/* Password Input */}
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-[#E0E0E0] mb-2">
+              <label htmlFor="password" className="block text-sm font-semibold text-[#757575] mb-2">
                 Password
               </label>
               <div className="relative">
@@ -64,7 +64,7 @@ const LoginPage = ({ onLogin, onSignUp, isLoading, error }) => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
-                  className="w-full px-4 py-3 bg-[#0F1419] border border-white rounded-lg text-[#F5F5F5] placeholder-[#A0A0A0] focus:outline-none focus:border-[#FFAA55] transition-colors pr-12 disabled:opacity-50"
+                  className="w-full px-4 py-3 bg-[#111121] border border-[#2F3A51] rounded-lg text-[#F5F5F5] placeholder-[#424242] focus:outline-none focus:border-[#FFAA55] transition-colors pr-12 disabled:opacity-50"
                   required
                   disabled={isLoading}
                 />

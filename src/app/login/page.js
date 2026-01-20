@@ -21,7 +21,7 @@ export default function Login() {
 
   const handleSignUp = () => {
     // Determine where sign up is. Assuming it's the home page quiz flow for now
-    router.push('/');
+    router.push('/signup');
   };
 
   return <LoginPage onLogin={handleLogin} onSignUp={handleSignUp} isLoading={isLoading} error={error} />;

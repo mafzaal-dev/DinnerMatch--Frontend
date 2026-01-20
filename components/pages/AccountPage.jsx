@@ -139,38 +139,24 @@ const AccountPage = ({
   );
 
   return (
-    <div className="min-h-screen bg-[#010102] p-4 md:p-8">
+    <div className="min-h-screen bg-[#080714] p-4 md:p-8">
       <div className="max-w-154 mx-auto">
         {/* Header */}
         <div className="mb-8 flex items-center justify-center relative">
           {onBack && (
             <button
               onClick={onBack}
-              className="absolute left-0 text-[#F5F5F5] hover:text-[#FFAA55] transition-colors flex items-center gap-1"
+              className="absolute left-0 text-[#F5F5F5] hover:text-[#FFAA55] transition-colors flex items-center"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 20 20">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 4l-6 6 6 6" />
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
-              <span className="text-sm">Back</span>
             </button>
           )}
           <h1 className="text-[32px] font-bold text-[#FFAA55]">My Account</h1>
         </div>
 
-        {/* User Info Section */}
-        {user && (
-            <div className="bg-[#111121] border border-[#2F3A51] rounded-lg p-6 mb-8 flex items-center gap-4">
-                <div className="w-16 h-16 bg-[#FFAA55] rounded-full flex items-center justify-center text-[#212121] text-2xl font-bold">
-                    {user.first_name?.[0]}{user.last_name?.[0]}
-                </div>
-                <div>
-                    <h2 className="text-[#F5F5F5] text-xl font-bold">
-                        {user.first_name} {user.last_name}
-                    </h2>
-                    <p className="text-[#757575] text-sm">{user.email}</p>
-                </div>
-            </div>
-        )}
+        
 
         {/* All sections in one container with 24px spacing */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>

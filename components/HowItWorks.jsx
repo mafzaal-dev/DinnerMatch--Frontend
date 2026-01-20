@@ -66,14 +66,14 @@ const steps = [
 
 const HowItWorks = () => {
     return (
-        <section id="how-it-works" className="bg-white py-12 px-6">
+        <section id="how-it-works" className="bg-white pt-22 pb-8 px-6">
             <div className="max-w-7xl mx-auto text-center">
-                <h2 className="text-3xl md:text-4xl font-bold mb-4 text-[#212121] ">How Does It Work?</h2>
-                <p className="text-[#424242] mb-16 text-lg ">
+                <h2 className="text-3xl md:text-4xl font-bold mb-1 text-[#212121] ">How Does It Work?</h2>
+                <p className="text-[#424242] mb-5 text-lg ">
                     It's dining, made simple. We handle everything, you just show up!
                 </p>
 
-                <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-16">
+                <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-7">
                     {steps.map((step, index) => (
                         <div
                             key={index}
@@ -99,3 +99,5 @@ const HowItWorks = () => {
 };
 
 export default HowItWorks;
+
+

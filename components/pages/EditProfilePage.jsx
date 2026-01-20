@@ -4,166 +4,179 @@ import React, { useState, useEffect } from 'react';
 
 const EditProfilePage = ({ onSave, onBack, initialData = {} }) => {
   const [formData, setFormData] = useState({
-    firstName: initialData.first_name || initialData.firstName || '',
-    lastName: initialData.last_name || initialData.lastName || '',
+    fullName: initialData.full_name || `${initialData.first_name || ''} ${initialData.last_name || ''}`.trim() || '',
     email: initialData.email || '',
-    phoneNumber: initialData.phone_number || initialData.phoneNumber || '', 
-    dateOfBirth: initialData.date_of_birth || initialData.dateOfBirth || '',
-    gender: initialData.gender || '',
-    cityId: initialData.city_id || initialData.cityId || '', 
-    cuisine: initialData.cuisine || [],
-    dietaryPreference: initialData.dietaryPreference || [],
-    alcoholPreference: initialData.alcoholPreference || [],
-    dayOfWeek: initialData.dayOfWeek || [],
-    timeOfDay: initialData.timeOfDay || [],
-    budget: initialData.budget || '',
+    phoneNumber: initialData.phone_number || initialData.phoneNumber || '',
+    languages: initialData.languages || ['English'],
+    menuPreferences: initialData.menuPreferences || [],
+    priceRange: initialData.priceRange || '',
   });
 
-  // Update form data when initialData changes
   useEffect(() => {
     setFormData((prev) => ({
-        ...prev,
-        firstName: initialData.first_name || initialData.firstName || prev.firstName,
-        lastName: initialData.last_name || initialData.lastName || prev.lastName,
-        email: initialData.email || prev.email,
-        phoneNumber: initialData.phone_number || initialData.phoneNumber || prev.phoneNumber,
-        dateOfBirth: initialData.date_of_birth || initialData.dateOfBirth || prev.dateOfBirth,
-        gender: initialData.gender || prev.gender,
-        cityId: initialData.city_id || initialData.cityId || prev.cityId,
+      ...prev,
+      fullName: initialData.full_name || `${initialData.first_name || ''} ${initialData.last_name || ''}`.trim() || prev.fullName,
+      email: initialData.email || prev.email,
+      phoneNumber: initialData.phone_number || initialData.phoneNumber || prev.phoneNumber,
     }));
   }, [initialData]);
 
-  const genders = ['Male', 'Female', 'Non-binary', 'Prefer not to say'];
-  const cuisines = ['Italian', 'Mexican', 'Asian', 'French', 'Mediterranean', 'American', 'Indian', 'Japanese', 'Thai', 'Other'];
-  const dietaryOptions = ['Vegetarian', 'Vegan', 'Gluten-free', 'Dairy-free', 'Keto', 'Paleo', 'Halal', 'Kosher', 'No restrictions'];
-  const alcoholOptions = ['Wine', 'Beer', 'Spirits', 'Non-alcoholic', 'No preference'];
-  const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-  const timesOfDay = ['Morning', 'Afternoon', 'Evening'];
+  const languages = ['English', 'Afrikaans', 'Xhosa'];
+  const menuOptions = ['I eat everything', 'Vegetarian', 'Meat', 'Fish', 'Vegan', 'Halaal'];
+  const priceOptions = [
+    { id: 'budget', label: '$ - Budget Friendly' },
+    { id: 'moderate', label: '$$ - Moderate' },
+    { id: 'premium', label: '$$$ - Premium' }
+  ];
 
-  const toggleArrayItem = (key, value) => {
-    setFormData((prev) => ({
+  const toggleLanguage = (lang) => {
+    setFormData(prev => ({
       ...prev,
-      [key]: prev[key].includes(value)
-        ? prev[key].filter((item) => item !== value)
-        : [...prev[key], value],
+      languages: prev.languages.includes(lang)
+        ? prev.languages.filter(l => l !== lang)
+        : [...prev.languages, lang]
+    }));
+  };
+
+  const toggleMenuPreference = (pref) => {
+    setFormData(prev => ({
+      ...prev,
+      menuPreferences: prev.menuPreferences.includes(pref)
+        ? prev.menuPreferences.filter(p => p !== pref)
+        : [...prev.menuPreferences, pref]
     }));
   };
 
   const handleSave = () => {
     if (onSave) {
-      // Map frontend state to API expected format if needed
-      // Based on Postman: { gender: "Male", city_id: "..." }
-      // We should send everything that changed or is relevant
-      
-      const apiData = {
-          first_name: formData.firstName,
-          last_name: formData.lastName,
-          // email: formData.email, // Email usually not editable directly without verification
-          gender: formData.gender,
-          date_of_birth: formData.dateOfBirth || null,
-          // Add other fields as supported by API
-          // ...formData
-      };
-      
-      onSave(apiData);
+      // Split full name back into first and last for API if needed
+      const nameParts = formData.fullName.split(' ');
+      const firstName = nameParts[0] || '';
+      const lastName = nameParts.slice(1).join(' ') || '';
+
+      onSave({
+        first_name: firstName,
+        last_name: lastName,
+        phone_number: formData.phoneNumber,
+        languages: formData.languages,
+        menu_preferences: formData.menuPreferences,
+        price_range: formData.priceRange
+      });
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#080814] p-4 md:p-8">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen bg-[#080714] text-white">
+      <div className="max-w-4xl mx-auto px-4 py-6">
         {/* Header */}
-        <div className="mb-8">
+        <div className="flex items-center gap-4 mb-8">
           {onBack && (
-            <button
-              onClick={onBack}
-              className="text-[#E0E0E0] hover:text-[#F5F5F5]
-               transition-colors mb-4 flex items-center gap-2"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <button onClick={onBack} className="text-[#F5F5F5] hover:text-[#FFAA55] transition-colors flex items-center">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
-              <span>Back</span>
             </button>
           )}
-          <h1 className="text-3xl font-bold text-[#F5F5F5] mb-2">DinnersMatch</h1>
-          <p className="text-sm text-[#FFAA55] uppercase tracking-wide">My Account</p>
+          <h1 className="text-2xl font-bold text-[#FFAA55]">Edit Profile</h1>
         </div>
 
-        {/* Basic Info Section */}
-        <div className="bg-[#111121] border border-gray-700 rounded-lg p-6 mb-6">
-          <i className="text-xl font-bold text-[#F5F5F5]  uppercase">Basic Info</i>
-          <div className="space-y-4 mt-2">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-6">
+          {/* BASIC INFO Section */}
+          <div className="bg-[#111121] border border-[#2F3A51] rounded-lg p-6 md:p-8 shadow-lg">
+            <h2 className="text-lg font-bold italic uppercase mb-6 tracking-wide text-[#F5F5F5]">BASIC INFO</h2>
+            <div className="space-y-6">
               <div>
-                <label className="block text-[#E0E0E0] text-sm mb-2">First Name</label>
+                <label className="block text-sm text-[#757575] font-semibold mb-2">Full Name</label>
                 <input
                   type="text"
-                  value={formData.firstName}
-                  onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                  className="w-full px-4 py-3 bg-[#0F1419] border border-[#2F3A51]
-                   rounded-lg text-[#F5F5F5] placeholder-[#757575] focus:outline-none focus:border-[#FFAA55]"
-                  placeholder="Enter first name"
+                  value={formData.fullName}
+                  onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                  className="w-full px-4 py-3 bg-[#111121] border border-[#2F3A51] rounded-lg text-[#F5F5F5] placeholder-[#424242] focus:outline-none focus:border-[#FFAA55] transition-colors"
+                  placeholder="John Doe"
                 />
               </div>
               <div>
-                <label className="block text-[#E0E0E0] text-sm mb-2">Last Name</label>
+                <label className="block text-sm text-[#757575] font-semibold mb-2">Email</label>
                 <input
-                  type="text"
-                  value={formData.lastName}
-                  onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                  className="w-full px-4 py-3 bg-[#0F1419
-                   border border-gray-700 rounded-lg text-[#F5F5F5] placeholder-[#757575] focus:outline-none focus:border-[#FFAA55]"
-                  placeholder="Enter last name"
+                  type="email"
+                  value={formData.email}
+                  readOnly
+                  className="w-full px-4 py-3 bg-[#111121] border border-[#2F3A51] rounded-lg text-[#757575] focus:outline-none cursor-not-allowed"
+                  placeholder="john.doe@gmail.com"
+                />
+              </div>
+              <div>
+                <label className="block text-sm text-[#757575] font-semibold mb-2">Phone Number</label>
+                <input
+                  type="tel"
+                  value={formData.phoneNumber}
+                  onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
+                  className="w-full px-4 py-3 bg-[#111121] border border-[#2F3A51] rounded-lg text-[#F5F5F5] placeholder-[#424242] focus:outline-none focus:border-[#FFAA55] transition-colors"
+                  placeholder="+1 (XXX) XXX-XXXX"
                 />
               </div>
             </div>
-            <div>
-              <label className="block text-[#E0E0E0] text-sm mb-2">Email</label>
-              <input
-                type="email"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="w-full px-4 py-3 bg-[#0F1419] border border-gray-700 
-                rounded-lg text-[#F5F5F5] placeholder-[#757575] focus:outline-none focus:border-[#FFAA55]"
-                placeholder="Enter email"
-              />
-            </div>
-            <div>
-              <label className="block text-[#E0E0E0] text-sm mb-2">Phone Number</label>
-              <input
-                type="tel"
-                value={formData.phoneNumber}
-                onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
-                className="w-full px-4 py-3 bg-[#0F1419] border
-                 border-gray-700 rounded-lg text-[#F5F5F5] placeholder-[#757575] focus:outline-none focus:border-[#FFAA55]"
-                placeholder="Enter phone number"
-              />
-            </div>
-            <div>
-              <label className="block text-[#E0E0E0] text-sm mb-2">Date of Birth</label>
-              <input
-                type="date"
-                value={formData.dateOfBirth}
-                onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
-                className="w-full px-4 py-3 bg-[#0F1419] border border-gray-700 
-                rounded-lg text-[#F5F5F5] focus:outline-none focus:border-[#FFAA55]"
-              />
-            </div>
-            <div>
-              <label className="block text-[#E0E0E0] text-sm font-semibold mb-2">Gender</label>
+          </div>
+
+          {/* DINNER PREFERENCES Section */}
+          <div className="bg-[#111121] border border-[#2F3A51] rounded-lg p-6 md:p-8 shadow-lg">
+            <h2 className="text-lg font-bold italic uppercase mb-6 tracking-wide text-[#F5F5F5]">DINNER PREFERENCES</h2>
+            
+            {/* Languages */}
+            <div className="mb-8">
+              <label className="block text-sm text-[#757575] font-semibold mb-4">Languages</label>
               <div className="flex flex-wrap gap-3">
-                {genders.map((gender) => (
+                {languages.map((lang) => (
                   <button
-                    key={gender}
-                    onClick={() => setFormData({ ...formData, gender })}
-                    className={`px-4 py-2 rounded-lg border transition-all ${
-                      formData.gender === gender
-                        ? 'bg-[#FFAA55] border-[#FFAA55] text-[#F5F5F5]'
-                        : 'bg-[#0F1419] border-gray-700 text-[#E0E0E0] hover:border-[#FFAA55]'
+                    key={lang}
+                    onClick={() => toggleLanguage(lang)}
+                    className={`px-6 py-2.5 rounded-lg border transition-all text-sm font-bold ${
+                      formData.languages.includes(lang)
+                        ? 'bg-[#FFAA55] border-[#FFAA55] text-[#212121]'
+                        : 'bg-[#111121] border-[#2F3A51] text-[#F5F5F5] hover:border-[#FFAA55]'
                     }`}
                   >
-                    {gender}
+                    {lang}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Menu Preferences */}
+            <div className="mb-8">
+              <label className="block text-sm text-[#757575] font-semibold mb-4">Menu Preferences</label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {menuOptions.map((option) => (
+                  <button
+                    key={option}
+                    onClick={() => toggleMenuPreference(option)}
+                    className={`w-full px-4 py-3 rounded-lg border text-left transition-all text-sm font-semibold ${
+                      formData.menuPreferences.includes(option)
+                        ? 'bg-[#FFAA55] border-[#FFAA55] text-[#212121]'
+                        : 'bg-[#111121] border-[#2F3A51] text-[#F5F5F5] hover:border-[#FFAA55]'
+                    }`}
+                  >
+                    {option}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Price Range */}
+            <div>
+              <label className="block text-sm text-[#757575] font-semibold mb-4">Price Range</label>
+              <div className="space-y-3 max-w-xs">
+                {priceOptions.map((option) => (
+                  <button
+                    key={option.id}
+                    onClick={() => setFormData({ ...formData, priceRange: option.id })}
+                    className={`w-full px-4 py-3 rounded-lg border text-left transition-all text-sm font-semibold ${
+                      formData.priceRange === option.id
+                        ? 'bg-[#FFAA55] border-[#FFAA55] text-[#212121]'
+                        : 'bg-[#111121] border-[#2F3A51] text-[#F5F5F5] hover:border-[#FFAA55]'
+                    }`}
+                  >
+                    {option.label}
                   </button>
                 ))}
               </div>
@@ -171,137 +184,20 @@ const EditProfilePage = ({ onSave, onBack, initialData = {} }) => {
           </div>
         </div>
 
-        {/* Dinner Preferences Section */}
-        <div className="bg-[#111121] border border-gray-700 rounded-lg p-6 mb-6">
-          <i className="text-lg font-bold text-[#F5F5F5] mb-6 uppercase">Dinner Preferences</i>
-          
-          {/* Cuisine */}
-          <div className="mb-6 mt-2">
-            <label className="block text-[#E0E0E0] font-semibold  text-sm mb-3">Cuisine</label>
-            <div className="flex flex-wrap gap-3">
-              {cuisines.map((cuisine) => (
-                <button
-                  key={cuisine}
-                  onClick={() => toggleArrayItem('cuisine', cuisine)}
-                  className={`px-4 py-2 rounded-lg border transition-all ${
-                    formData.cuisine.includes(cuisine)
-                      ? 'bg-[#FFAA55] border-[#FFAA55] text-[#F5F5F5]'
-                      : 'bg-[#0F1419] border-[#2F3A51] text-[#E0E0E0] hover:border-[#FFAA55]'
-                  }`}
-                >
-                  {cuisine}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Dietary Preference */}
-          <div className="mb-6">
-            <label className="block text-[#E0E0E0] font-semibold  text-sm mb-3">Dietary Preference</label>
-            <div className="flex flex-wrap gap-3">
-              {dietaryOptions.map((option) => (
-                <button
-                  key={option}
-                  onClick={() => toggleArrayItem('dietaryPreference', option)}
-                  className={`px-4 py-2 rounded-lg border transition-all ${
-                    formData.dietaryPreference.includes(option)
-                      ? 'bg-[#FFAA55] border-[#FFAA55] text-[#F5F5F5]'
-                      : 'bg-[#0F1419] border-[#2F3A51] text-[#E0E0E0] hover:border-[#FFAA55]'
-                  }`}
-                >
-                  {option}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Alcohol Preference */}
-          <div className="mb-6">
-            <label className="block text-[#E0E0E0] font-semibold  text-sm mb-3">Alcohol Preference</label>
-            <div className="flex flex-wrap gap-3">
-              {alcoholOptions.map((option) => (
-                <button
-                  key={option}
-                  onClick={() => toggleArrayItem('alcoholPreference', option)}
-                  className={`px-4 py-2 rounded-lg border transition-all ${
-                    formData.alcoholPreference.includes(option)
-                      ? 'bg-[#FFAA55] border-[#FFAA55] text-[#F5F5F5]'
-                      : 'bg-[#0F1419] border-[#2F3A51] text-[#E0E0E0] hover:border-[#FFAA55]'
-                  }`}
-                >
-                  {option}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Day of Week */}
-          <div className="mb-6">
-            <label className="block text-[#E0E0E0] font-semibold  text-sm mb-3">Day of the Week</label>
-            <div className="flex flex-wrap gap-3">
-              {daysOfWeek.map((day) => (
-                <button
-                  key={day}
-                  onClick={() => toggleArrayItem('dayOfWeek', day)}
-                  className={`px-4 py-2 rounded-lg border transition-all ${
-                    formData.dayOfWeek.includes(day)
-                      ? 'bg-[#FFAA55] border-[#FFAA55] text-[#F5F5F5]'
-                      : 'bg-[#0F1419] border-[#2F3A51] text-[#E0E0E0] hover:border-[#FFAA55]'
-                  }`}
-                >
-                  {day}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Time of Day */}
-          <div className="mb-6">
-            <label className="block text-[#E0E0E0] font-semibold text-sm mb-3">Time of Day</label>
-            <div className="flex flex-wrap gap-3">
-              {timesOfDay.map((time) => (
-                <button
-                  key={time}
-                  onClick={() => toggleArrayItem('timeOfDay', time)}
-                  className={`px-4 py-2 rounded-lg border transition-all ${
-                    formData.timeOfDay.includes(time)
-                      ? 'bg-[#FFAA55] border-[#FFAA55] text-[#F5F5F5]'
-                      : 'bg-[#0F1419] border-[#2F3A51] text-[#E0E0E0] hover:border-[#FFAA55]'
-                  }`}
-                >
-                  {time}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Budget */}
-          <div>
-            <label className="block text-[#E0E0E0] font-semibold  text-sm mb-2">Budget</label>
-            <div className="relative">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#E0E0E0]">$</span>
-              <input
-                type="text"
-                value={formData.budget}
-                onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
-                placeholder="Enter budget"
-                className="w-full pl-8 pr-4 py-3 bg-[#0F1419] border border-gray-700 rounded-lg text-[#F5F5F5] placeholder-[#A0A0A0] focus:outline-none focus:border-[#FFAA55]"
-              />
-            </div>
-          </div>
-        </div>
-
         {/* Save Button */}
-        <button
-          onClick={handleSave}
-          className="w-full bg-[#FFAA55] text-[#212121] py-4 px-2
-           rounded-lg  text-sm uppercase tracking-wide hover:bg-[#FF9955] transition-colors"
-        >
-          Save Changes
-        </button>
+        <div className="mt-10">
+          <button
+            onClick={handleSave}
+            className="w-full bg-[#FFAA55] text-[#212121] py-4 rounded-lg font-bold text-base uppercase tracking-wide hover:bg-[#FF9955] transition-colors shadow-lg"
+          >
+            Save Changes
+          </button>
+        </div>
       </div>
     </div>
+
   );
 };
 
 export default EditProfilePage;
+

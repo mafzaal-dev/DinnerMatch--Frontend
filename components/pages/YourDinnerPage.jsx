@@ -25,7 +25,7 @@ const YourDinnerPage = ({ dinners = [], onViewDetails, onMyAccount }) => {
   const displayDinners = dinners.length > 0 ? dinners : defaultDinners;
 
   return (
-    <div className="min-h-screen bg-[#080814] p-4 md:p-8">
+    <div className="min-h-screen bg-[#080714] p-4 md:p-8">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-8 flex items-center justify-between">

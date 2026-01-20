@@ -99,3 +99,4 @@ const AreaSelectionModal = ({ isOpen, onClose, onSelectArea, city, selectedCityI
 
 export default AreaSelectionModal;
 
+
