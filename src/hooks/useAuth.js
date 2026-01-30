@@ -22,30 +22,23 @@ export const useAuth = () => {
         const storedUser = localStorage.getItem('user_data');
         const token = localStorage.getItem('access_token');
         
-        if (token) {
-          if (storedUser) {
-            setUser(JSON.parse(storedUser));
-          }
-          
-          // Verify/Fetch fresh user data
+        if (token && storedUser) {
           try {
-            const response = await api.get(API_ENDPOINTS.AUTH_ME);
-            if (response.success && response.data) {
-              setUser(response.data);
-              localStorage.setItem('user_data', JSON.stringify(response.data));
-            }
-          } catch (apiError) {
-            console.error('Failed to fetch user profile:', apiError);
-            // If token is invalid (401), the interceptor might have handled it or we should clear it
-            // Interceptor handles 401 refresh logic.
+            const parsedUser = JSON.parse(storedUser);
+            setUser(parsedUser);
+            setIsLoading(false);
+          } catch (parseError) {
+            console.error('Failed to parse stored user:', parseError);
+            localStorage.removeItem('user_data');
+            localStorage.removeItem('access_token');
+            localStorage.removeItem('refresh_token');
+            setIsLoading(false);
           }
+        } else {
+          setIsLoading(false);
         }
       } catch (err) {
         console.error('Failed to load auth state:', err);
-        localStorage.removeItem('access_token');
-        localStorage.removeItem('refresh_token');
-        localStorage.removeItem('user_data');
-      } finally {
         setIsLoading(false);
       }
     };
@@ -63,28 +56,31 @@ export const useAuth = () => {
       if (response.success && response.data) {
         const { access, refresh, ...userData } = response.data;
         
-        // Store tokens
-        if (access) localStorage.setItem('access_token', access);
-        if (refresh) localStorage.setItem('refresh_token', refresh);
+        if (!access || !refresh) {
+          throw new Error('Invalid response: missing tokens');
+        }
         
-        // Store user data
+        localStorage.setItem('access_token', access);
+        localStorage.setItem('refresh_token', refresh);
         localStorage.setItem('user_data', JSON.stringify(userData));
+        
         setUser(userData);
+        setIsLoading(false);
 
         if (redirectPath) {
-          router.push(redirectPath);
+          setTimeout(() => router.push(redirectPath), 100);
         }
+        
         return response;
       } else {
         throw new Error(response.message || 'Login failed');
       }
     } catch (err) {
       console.error('Login failed:', err);
-      const message = err.response?.data?.detail || err.message || 'Login failed';
+      const message = err.data?.message || err.message || 'Login failed';
       setError(message);
-      throw err;
-    } finally {
       setIsLoading(false);
+      throw err;
     }
   }, [router]);
 
@@ -145,12 +141,16 @@ export const useAuth = () => {
       const response = await api.get(API_ENDPOINTS.USER_PROFILE);
       
       if (response.success && response.data) {
-          // Merge profile data with user data if needed, or return as is
           return response.data;
       }
       return null;
     } catch (err) {
       console.error('Get profile failed:', err);
+      // For new users, profile might not exist yet - that's okay
+      if (err.status === 404 || err.response?.status === 404) {
+        console.log('Profile not found (new user) - returning null');
+        return null;
+      }
       throw err;
     } finally {
         setIsLoading(false);

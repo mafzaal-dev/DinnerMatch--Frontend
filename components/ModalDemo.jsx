@@ -8,7 +8,7 @@ import {
   PricingModal,
   CitySelectionModal,
   AreaSelectionModal,
-  PersonalityQuiz,
+  QuizFlow,
 } from './modals';
 
 /**
@@ -106,7 +106,7 @@ const ModalDemo = () => {
             onClick={() => setQuizOpen(true)}
             className="bg-orange-600 text-white px-6 py-3 rounded-lg hover:bg-orange-700 transition-colors"
           >
-            Open Personality Quiz
+            Open Quiz Flow
           </button>
 
           <button
@@ -187,7 +187,7 @@ const ModalDemo = () => {
         city={selectedCity?.name || 'Cape Town'}
       />
 
-      <PersonalityQuiz
+      <QuizFlow
         isOpen={quizOpen}
         onClose={() => setQuizOpen(false)}
         onComplete={handleQuizComplete}

@@ -13,18 +13,12 @@ export default function AdminLayout({ children }) {
 
   // Protect admin routes
   useEffect(() => {
-    // Skip protection for login page
     if (pathname === '/admin/login') return;
 
-    if (!isLoading) {
-      if (!isAuthenticated) {
-         router.push('/admin/login');
-      }
-      //  else if (!isAdmin) {
-      //    router.push('/');
-      // }
+    if (!isLoading && !isAuthenticated) {
+      router.replace('/admin/login');
     }
-  }, [isLoading, isAuthenticated, isAdmin, router, pathname]);
+  }, [isLoading, isAuthenticated, router, pathname]);
 
   // Close sidebar on route change
   useEffect(() => {
@@ -32,12 +26,10 @@ export default function AdminLayout({ children }) {
   }, [pathname]);
 
   const handleLogout = () => {
-    // Here you would typically clear authentication tokens/session
-    console.log('Admin logged out');
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
     localStorage.removeItem('user_data');
-    router.push('/admin/login');
+    router.replace('/admin/login');
   };
 
   // Don't show sidebar on login page

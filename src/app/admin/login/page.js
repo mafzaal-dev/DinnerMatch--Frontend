@@ -3,18 +3,25 @@
 import AdminLoginPage from '@/components/admin/AdminLoginPage';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'react-hot-toast';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
 export default function AdminLogin() {
-  const { login, isLoading, error } = useAuth();
+  const { login, isLoading, error, isAuthenticated } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (isAuthenticated && !isLoading) {
+      router.replace('/admin/dashboard');
+    }
+  }, [isAuthenticated, isLoading, router]);
 
   const handleAdminLogin = async (credentials) => {
     try {
       await login(credentials, '/admin/dashboard');
       toast.success('Welcome back, Admin!');
     } catch (err) {
-      console.error('Admin login failed:', err);
-      // Error is handled in useAuth, but showing toast here as well
-      // toast.error(err.response?.data?.detail || 'Invalid credentials');
+      toast.error(err.data?.message || err.message || 'Invalid credentials');
     }
   };
 

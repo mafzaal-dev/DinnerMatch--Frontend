@@ -15,20 +15,28 @@ export default function EditProfile() {
   useEffect(() => {
     const fetchProfile = async () => {
         try {
-            // First use user data from context if available as a base
-            // But we should fetch fresh profile data to be sure
-            const profileData = await getProfile();
-            if (profileData) {
-                setInitialData({
-                    ...user, // Basic info like email/name from auth
-                    ...profileData // Profile specific info
-                });
-            } else if (user) {
-                 setInitialData(user);
+            const storedUser = typeof window !== 'undefined' 
+              ? JSON.parse(localStorage.getItem('user_data') || '{}') 
+              : {};
+            
+            try {
+              const profileData = await getProfile();
+              if (profileData) {
+                  setInitialData({
+                      ...storedUser,
+                      ...user,
+                      ...profileData
+                  });
+              } else if (user || Object.keys(storedUser).length > 0) {
+                  setInitialData({ ...storedUser, ...user });
+              }
+            } catch (profileError) {
+              if (user || Object.keys(storedUser).length > 0) {
+                  setInitialData({ ...storedUser, ...user });
+              }
             }
         } catch (error) {
-            console.error('Failed to fetch profile', error);
-            toast.error('Failed to load profile data');
+            console.error('Failed to load profile', error);
         } finally {
             setLoading(false);
         }
@@ -41,8 +49,20 @@ export default function EditProfile() {
   const handleSave = async (formData) => {
     try {
         await updateProfile(formData);
-        toast.success('Profile updated successfully');
-        router.push('/account');
+        toast.success('Profile updated successfully! You can now request for dinners.');
+        
+        if (typeof window !== 'undefined') {
+          const showBookDinner = localStorage.getItem('show_book_dinner');
+          localStorage.removeItem('show_book_dinner');
+          
+          if (showBookDinner === 'true') {
+            router.push('/');
+          } else {
+            router.push('/available-dinners');
+          }
+        } else {
+          router.push('/available-dinners');
+        }
     } catch (error) {
         console.error('Failed to update profile', error);
         toast.error(error.message || 'Failed to update profile');

@@ -13,7 +13,8 @@ const CreateEditDinnerPage = ({ dinnerId = null, isEdit = false }) => {
     title: '',
     date: '',
     location: '',
-    dinner_type: 'Public',
+    dinner_type: 'Open',
+    dinner_status: 'Draft',
   });
 
   useEffect(() => {
@@ -32,7 +33,8 @@ const CreateEditDinnerPage = ({ dinnerId = null, isEdit = false }) => {
           title: dinner.title || '',
           date: dinner.date ? formatDateForInput(dinner.date) : '',
           location: dinner.location || '',
-          dinner_type: dinner.dinner_type || 'Public',
+          dinner_type: dinner.dinner_type || 'Open',
+          dinner_status: dinner.dinner_status || 'Draft',
         });
       } else {
         toast.error('Dinner not found');
@@ -93,6 +95,7 @@ const CreateEditDinnerPage = ({ dinnerId = null, isEdit = false }) => {
         date: dateToSend,
         location: formData.location,
         dinner_type: formData.dinner_type,
+        dinner_status: formData.dinner_status,
       };
 
       if (isEdit && dinnerId) {
@@ -224,11 +227,30 @@ const CreateEditDinnerPage = ({ dinnerId = null, isEdit = false }) => {
                 onChange={handleChange}
                 className="w-full px-4 py-2.5 border border-[#D1D5DB] rounded-lg text-sm focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316] outline-none bg-white"
               >
-                <option value="Public">Public</option>
-                <option value="Private">Private</option>
+                <option value="Open">Open</option>
+                <option value="Upcoming">Upcoming</option>
               </select>
               <p className="mt-1 text-xs text-[#6B7280]">
-                Public dinners are open to all users, private dinners are invitation-only
+                Select whether this is an open or upcoming dinner event
+              </p>
+            </div>
+
+            {/* Dinner Status */}
+            <div>
+              <label className="block text-sm font-medium text-[#374151] mb-2">
+                Dinner Status <span className="text-red-500">*</span>
+              </label>
+              <select
+                name="dinner_status"
+                value={formData.dinner_status}
+                onChange={handleChange}
+                className="w-full px-4 py-2.5 border border-[#D1D5DB] rounded-lg text-sm focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316] outline-none bg-white"
+              >
+                <option value="Draft">Draft</option>
+                <option value="Upcoming">Upcoming</option>
+              </select>
+              <p className="mt-1 text-xs text-[#6B7280]">
+                Set the current status of the dinner event
               </p>
             </div>
           </div>

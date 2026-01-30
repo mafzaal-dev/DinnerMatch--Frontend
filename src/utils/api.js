@@ -50,15 +50,26 @@ axiosInstance.interceptors.response.use(
     const originalRequest = error.config;
 
     // Prevent infinite loops
-    if (error.response?.status === 401 && !originalRequest._retry && !originalRequest.url.includes('/auth/login')) {
+    if (error.response?.status === 401 && !originalRequest._retry && !originalRequest.url.includes('/auth/login') && !originalRequest.url.includes('/register')) {
       originalRequest._retry = true;
 
-      try {
-        const refreshToken = getRefreshToken();
-        if (!refreshToken) {
-          throw new Error('No refresh token available');
+      const refreshToken = getRefreshToken();
+      const isAuthOrProfileCall = originalRequest.url.includes('/auth/me') || 
+                                  originalRequest.url.includes('/profile/me');
+      
+      // If no refresh token available
+      if (!refreshToken) {
+        // For auth/profile calls, just fail silently (user might be newly registered)
+        if (isAuthOrProfileCall) {
+          return Promise.reject(new Error('Unauthorized - new user profile not yet created'));
         }
+        
+        // For other calls, fail without auto-redirecting (let the component handle it)
+        return Promise.reject(new Error('No refresh token available'));
+      }
 
+      // Try to refresh the token
+      try {
         // Call refresh endpoint
         const response = await axios.post(`${API_BASE_URL}/auth/refresh/`, {
           refresh: refreshToken,
@@ -74,12 +85,11 @@ axiosInstance.interceptors.response.use(
           return axiosInstance(originalRequest);
         }
       } catch (refreshError) {
-        // If refresh fails, logout user
-        if (typeof window !== 'undefined') {
+        // If refresh fails and this is not an AUTH_ME or profile call, logout user
+        if (typeof window !== 'undefined' && !isAuthOrProfileCall) {
           localStorage.removeItem('access_token');
           localStorage.removeItem('refresh_token');
           localStorage.removeItem('user_data');
-          // Redirect to login or dispatch an event
           window.location.href = '/login';
         }
         return Promise.reject(refreshError);
@@ -114,7 +124,7 @@ export const API_ENDPOINTS = {
   // Auth
   LOGIN: '/auth/login/',
   REGISTER: '/auth/register/',
-  REGISTER_WITH_QUIZ: '/register-with-quiz/',
+  REGISTER_WITH_QUIZ: '/auth/register-with-quiz/',
   REFRESH: '/auth/refresh/',
   LOGOUT: '/auth/logout/', 
   AUTH_ME: '/auth/me/',
@@ -148,6 +158,10 @@ export const API_ENDPOINTS = {
   GROUP_CREATE: '/groups/create/',
   GROUP_LIST: '/groups/list/',
   GROUP_MARK_BOOKED: '/group/mark-as-booked/',
+  
+  // Dinner Requests
+  DINNER_MAKE_REQUEST: '/dinner/make-request/',
+  DINNER_REQUESTS_LIST: '/dinner/requests/list/',
   
   // Others
   DINNERS: '/dinners/',

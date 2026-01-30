@@ -117,18 +117,6 @@ const LoginPage = ({ onLogin, onSignUp, isLoading, error }) => {
               ) : 'Login'}
             </button>
 
-            {/* Sign Up Link */}
-            <p className="text-center text-[#E0E0E0] text-sm">
-              Don't have an account?{' '}
-              <button
-                type="button"
-                onClick={onSignUp}
-                className="text-[#FFAA55] hover:underline"
-              >
-                Sign up
-              </button>
-            </p>
-
             {/* Terms */}
             <p className="text-xs text-[#A0A0A0] text-center mt-4">
               By continuing, you agree to our{' '}

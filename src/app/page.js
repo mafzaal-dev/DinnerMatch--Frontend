@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from 'next/navigation';
 import Navbar from "../../components/Navbar";
 import Hero from "../../components/Hero";
 import Testimonials from "../../components/Testimonials";
@@ -9,137 +10,196 @@ import AboutUs from "../../components/AboutUs";
 import FAQ from "../../components/FAQ";
 import Footer from "../../components/Footer";
 import { 
-  PersonalityQuiz, 
   CitySelectionModal, 
   AreaSelectionModal, 
-  IdentityQuiz, 
-  BirthdayPicker,
-  SocialLoginModal,
-  EmailConfirmationModal,
-  PasswordCreationModal,
-  UserInfoModal,
+  QuizFlow,
+  QuizResultsModal,
+  SignupModal,
   WelcomeModal,
-  HowItWorksModal,
   BookDinnerModal
 } from "../../components/modals";
+import { api, API_ENDPOINTS } from '../utils/api';
 
 export default function Home() {
-  const [quizFlow, setQuizFlow] = useState(null); // null, 'city', 'place', 'quiz', 'identity', 'birthday', 'social-login', 'email', 'password', 'user-info', 'welcome', 'how-it-works', 'book-dinner'
+  const router = useRouter();
+  const [quizStep, setQuizStep] = useState(null);
   const [selectedCity, setSelectedCity] = useState(null);
   const [selectedPlace, setSelectedPlace] = useState(null);
-  const [personalityAnswers, setPersonalityAnswers] = useState(null);
-  const [identityAnswers, setIdentityAnswers] = useState(null);
-  const [selectedLoginMethod, setSelectedLoginMethod] = useState(null);
-  const [userEmail, setUserEmail] = useState(null);
-  const [userPassword, setUserPassword] = useState(null);
-  const [userInfo, setUserInfo] = useState(null);
+  const [quizAnswers, setQuizAnswers] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     const handleOpenQuiz = () => {
-      setQuizFlow('city');
+      setQuizStep('city');
     };
 
     window.addEventListener('openQuiz', handleOpenQuiz);
+    
+    if (typeof window !== 'undefined') {
+      const showBookDinner = localStorage.getItem('show_book_dinner');
+      if (showBookDinner === 'true') {
+        const city = JSON.parse(localStorage.getItem('quiz_city') || 'null');
+        const place = JSON.parse(localStorage.getItem('quiz_place') || 'null');
+        
+        if (city && place) {
+          setSelectedCity(city);
+          setSelectedPlace(place);
+          setQuizStep('book-dinner');
+        }
+        
+        localStorage.removeItem('show_book_dinner');
+        localStorage.removeItem('quiz_answers');
+      }
+    }
     
     return () => {
       window.removeEventListener('openQuiz', handleOpenQuiz);
     };
   }, []);
 
+  const resetQuizFlow = () => {
+    setQuizStep(null);
+    setSelectedCity(null);
+    setSelectedPlace(null);
+    setQuizAnswers(null);
+    setError('');
+    
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('quiz_answers');
+      localStorage.removeItem('quiz_city');
+      localStorage.removeItem('quiz_place');
+    }
+  };
+
   const handleCitySelect = (city) => {
     setSelectedCity(city);
-    setQuizFlow('place');
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('quiz_city', JSON.stringify(city));
+    }
+    setQuizStep('place');
   };
 
   const handlePlaceSelect = (place) => {
     setSelectedPlace(place);
-    setQuizFlow('quiz');
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('quiz_place', JSON.stringify(place));
+    }
+    setQuizStep('quiz');
   };
 
-  const handlePersonalityQuizComplete = (answers) => {
-    setPersonalityAnswers(answers);
-    // After compatibility score, show identity quiz
-    setQuizFlow('identity');
+  const handleQuizComplete = (answers) => {
+    const validAnswers = Array.isArray(answers) ? answers.filter(a => a && a.question_id) : [];
+    setQuizAnswers(validAnswers);
+    
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('quiz_answers', JSON.stringify(validAnswers));
+    }
+    
+    setQuizStep('results');
   };
 
-  const handleIdentityQuizComplete = (answers) => {
-    setIdentityAnswers(answers);
-    // After identity quiz, show birthday picker
-    setQuizFlow('birthday');
-  };
-
-  const handleBirthdayConfirm = (birthday) => {
-    // After birthday, show social login
-    setQuizFlow('social-login');
-  };
-
-  const handleSocialLoginSelect = (method) => {
-    setSelectedLoginMethod(method);
-    if (method === 'email') {
-      setQuizFlow('email');
+  const handleResultsContinue = () => {
+    const accessToken = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
+    
+    if (accessToken) {
+      setQuizStep('book-dinner');
     } else {
-      // For Apple/Google, skip to user info
-      setQuizFlow('user-info');
+      setQuizStep('signup');
     }
   };
 
-  const handleEmailConfirm = (email) => {
-    setUserEmail(email);
-    setQuizFlow('password');
-  };
+  const handleSignup = async (formData) => {
+    try {
+      setLoading(true);
+      setError('');
 
-  const handlePasswordCreate = (password) => {
-    setUserPassword(password);
-    setQuizFlow('user-info');
-  };
+      const answersArray = Array.isArray(quizAnswers) ? quizAnswers.filter(a => a && a.question_id) : [];
 
-  const handleUserInfoSubmit = (info) => {
-    setUserInfo(info);
-    setQuizFlow('welcome');
+      const registrationData = {
+        email: formData.email,
+        password: formData.password,
+        first_name: formData.firstName,
+        last_name: formData.lastName || '',
+        answers: answersArray
+      };
+      
+      if (formData.mobileNumber) {
+        registrationData.phone_number = formData.mobileNumber;
+      }
+
+      const response = await api.post(API_ENDPOINTS.REGISTER_WITH_QUIZ, registrationData);
+
+      if (response.success) {
+        const accessToken = response.data?.access || response.data?.tokens?.access || response.access;
+        const refreshToken = response.data?.refresh || response.data?.tokens?.refresh || response.refresh;
+        
+        if (!accessToken || !refreshToken) {
+          try {
+            const loginResponse = await api.post(API_ENDPOINTS.LOGIN, {
+              email: formData.email,
+              password: formData.password
+            });
+            
+            if (loginResponse.success && loginResponse.data) {
+              const loginAccessToken = loginResponse.data.access;
+              const loginRefreshToken = loginResponse.data.refresh;
+              
+              if (loginAccessToken) localStorage.setItem('access_token', loginAccessToken);
+              if (loginRefreshToken) localStorage.setItem('refresh_token', loginRefreshToken);
+              
+              if (loginResponse.data) {
+                localStorage.setItem('user_data', JSON.stringify(loginResponse.data));
+              }
+            }
+          } catch (loginError) {
+            console.error('Login after registration failed:', loginError);
+            throw new Error('Registration succeeded but auto-login failed. Please try logging in manually.');
+          }
+        } else {
+          localStorage.setItem('access_token', accessToken);
+          localStorage.setItem('refresh_token', refreshToken);
+          
+          if (response.data?.user || response.data) {
+            const userData = response.data.user || {
+              id: response.data.id,
+              email: formData.email,
+              first_name: formData.firstName,
+              last_name: formData.lastName,
+              full_name: `${formData.firstName} ${formData.lastName}`,
+            };
+            localStorage.setItem('user_data', JSON.stringify(userData));
+          }
+        }
+        
+        localStorage.removeItem('quiz_answers');
+
+        setQuizStep('welcome');
+      }
+    } catch (err) {
+      console.error('Registration error:', err);
+      const errorMessage = err.data?.message || err.message || 'Registration failed. Please try again.';
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleWelcomeNext = () => {
-    setQuizFlow('how-it-works');
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('show_book_dinner', 'true');
+    }
+    router.push('/edit-profile');
   };
 
-  const handleHowItWorksNext = () => {
-    setQuizFlow('book-dinner');
-  };
-
-  const handleSecureSpot = (slotId) => {
-    console.log('Complete flow data:', {
-      city: selectedCity,
-      place: selectedPlace,
-      personalityAnswers,
-      identityAnswers,
-      loginMethod: selectedLoginMethod,
-      email: userEmail,
-      password: userPassword,
-      userInfo,
-      selectedSlot: slotId,
-    });
-    // Complete the entire flow
-    setQuizFlow(null);
-    setSelectedCity(null);
-    setSelectedPlace(null);
-    setPersonalityAnswers(null);
-    setIdentityAnswers(null);
-    setSelectedLoginMethod(null);
-    setUserEmail(null);
-    setUserPassword(null);
-    setUserInfo(null);
-  };
-
-  const handleClose = () => {
-    setQuizFlow(null);
-    setSelectedCity(null);
-    setSelectedPlace(null);
-    setPersonalityAnswers(null);
-    setIdentityAnswers(null);
-    setSelectedLoginMethod(null);
-    setUserEmail(null);
-    setUserPassword(null);
-    setUserInfo(null);
+  const handleBookDinnerSuccess = (data) => {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('quiz_city');
+      localStorage.removeItem('quiz_place');
+      localStorage.removeItem('quiz_answers');
+    }
+    resetQuizFlow();
+    router.push('/your-dinner');
   };
 
   return (
@@ -152,108 +212,68 @@ export default function Home() {
       <FAQ />
       <Footer />
       
-      {/* City Selection Modal */}
       <CitySelectionModal
-        isOpen={quizFlow === 'city'}
-        onClose={handleClose}
+        isOpen={quizStep === 'city'}
+        onClose={resetQuizFlow}
         onSelectCity={handleCitySelect}
       />
       
-      {/* Place Selection Modal */}
       <AreaSelectionModal
-        isOpen={quizFlow === 'place'}
-        onClose={() => setQuizFlow('city')}
+        isOpen={quizStep === 'place'}
+        onClose={() => setQuizStep('city')}
         onSelectArea={handlePlaceSelect}
         city={selectedCity?.name}
         selectedCityId={selectedCity?.id}
       />
       
-      {/* Personality Quiz */}
-      <PersonalityQuiz
-        isOpen={quizFlow === 'quiz'}
-        onClose={handleClose}
-        onBack={() => setQuizFlow('place')}
-        onComplete={handlePersonalityQuizComplete}
+      <QuizFlow
+        isOpen={quizStep === 'quiz'}
+        onClose={resetQuizFlow}
+        onBack={() => setQuizStep('place')}
+        onComplete={handleQuizComplete}
       />
       
-      {/* Identity Quiz */}
-      <IdentityQuiz
-        isOpen={quizFlow === 'identity'}
-        onClose={handleClose}
-        onBack={() => setQuizFlow('quiz')}
-        onComplete={handleIdentityQuizComplete}
+      <QuizResultsModal
+        isOpen={quizStep === 'results'}
+        onClose={resetQuizFlow}
+        onContinue={handleResultsContinue}
+        compatibilityScore={90}
       />
       
-      {/* Birthday Picker */}
-      <BirthdayPicker
-        isOpen={quizFlow === 'birthday'}
-        onClose={handleClose}
-        onBack={() => setQuizFlow('identity')}
-        onConfirm={handleBirthdayConfirm}
+      <SignupModal
+        isOpen={quizStep === 'signup'}
+        onClose={resetQuizFlow}
+        onBack={() => setQuizStep('results')}
+        onSignup={handleSignup}
+        loading={loading}
+        error={error}
       />
       
-      {/* Social Login Modal */}
-      <SocialLoginModal
-        isOpen={quizFlow === 'social-login'}
-        onClose={handleClose}
-        onSelectMethod={handleSocialLoginSelect}
-        onBackToOptions={() => setQuizFlow('birthday')}
-        onSignIn={() => setQuizFlow('social-login')}
-      />
-      
-      {/* Email Confirmation Modal */}
-      <EmailConfirmationModal
-        isOpen={quizFlow === 'email'}
-        onClose={handleClose}
-        onBack={() => setQuizFlow('social-login')}
-        onContinue={handleEmailConfirm}
-      />
-      
-      {/* Password Creation Modal */}
-      <PasswordCreationModal
-        isOpen={quizFlow === 'password'}
-        onClose={handleClose}
-        onBack={() => setQuizFlow('email')}
-        onContinue={handlePasswordCreate}
-      />
-      
-      {/* User Info Modal */}
-      <UserInfoModal
-        isOpen={quizFlow === 'user-info'}
-        onClose={handleClose}
-        onBack={() => {
-          if (selectedLoginMethod === 'email') {
-            setQuizFlow('password');
-          } else {
-            setQuizFlow('social-login');
-          }
-        }}
-        onContinue={handleUserInfoSubmit}
-      />
-      
-      {/* Welcome Modal */}
       <WelcomeModal
-        isOpen={quizFlow === 'welcome'}
-        onClose={handleClose}
-        onBack={() => setQuizFlow('user-info')}
+        isOpen={quizStep === 'welcome'}
+        onClose={resetQuizFlow}
         onNext={handleWelcomeNext}
       />
       
-      {/* How It Works Modal */}
-      <HowItWorksModal
-        isOpen={quizFlow === 'how-it-works'}
-        onClose={handleClose}
-        onBack={() => setQuizFlow('welcome')}
-        onNext={handleHowItWorksNext}
-      />
-      
-      {/* Book Dinner Modal */}
       <BookDinnerModal
-        isOpen={quizFlow === 'book-dinner'}
-        onClose={handleClose}
-        onBack={() => setQuizFlow('how-it-works')}
-        onSecureSpot={handleSecureSpot}
+        isOpen={quizStep === 'book-dinner'}
+        onClose={resetQuizFlow}
+        onSuccess={handleBookDinnerSuccess}
+        selectedCity={selectedCity}
+        selectedPlace={selectedPlace}
       />
+
+      {loading && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-[#080814] rounded-xl w-full max-w-154 p-10">
+            <div className="flex flex-col items-center justify-center space-y-4">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#FFAA55]"></div>
+              <p className="text-[#F5F5F5] text-lg">Creating your account...</p>
+              <p className="text-[#E0E0E0] text-sm">Please wait while we set everything up</p>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
