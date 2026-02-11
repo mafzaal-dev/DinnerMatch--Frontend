@@ -52,6 +52,7 @@ const SortableOption = ({ id, index, option, handleOptionChange, handleDeleteOpt
                         placeholder="Select Language" 
                         value={option?.label || ''}
                         onChange={(e) => handleOptionChange(index, e.target.value)}
+                        maxLength={150}
                         className="w-full px-4 py-2.5 border border-[#D1D5DB] rounded-lg text-sm focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316] outline-none"
                     />
                     <button 
@@ -188,6 +189,32 @@ const CreateQuizPage = ({ quizId = null, isEdit = false }) => {
   };
 
   const handleSubmit = async () => {
+    // Validation
+    if (!formData.code.trim()) {
+      toast.error('Title is required');
+      return;
+    }
+    if (!formData.text.trim()) {
+      toast.error('Question is required');
+      return;
+    }
+    
+    // Scale validation
+    if (formData.answer_type === 'scale') {
+      if (!formData.min_value || parseInt(formData.min_value) <= 0) {
+        toast.error('Min value must be greater than 0');
+        return;
+      }
+      if (!formData.max_value || parseInt(formData.max_value) > 15 || parseInt(formData.max_value) <= 0) {
+        toast.error('Max value must be between 1 and 15');
+        return;
+      }
+      if (parseInt(formData.min_value) >= parseInt(formData.max_value)) {
+        toast.error('Min value must be less than Max value');
+        return;
+      }
+    }
+    
     try {
       // Prepare options payload
       const formattedOptions = options.map((opt, index) => {
@@ -286,8 +313,8 @@ const CreateQuizPage = ({ quizId = null, isEdit = false }) => {
     <div className="flex-1 bg-[#F9FAFB] min-h-screen">
       {/* Header */}
       <div className="bg-white px-8 py-5 border-b border-[#E5E7EB]">
-        <h1 className="text-xl font-semibold text-[#111827]">Create Quiz</h1>
-        <p className="text-sm text-[#6B7280] mt-0.5">Please provide all of the information below to create your quiz.</p>
+        <h1 className="text-xl font-semibold text-[#111827]">Quiz</h1>
+        <p className="text-sm text-[#6B7280] mt-0.5">Please provide all of the information below to add a question.</p>
       </div>
 
       {/* Main Content */}
@@ -301,27 +328,34 @@ const CreateQuizPage = ({ quizId = null, isEdit = false }) => {
           <div className="space-y-6">
             {/* Title / Code */}
             <div>
-                <label className="block text-sm font-medium text-[#374151] mb-2">Title</label>
+                <label className="block text-sm font-medium text-[#374151] mb-2">
+                  Title <span className="text-red-500">*</span>
+                </label>
                 <input
                   type="text"
                   name="code"
                   value={formData.code}
                   onChange={handleChange}
                   placeholder="Write here"
+                  maxLength={150}
                   className="w-full px-4 py-2.5 border border-[#D1D5DB] rounded-lg text-sm focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316] outline-none"
                   required
                 />
+                <p className="mt-1 text-xs text-[#6B7280]">{formData.code.length}/150 characters</p>
             </div>
 
                 {/* Section and Type Row */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
                     <div>
-                        <label className="block text-sm font-medium text-[#374151] mb-2">Section</label>
+                        <label className="block text-sm font-medium text-[#374151] mb-2">
+                          Section <span className="text-red-500">*</span>
+                        </label>
                         <select
                         name="section"
                         value={formData.section}
                         onChange={handleChange}
                         className="w-full px-4 py-2.5 border border-[#D1D5DB] rounded-lg text-sm focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316] outline-none bg-white"
+                        required
                         >
                         <option value="basic">Basic</option>
                         <option value="personality">Personality</option>
@@ -329,12 +363,15 @@ const CreateQuizPage = ({ quizId = null, isEdit = false }) => {
                         </select>
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-[#374151] mb-2">Answer Type</label>
+                        <label className="block text-sm font-medium text-[#374151] mb-2">
+                          Answer Type <span className="text-red-500">*</span>
+                        </label>
                         <select
                         name="answer_type"
                         value={formData.answer_type}
                         onChange={handleChange}
                         className="w-full px-4 py-2.5 border border-[#D1D5DB] rounded-lg text-sm focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316] outline-none bg-white"
+                        required
                         >
                         <option value="text">Text</option>
                         <option value="scale">Scale</option>
@@ -347,25 +384,53 @@ const CreateQuizPage = ({ quizId = null, isEdit = false }) => {
                 {/* Question Text */}
                 <div className="flex flex-col md:flex-row gap-6 mb-6">
                     <div className="flex-1">
-                      <label className="block text-sm font-medium text-[#374151] mb-2">Question</label>
+                      <label className="block text-sm font-medium text-[#374151] mb-2">
+                        Question <span className="text-red-500">*</span>
+                      </label>
                       <input
                         type="text"
                         name="text"
                         value={formData.text}
                         onChange={handleChange}
                         placeholder="Write here"
+                        maxLength={150}
                         className="w-full px-4 py-2.5 border border-[#D1D5DB] rounded-lg text-sm focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316] outline-none"
                         required
                       />
+                      <p className="mt-1 text-xs text-[#6B7280]">{formData.text.length}/150 characters</p>
                     </div>
 
-                    {/* No. of Options Display */}
+                    {/* No. of Options - Editable */}
                     {(formData.answer_type === 'choice' || formData.answer_type === 'boolean') && (
                         <div className="w-full md:w-48">
                             <label className="block text-sm font-medium text-[#374151] mb-2">No. of Options</label>
-                            <div className="px-4 py-2.5 border border-[#D1D5DB] rounded-lg text-sm bg-gray-50 text-gray-600">
-                                {options.length}
-                            </div>
+                            <input
+                              type="number"
+                              min="1"
+                              max="20"
+                              value={options.length}
+                              onChange={(e) => {
+                                const newCount = parseInt(e.target.value) || 1;
+                                if (newCount > options.length) {
+                                  // Add more options
+                                  const toAdd = newCount - options.length;
+                                  const newOptions = [...options];
+                                  for (let i = 0; i < toAdd; i++) {
+                                    newOptions.push({
+                                      id: `temp-${Date.now()}-${i}`,
+                                      label: '',
+                                      value: '',
+                                      sort_order: newOptions.length + 1
+                                    });
+                                  }
+                                  setOptions(newOptions);
+                                } else if (newCount < options.length) {
+                                  // Remove options from the end
+                                  setOptions(options.slice(0, newCount));
+                                }
+                              }}
+                              className="w-full px-4 py-2.5 border border-[#D1D5DB] rounded-lg text-sm focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316] outline-none"
+                            />
                         </div>
                     )}
                 </div>
@@ -411,24 +476,45 @@ const CreateQuizPage = ({ quizId = null, isEdit = false }) => {
                 {formData.answer_type === 'scale' && (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-gray-50 p-4 rounded-lg mt-4">
                         <div>
-                            <label className="block text-sm font-medium text-[#374151] mb-2">Min Value</label>
+                            <label className="block text-sm font-medium text-[#374151] mb-2">
+                              Min Value <span className="text-red-500">*</span>
+                            </label>
                             <input
                             type="number"
                             name="min_value"
                             value={formData.min_value || ''}
-                            onChange={handleChange}
+                            onChange={(e) => {
+                              const value = e.target.value === '' ? '' : parseInt(e.target.value);
+                              if (value === '' || (value > 0)) {
+                                setFormData(prev => ({ ...prev, min_value: value }));
+                              }
+                            }}
+                            min="1"
+                            required
                             className="w-full px-4 py-2.5 border border-[#D1D5DB] rounded-lg text-sm focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316] outline-none"
                             />
+                            <p className="mt-1 text-xs text-[#6B7280]">Must be greater than 0</p>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-[#374151] mb-2">Max Value</label>
+                            <label className="block text-sm font-medium text-[#374151] mb-2">
+                              Max Value <span className="text-red-500">*</span>
+                            </label>
                             <input
                             type="number"
                             name="max_value"
                             value={formData.max_value || ''}
-                            onChange={handleChange}
+                            onChange={(e) => {
+                              const value = e.target.value === '' ? '' : parseInt(e.target.value);
+                              if (value === '' || (value > 0 && value <= 15)) {
+                                setFormData(prev => ({ ...prev, max_value: value }));
+                              }
+                            }}
+                            min="1"
+                            max="15"
+                            required
                             className="w-full px-4 py-2.5 border border-[#D1D5DB] rounded-lg text-sm focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316] outline-none"
                             />
+                            <p className="mt-1 text-xs text-[#6B7280]">Must be ≤ 15</p>
                         </div>
                     </div>
                 )}

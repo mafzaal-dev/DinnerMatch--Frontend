@@ -15,12 +15,18 @@ const CreateEditRestaurantPage = ({ restaurantId = null, isEdit = false }) => {
     location: '',
     number: '',
     price: '',
+    budget: '',
     is_meat: false,
     is_vegetarian: false,
     is_vegan: false,
     is_fish: false,
     is_halal: false,
+    is_others: false,
   });
+
+  // TODO: Fetch cities and locations from backend API
+  const [cities, setCities] = useState([]);
+  const [locations, setLocations] = useState([]);
 
   useEffect(() => {
     if (isEdit && restaurantId) {
@@ -40,11 +46,13 @@ const CreateEditRestaurantPage = ({ restaurantId = null, isEdit = false }) => {
           location: restaurant.location || '',
           number: restaurant.number || '',
           price: restaurant.price || '',
+          budget: restaurant.budget || '',
           is_meat: restaurant.is_meat || false,
           is_vegetarian: restaurant.is_vegetarian || false,
           is_vegan: restaurant.is_vegan || false,
           is_fish: restaurant.is_fish || false,
           is_halal: restaurant.is_halal || false,
+          is_others: restaurant.is_others || false,
         });
       } else {
         toast.error('Restaurant not found');
@@ -89,6 +97,10 @@ const CreateEditRestaurantPage = ({ restaurantId = null, isEdit = false }) => {
       toast.error('Please enter a valid price');
       return;
     }
+    if (!formData.budget) {
+      toast.error('Please select a budget');
+      return;
+    }
 
     try {
       const payload = {
@@ -97,11 +109,13 @@ const CreateEditRestaurantPage = ({ restaurantId = null, isEdit = false }) => {
         location: formData.location,
         number: formData.number,
         price: parseFloat(formData.price).toFixed(2),
+        budget: formData.budget,
         is_meat: formData.is_meat,
         is_vegetarian: formData.is_vegetarian,
         is_vegan: formData.is_vegan,
         is_fish: formData.is_fish,
         is_halal: formData.is_halal,
+        is_others: formData.is_others,
       };
 
       if (isEdit && restaurantId) {
@@ -172,7 +186,7 @@ const CreateEditRestaurantPage = ({ restaurantId = null, isEdit = false }) => {
             {/* Restaurant Name */}
             <div>
               <label className="block text-sm font-medium text-[#374151] mb-2">
-                Restaurant Name <span className="text-red-500">*</span>
+                Name <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
@@ -185,36 +199,56 @@ const CreateEditRestaurantPage = ({ restaurantId = null, isEdit = false }) => {
               />
             </div>
 
-            {/* City and Location */}
+            {/* City and Location - Backend Driven */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-[#374151] mb-2">
                   City <span className="text-red-500">*</span>
                 </label>
-                <input
-                  type="text"
+                <select
                   name="city"
                   value={formData.city}
                   onChange={handleChange}
-                  placeholder="Enter city"
                   className="w-full px-4 py-2.5 border border-[#D1D5DB] rounded-lg text-sm focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316] outline-none"
                   required
-                />
+                >
+                  <option value="">Select city</option>
+                  {/* TODO: Replace with dynamic cities from backend API */}
+                  <option value="Cape Town">Cape Town</option>
+                  <option value="Johannesburg">Johannesburg</option>
+                  <option value="Durban">Durban</option>
+                  <option value="Pretoria">Pretoria</option>
+                </select>
+                <p className="mt-1 text-xs text-[#6B7280]">
+                  Note: Cities will be fetched from backend API
+                </p>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-[#374151] mb-2">
                   Location <span className="text-red-500">*</span>
                 </label>
-                <input
-                  type="text"
+                <select
                   name="location"
                   value={formData.location}
                   onChange={handleChange}
-                  placeholder="Enter location/area"
                   className="w-full px-4 py-2.5 border border-[#D1D5DB] rounded-lg text-sm focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316] outline-none"
                   required
-                />
+                  disabled={!formData.city}
+                >
+                  <option value="">Select location</option>
+                  {/* TODO: Replace with dynamic locations based on selected city from backend API */}
+                  {formData.city && (
+                    <>
+                      <option value="City Centre">City Centre</option>
+                      <option value="Waterfront">Waterfront</option>
+                      <option value="Suburbs">Suburbs</option>
+                    </>
+                  )}
+                </select>
+                <p className="mt-1 text-xs text-[#6B7280]">
+                  Note: Locations will be fetched from backend API based on selected city
+                </p>
               </div>
             </div>
 
@@ -254,6 +288,27 @@ const CreateEditRestaurantPage = ({ restaurantId = null, isEdit = false }) => {
                   />
                 </div>
               </div>
+            </div>
+
+            {/* Budget */}
+            <div>
+              <label className="block text-sm font-medium text-[#374151] mb-2">
+                Budget <span className="text-red-500">*</span>
+              </label>
+              <select
+                name="budget"
+                value={formData.budget}
+                onChange={handleChange}
+                className="w-full px-4 py-2.5 border border-[#D1D5DB] rounded-lg text-sm focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316] outline-none"
+                required
+              >
+                <option value="">Select budget range</option>
+                <option value="R0-R250">R0 - R250</option>
+                <option value="R250-R500">R250 - R500</option>
+                <option value="R500-R750">R500 - R750</option>
+                <option value="R750-R1000">R750 - R1000</option>
+                <option value="R1000+">R1000+</option>
+              </select>
             </div>
 
             {/* Food Options */}
@@ -315,6 +370,17 @@ const CreateEditRestaurantPage = ({ restaurantId = null, isEdit = false }) => {
                     className="w-4 h-4 text-[#F97316] border-[#D1D5DB] rounded focus:ring-[#F97316]"
                   />
                   <span className="text-sm text-[#374151]">Halal</span>
+                </label>
+
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    name="is_others"
+                    checked={formData.is_others}
+                    onChange={handleChange}
+                    className="w-4 h-4 text-[#F97316] border-[#D1D5DB] rounded focus:ring-[#F97316]"
+                  />
+                  <span className="text-sm text-[#374151]">Others</span>
                 </label>
               </div>
               <p className="mt-2 text-xs text-[#6B7280]">

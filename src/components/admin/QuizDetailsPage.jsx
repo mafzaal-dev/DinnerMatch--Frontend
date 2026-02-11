@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQuiz } from '@/hooks/useQuiz';
 import { toast } from 'react-hot-toast';
+import { formatDisplayValue, capitalizeWords } from '@/utils/searchHelper';
 
 const QuizDetailsPage = ({ quizId }) => {
   const router = useRouter();
@@ -34,15 +35,19 @@ const QuizDetailsPage = ({ quizId }) => {
     router.push(`/admin/quiz/edit/${quizId}`);
   };
 
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
   const handleDeleteQuestion = async () => {
-    if (confirm('Are you sure you want to delete this question?')) {
-      try {
-        await deleteQuestion(quizId);
-        toast.success('Question deleted');
-        router.push('/admin/quiz');
-      } catch (error) {
-        toast.error('Failed to delete question');
-      }
+    setShowDeleteConfirm(true);
+  };
+  
+  const confirmDelete = async () => {
+    try {
+      await deleteQuestion(quizId);
+      toast.success('Question deleted');
+      router.push('/admin/quiz');
+    } catch (error) {
+      toast.error('Failed to delete question');
     }
   };
 
@@ -57,7 +62,7 @@ const QuizDetailsPage = ({ quizId }) => {
     <div className="flex-1 bg-[#F9FAFB] min-h-screen">
       {/* Header */}
       <div className="bg-white px-8 py-5 border-b border-[#E5E7EB]">
-        <h1 className="text-xl font-semibold text-[#111827]">Quiz Management</h1>
+        <h1 className="text-xl font-semibold text-[#111827]">Quiz</h1>
         <p className="text-sm text-[#6B7280] mt-0.5">Question Details</p>
       </div>
 
@@ -98,21 +103,21 @@ const QuizDetailsPage = ({ quizId }) => {
             <div className="grid grid-cols-2 gap-4">
                 <div>
                     <h3 className="text-sm font-semibold text-[#111827] mb-1">Type</h3>
-                    <p className="text-gray-600 capitalize">{question.answer_type}</p>
+                    <p className="text-gray-600 capitalize">{capitalizeWords(question.answer_type)}</p>
                 </div>
                 <div>
                     <h3 className="text-sm font-semibold text-[#111827] mb-1">Sort Order</h3>
-                    <p className="text-gray-600">{question.sort_order}</p>
+                    <p className="text-gray-600">{formatDisplayValue(question.sort_order)}</p>
                 </div>
                 {question.answer_type === 'scale' && (
                     <>
                         <div>
                             <h3 className="text-sm font-semibold text-[#111827] mb-1">Min Value</h3>
-                            <p className="text-gray-600">{question.min_value}</p>
+                            <p className="text-gray-600">{formatDisplayValue(question.min_value)}</p>
                         </div>
                         <div>
                             <h3 className="text-sm font-semibold text-[#111827] mb-1">Max Value</h3>
-                            <p className="text-gray-600">{question.max_value}</p>
+                            <p className="text-gray-600">{formatDisplayValue(question.max_value)}</p>
                         </div>
                     </>
                 )}
@@ -125,27 +130,58 @@ const QuizDetailsPage = ({ quizId }) => {
                     
                     {/* Options List */}
                     <div className="space-y-2">
-                        {options.length === 0 ? (
-                            <p className="text-gray-500 italic text-sm">No options added yet.</p>
-                        ) : (
-                            options.map(opt => (
-                                <div key={opt.id || opt.value} className="flex items-center justify-between p-3 bg-gray-50 border border-gray-200 rounded-lg">
-                                    <div>
-                                        <span className="font-medium text-gray-800">{opt.label}</span>
-                                        <span className="text-gray-500 text-sm ml-2">({opt.value})</span>
-                                    </div>
-                                    <div className="text-gray-400 text-xs">
-                                        Order: {opt.sort_order}
-                                    </div>
+                    {options.length === 0 ? (
+                        <p className="text-gray-500 italic text-sm">No options added yet.</p>
+                    ) : (
+                        options.map(opt => (
+                            <div key={opt.id || opt.value} className="flex items-center justify-between p-3 bg-gray-50 border border-gray-200 rounded-lg">
+                                <div>
+                                    <span className="font-medium text-gray-800">{formatDisplayValue(opt.label)}</span>
+                                    <span className="text-gray-500 text-sm ml-2">({formatDisplayValue(opt.value)})</span>
                                 </div>
-                            ))
-                        )}
+                                <div className="text-gray-400 text-xs">
+                                    Order: {formatDisplayValue(opt.sort_order)}
+                                </div>
+                            </div>
+                        ))
+                    )}
                     </div>
                 </div>
             )}
           </div>
         </div>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
+            <div className="flex items-center justify-center w-12 h-12 mx-auto mb-4 bg-red-100 rounded-full">
+              <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-semibold text-[#111827] text-center mb-2">Delete Question</h3>
+            <p className="text-sm text-[#6B7280] text-center mb-6">
+              Are you sure you want to delete this question? This action cannot be undone.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowDeleteConfirm(false)}
+                className="flex-1 px-4 py-2.5 border border-[#D1D5DB] text-[#374151] rounded-lg text-sm font-medium hover:bg-[#F9FAFB] transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDelete}
+                className="flex-1 px-4 py-2.5 bg-[#DC2626] text-white rounded-lg text-sm font-medium hover:bg-[#B91C1C] transition-colors"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

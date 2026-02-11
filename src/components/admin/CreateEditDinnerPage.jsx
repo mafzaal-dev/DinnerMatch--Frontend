@@ -4,24 +4,49 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
 import { useDinner } from '@/hooks/useDinner';
+import { api, API_ENDPOINTS } from '@/utils/api';
 
 const CreateEditDinnerPage = ({ dinnerId = null, isEdit = false }) => {
   const router = useRouter();
   const { getDinner, createDinner, updateDinner, deleteDinner, loading } = useDinner();
   const [initialLoading, setInitialLoading] = useState(isEdit);
+  const [locations, setLocations] = useState([]);
   const [formData, setFormData] = useState({
     title: '',
     date: '',
     location: '',
     dinner_type: 'Open',
-    dinner_status: 'Draft',
+    is_published: false,
   });
 
   useEffect(() => {
+    fetchLocations();
     if (isEdit && dinnerId) {
       fetchDinner();
     }
   }, [isEdit, dinnerId]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const fetchLocations = async () => {
+    try {
+      // TODO: Replace with actual API endpoint when backend is ready
+      // For now, using hardcoded locations
+      setLocations([
+        { id: 'cape-town', name: 'Cape Town' },
+        { id: 'johannesburg', name: 'Johannesburg' },
+        { id: 'durban', name: 'Durban' },
+        { id: 'pretoria', name: 'Pretoria' },
+        { id: 'lahore', name: 'Lahore' },
+      ]);
+      
+      // Uncomment when backend API is ready:
+      // const response = await api.get(API_ENDPOINTS.LOCATIONS_LIST);
+      // if (response.success) {
+      //   setLocations(response.data || []);
+      // }
+    } catch (err) {
+      console.error('Error fetching locations:', err);
+    }
+  };
 
   const fetchDinner = async () => {
     try {
@@ -29,12 +54,17 @@ const CreateEditDinnerPage = ({ dinnerId = null, isEdit = false }) => {
       const dinner = await getDinner(dinnerId);
       
       if (dinner) {
+        // Check if dinner_status indicates published state
+        const isPublished = dinner.is_published || 
+                           dinner.dinner_status === 'Upcoming' || 
+                           dinner.dinner_status === 'Published';
+        
         setFormData({
           title: dinner.title || '',
           date: dinner.date ? formatDateForInput(dinner.date) : '',
           location: dinner.location || '',
           dinner_type: dinner.dinner_type || 'Open',
-          dinner_status: dinner.dinner_status || 'Draft',
+          is_published: isPublished,
         });
       } else {
         toast.error('Dinner not found');
@@ -62,10 +92,10 @@ const CreateEditDinnerPage = ({ dinnerId = null, isEdit = false }) => {
   };
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value, type, checked } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: type === 'checkbox' ? checked : value
     }));
   };
 
@@ -95,7 +125,9 @@ const CreateEditDinnerPage = ({ dinnerId = null, isEdit = false }) => {
         date: dateToSend,
         location: formData.location,
         dinner_type: formData.dinner_type,
-        dinner_status: formData.dinner_status,
+        is_published: formData.is_published,
+        // Also send as dinner_status for backwards compatibility
+        dinner_status: formData.is_published ? 'Upcoming' : 'Draft',
       };
 
       if (isEdit && dinnerId) {
@@ -197,29 +229,34 @@ const CreateEditDinnerPage = ({ dinnerId = null, isEdit = false }) => {
               </p>
             </div>
 
-            {/* Location */}
+            {/* Location - Backend Driven */}
             <div>
               <label className="block text-sm font-medium text-[#374151] mb-2">
                 Location <span className="text-red-500">*</span>
               </label>
-              <input
-                type="text"
+              <select
                 name="location"
                 value={formData.location}
                 onChange={handleChange}
-                placeholder="Enter location"
-                className="w-full px-4 py-2.5 border border-[#D1D5DB] rounded-lg text-sm focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316] outline-none"
+                className="w-full px-4 py-2.5 border border-[#D1D5DB] rounded-lg text-sm focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316] outline-none bg-white"
                 required
-              />
+              >
+                <option value="">Select location</option>
+                {locations.map((loc) => (
+                  <option key={loc.id} value={loc.name}>
+                    {loc.name}
+                  </option>
+                ))}
+              </select>
               <p className="mt-1 text-xs text-[#6B7280]">
-                City or venue where the dinner will take place
+                City or venue where the dinner will take place (API required for dynamic locations)
               </p>
             </div>
 
-            {/* Dinner Type */}
+            {/* Status (formerly Dinner Type) */}
             <div>
               <label className="block text-sm font-medium text-[#374151] mb-2">
-                Dinner Type <span className="text-red-500">*</span>
+                Status <span className="text-red-500">*</span>
               </label>
               <select
                 name="dinner_type"
@@ -235,22 +272,31 @@ const CreateEditDinnerPage = ({ dinnerId = null, isEdit = false }) => {
               </p>
             </div>
 
-            {/* Dinner Status */}
+            {/* Publish Toggle (formerly Dinner Status) */}
             <div>
               <label className="block text-sm font-medium text-[#374151] mb-2">
-                Dinner Status <span className="text-red-500">*</span>
+                Publish
               </label>
-              <select
-                name="dinner_status"
-                value={formData.dinner_status}
-                onChange={handleChange}
-                className="w-full px-4 py-2.5 border border-[#D1D5DB] rounded-lg text-sm focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316] outline-none bg-white"
-              >
-                <option value="Draft">Draft</option>
-                <option value="Upcoming">Upcoming</option>
-              </select>
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => setFormData(prev => ({ ...prev, is_published: !prev.is_published }))}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-[#F97316] focus:ring-offset-2 ${
+                    formData.is_published ? 'bg-[#F97316]' : 'bg-gray-200'
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                      formData.is_published ? 'translate-x-6' : 'translate-x-1'
+                    }`}
+                  />
+                </button>
+                <span className="text-sm text-[#374151]">
+                  {formData.is_published ? 'Published' : 'Draft'}
+                </span>
+              </div>
               <p className="mt-1 text-xs text-[#6B7280]">
-                Set the current status of the dinner event
+                Toggle to publish or keep as draft
               </p>
             </div>
           </div>

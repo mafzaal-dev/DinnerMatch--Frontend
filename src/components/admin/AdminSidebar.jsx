@@ -58,16 +58,17 @@ const AdminSidebar = ({ onLogout, isOpen, onClose }) => {
       ),
       href: '/admin/restaurants',
     },
-    {
-      id: 'email-manager',
-      label: 'Email Manager',
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-        </svg>
-      ),
-      href: '/admin/email-manager',
-    },
+    // Email Manager - Hidden for now
+    // {
+    //   id: 'email-manager',
+    //   label: 'Email Manager',
+    //   icon: (
+    //     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    //       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+    //     </svg>
+    //   ),
+    //   href: '/admin/email-manager',
+    // },
   ];
 
   return (
@@ -99,7 +100,9 @@ const AdminSidebar = ({ onLogout, isOpen, onClose }) => {
       <nav className="flex-1 px-4 py-4 overflow-y-auto">
         <ul className="space-y-1">
           {menuItems.map((item) => {
-            const isActive = pathname === item.href;
+            // Check if current path matches the menu item
+            // For quiz and other pages with sub-routes, check if pathname starts with the href
+            const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
             return (
               <li key={item.id}>
                 <Link

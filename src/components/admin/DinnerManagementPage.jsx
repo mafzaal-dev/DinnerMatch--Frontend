@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useDinner } from '@/hooks/useDinner';
 import toast from 'react-hot-toast';
+import { debounce, isValidSearchQuery } from '@/utils/searchHelper';
 
 const DinnerManagementPage = () => {
   const router = useRouter();
@@ -14,6 +15,12 @@ const DinnerManagementPage = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [pageSize] = useState(10);
   const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+  const [filterLocation, setFilterLocation] = useState('');
+  const [filterStatus, setFilterStatus] = useState('');
+  const [filterPublish, setFilterPublish] = useState('');
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [dinnerToDelete, setDinnerToDelete] = useState(null);
 
   // Fetch dinners from API
   const fetchDinners = async () => {
@@ -23,12 +30,29 @@ const DinnerManagementPage = () => {
         offset: pageSize,
       };
       
-      if (searchQuery) {
+      // Only add search if valid (3+ characters)
+      if (isValidSearchQuery(searchQuery)) {
         params.search = searchQuery;
       }
       
       if (startDate) {
         params.start_date = startDate;
+      }
+      
+      if (endDate) {
+        params.end_date = endDate;
+      }
+      
+      if (filterLocation) {
+        params.location = filterLocation;
+      }
+      
+      if (filterStatus) {
+        params.status = filterStatus;
+      }
+      
+      if (filterPublish) {
+        params.publish = filterPublish;
       }
 
       const result = await getDinners(params);
@@ -40,9 +64,26 @@ const DinnerManagementPage = () => {
     }
   };
 
+  // Debounced search function
+  const debouncedSearch = useCallback(
+    debounce((query) => {
+      if (isValidSearchQuery(query) || query.length === 0) {
+        setCurrentPage(0);
+        fetchDinners();
+      }
+    }, 500),
+    [] // eslint-disable-line react-hooks/exhaustive-deps
+  );
+
   useEffect(() => {
     fetchDinners();
-  }, [currentPage, searchQuery, startDate]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [currentPage, startDate, endDate, filterLocation, filterStatus, filterPublish]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleSearchChange = (e) => {
+    const value = e.target.value;
+    setSearchQuery(value);
+    debouncedSearch(value);
+  };
 
   // Handle Create Dinner - Navigate to create page
   const handleCreateDinner = () => {
@@ -55,14 +96,19 @@ const DinnerManagementPage = () => {
   };
 
   // Handle Delete Dinner
-  const handleDeleteDinner = async (dinnerId) => {
-    if (!confirm('Are you sure you want to delete this dinner?')) {
-      return;
-    }
+  const handleDeleteClick = (dinner) => {
+    setDinnerToDelete(dinner);
+    setShowDeleteConfirm(true);
+  };
+  
+  const confirmDelete = async () => {
+    if (!dinnerToDelete) return;
 
     try {
-      await deleteDinner(dinnerId);
+      await deleteDinner(dinnerToDelete.id);
       toast.success('Dinner deleted successfully!');
+      setShowDeleteConfirm(false);
+      setDinnerToDelete(null);
       fetchDinners();
     } catch (error) {
       console.error('Error deleting dinner:', error);
@@ -99,40 +145,99 @@ const DinnerManagementPage = () => {
 
         <div className="bg-white rounded-xl shadow-sm border border-[#E5E7EB] overflow-hidden">
           {/* Controls */}
-          <div className="p-4 border-b border-[#E5E7EB] flex items-center justify-between gap-3">
-            <div className="mb-4">
-              <h2 className="text-xl font-semibold text-[#111827]">Dinner Management</h2>
-              <p className="text-sm text-[#6B7280] mt-0.5">Manage your existing dinners.</p>
-            </div>
-            
-            <div className="flex items-center gap-3">
-              <div className="relative">
-                <input
-                  type="date"
-                  value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
-                  className="pl-4 pr-4 py-2 border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-orange-500 bg-white"
-                  placeholder="Start Date"
-                />
+          <div className="p-4 border-b border-[#E5E7EB]">
+            <div className="flex items-center justify-between gap-3 mb-4">
+              <div>
+                <h2 className="text-xl font-semibold text-[#111827]">Dinner Management</h2>
+                <p className="text-sm text-[#6B7280] mt-0.5">Manage your existing dinners.</p>
               </div>
-              <div className="relative">
+              
+              <div className="flex items-center gap-3">
+                <div className="relative">
                 <input
                   type="text"
-                  placeholder="Search"
+                  placeholder="Search (min 3 characters)"
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={handleSearchChange}
                   className="pl-4 pr-10 py-2 border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-orange-500 w-64 bg-white"
                 />
-                <svg className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9CA3AF]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
+                  <svg className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9CA3AF]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                </div>
+                <button 
+                  onClick={handleCreateDinner}
+                  className="px-4 py-2 bg-[#F97316] hover:bg-[#EA580C] text-white rounded-lg text-sm font-medium transition-colors"
+                >
+                  Create Dinner
+                </button>
               </div>
-              <button 
-                onClick={handleCreateDinner}
-                className="px-4 py-2 bg-[#F97316] hover:bg-[#EA580C] text-white rounded-lg text-sm font-medium transition-colors"
+            </div>
+
+            {/* Filters */}
+            <div className="flex flex-wrap items-center gap-3">
+              <select
+                value={filterLocation}
+                onChange={(e) => setFilterLocation(e.target.value)}
+                className="px-4 py-2 border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-orange-500 bg-white"
               >
-                Create Dinner
-              </button>
+                <option value="">All Locations</option>
+                <option value="Cape Town">Cape Town</option>
+                <option value="Johannesburg">Johannesburg</option>
+                <option value="Durban">Durban</option>
+                <option value="Lahore">Lahore</option>
+              </select>
+
+              <input
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                placeholder="From Date"
+                className="px-4 py-2 border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-orange-500 bg-white"
+              />
+
+              <input
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                placeholder="To Date"
+                className="px-4 py-2 border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-orange-500 bg-white"
+              />
+
+              <select
+                value={filterStatus}
+                onChange={(e) => setFilterStatus(e.target.value)}
+                className="px-4 py-2 border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-orange-500 bg-white"
+              >
+                <option value="">All Status</option>
+                <option value="Open">Open</option>
+                <option value="Upcoming">Upcoming</option>
+              </select>
+
+              <select
+                value={filterPublish}
+                onChange={(e) => setFilterPublish(e.target.value)}
+                className="px-4 py-2 border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-orange-500 bg-white"
+              >
+                <option value="">All Publish Status</option>
+                <option value="true">Published</option>
+                <option value="false">Draft</option>
+              </select>
+
+              {(filterLocation || startDate || endDate || filterStatus || filterPublish) && (
+                <button
+                  onClick={() => {
+                    setFilterLocation('');
+                    setStartDate('');
+                    setEndDate('');
+                    setFilterStatus('');
+                    setFilterPublish('');
+                  }}
+                  className="px-4 py-2 text-sm text-[#6B7280] hover:text-[#374151] hover:bg-gray-50 rounded-lg transition-colors"
+                >
+                  Clear Filters
+                </button>
+              )}
             </div>
           </div>
 
@@ -146,22 +251,19 @@ const DinnerManagementPage = () => {
               <table className="w-full min-w-max">
                 <thead className="bg-[#F9FAFB] border-b border-[#E5E7EB]">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-[#9CA3AF] uppercase tracking-wide w-24">ID</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-[#9CA3AF] uppercase tracking-wide">Title</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-[#9CA3AF] uppercase tracking-wide">Location</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-[#9CA3AF] uppercase tracking-wide">Date</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-[#9CA3AF] uppercase tracking-wide">Time</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-[#9CA3AF] uppercase tracking-wide">Type</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-[#9CA3AF] uppercase tracking-wide">Groups</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-[#9CA3AF] uppercase tracking-wide">Status</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-[#9CA3AF] uppercase tracking-wide">Publish</th>
                     <th className="px-6 py-3 text-right text-xs font-medium text-[#9CA3AF] uppercase tracking-wide w-10">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#F3F4F6]">
                   {dinners.map((dinner) => (
                     <tr key={dinner.id} className="hover:bg-[#F9FAFB] transition-colors">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-[#6B7280]">
-                        {dinner.id.split('-')[0]}
-                      </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-[#374151] font-medium">
                         {dinner.title}
                       </td>
@@ -176,6 +278,11 @@ const DinnerManagementPage = () => {
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-[#374151]">
                         {formatTime(dinner.date)}
                       </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-[#374151]">
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                          {dinner.groups_count || 0}
+                        </span>
+                      </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm">
                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                           dinner.dinner_type === 'Open' 
@@ -187,11 +294,11 @@ const DinnerManagementPage = () => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm">
                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          dinner.dinner_status === 'Draft' 
-                            ? 'bg-yellow-100 text-yellow-800' 
-                            : 'bg-purple-100 text-purple-800'
+                          dinner.is_published || dinner.dinner_status === 'Upcoming' || dinner.dinner_status === 'Published'
+                            ? 'bg-green-100 text-green-800' 
+                            : 'bg-yellow-100 text-yellow-800'
                         }`}>
-                          {dinner.dinner_status}
+                          {dinner.is_published || dinner.dinner_status === 'Upcoming' || dinner.dinner_status === 'Published' ? 'Published' : 'Draft'}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right">
@@ -203,7 +310,7 @@ const DinnerManagementPage = () => {
                             Edit
                           </button>
                           <button 
-                            onClick={() => handleDeleteDinner(dinner.id)}
+                            onClick={() => handleDeleteClick(dinner)}
                             className="text-[#EF4444] hover:text-[#DC2626] text-sm font-medium"
                           >
                             Delete
@@ -243,6 +350,41 @@ const DinnerManagementPage = () => {
           )}
         </div>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && dinnerToDelete && (
+        <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
+            <div className="flex items-center justify-center w-12 h-12 mx-auto mb-4 bg-red-100 rounded-full">
+              <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-semibold text-[#111827] text-center mb-2">Delete Dinner</h3>
+            <p className="text-sm text-[#6B7280] text-center mb-6">
+              Are you sure you want to delete "{dinnerToDelete.title}"? This action cannot be undone.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  setShowDeleteConfirm(false);
+                  setDinnerToDelete(null);
+                }}
+                className="flex-1 px-4 py-2.5 border border-[#D1D5DB] text-[#374151] rounded-lg text-sm font-medium hover:bg-[#F9FAFB] transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDelete}
+                disabled={loading}
+                className="flex-1 px-4 py-2.5 bg-[#DC2626] text-white rounded-lg text-sm font-medium hover:bg-[#B91C1C] transition-colors disabled:opacity-50"
+              >
+                {loading ? 'Deleting...' : 'Delete'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

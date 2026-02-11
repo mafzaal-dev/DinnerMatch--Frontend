@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { api, API_ENDPOINTS } from '../../utils/api';
+import { debounce, formatDisplayValue, isValidSearchQuery } from '../../utils/searchHelper';
 
 const AdminDashboardPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -14,82 +15,26 @@ const AdminDashboardPage = () => {
   const [totalUsers, setTotalUsers] = useState('0');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-
-  // Stats cards data
-  const stats = [
-    {
-      id: 'total-users',
-      label: 'Total Users',
-      value: totalUsers,
-      change: '1.3%',
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-        </svg>
-      ),
-      bgColor: 'bg-[#F97316]',
-      textColor: 'text-white',
-      valueColor: 'text-white',
-      labelColor: 'text-white/90',
-    },
-    {
-      id: 'active-tickets',
-      label: 'Active Tickets',
-      value: '671',
-      change: '1.3%',
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
-        </svg>
-      ),
-      bgColor: 'bg-white',
-      textColor: 'text-[#424242]',
-      valueColor: 'text-[#111827]',
-      labelColor: 'text-[#6B7280]',
-    },
-    {
-      id: 'confirmed-bookings',
-      label: 'Confirmed Bookings',
-      value: '314',
-      change: '1.3%',
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-        </svg>
-      ),
-      bgColor: 'bg-white',
-      textColor: 'text-[#424242]',
-      valueColor: 'text-[#111827]',
-      labelColor: 'text-[#6B7280]',
-    },
-    {
-      id: 'total-revenue',
-      label: 'Total Revenue',
-      value: 'R160058.00',
-      change: '1.3%',
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-        </svg>
-      ),
-      bgColor: 'bg-white',
-      textColor: 'text-[#424242]',
-      valueColor: 'text-[#111827]',
-      labelColor: 'text-[#6B7280]',
-    },
-  ];
+  
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
 
   const fetchUsers = async (query = '') => {
     setLoading(true);
     setError(null);
     try {
-      const endpoint = query 
-        ? `${API_ENDPOINTS.USER_LIST}?search=${encodeURIComponent(query)}`
-        : API_ENDPOINTS.USER_LIST;
+      const params = new URLSearchParams();
+      // Only add search if it's valid (3+ characters)
+      if (isValidSearchQuery(query)) {
+        params.append('search', query);
+      }
+      params.append('index', currentPage);
+      params.append('offset', pageSize);
       
+      const endpoint = `${API_ENDPOINTS.USER_LIST}?${params.toString()}`;
       const response = await api.get(endpoint);
-      // Based on API response: { success: true, message: "...", data: { users: [...], total: N } }
-      // The interceptor returns response.data, so response here is the outer object.
+      
       const userData = response.data?.users || [];
       const total = response.data?.total || 0;
       
@@ -103,12 +48,29 @@ const AdminDashboardPage = () => {
     }
   };
 
-  useEffect(() => {
-    fetchUsers();
-  }, []);
+  // Debounced search function
+  const debouncedFetchUsers = useCallback(
+    debounce((query) => {
+      if (isValidSearchQuery(query) || query.length === 0) {
+        setCurrentPage(0); // Reset to first page on new search
+        fetchUsers(query);
+      }
+    }, 500),
+    [] // eslint-disable-line react-hooks/exhaustive-deps
+  );
 
-  const handleSearch = () => {
+  useEffect(() => {
     fetchUsers(searchQuery);
+  }, [currentPage, pageSize]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleSearchChange = (e) => {
+    const value = e.target.value;
+    setSearchQuery(value);
+    
+    // Trigger search on type (debounced)
+    if (value.length === 0 || value.length >= 3) {
+      debouncedFetchUsers(value);
+    }
   };
 
   const handleExportCSV = async () => {
@@ -145,29 +107,7 @@ const AdminDashboardPage = () => {
 
       {/* Main Content */}
       <div className="p-6">
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          {stats.map((stat) => (
-            <div
-              key={stat.id}
-              className={`${stat.bgColor} rounded-xl p-5 shadow-sm border border-[#E5E7EB]`}
-            >
-              <div className="flex items-center justify-between mb-3">
-                <div className={`${stat.textColor}`}>
-                  {stat.icon}
-                </div>
-                <div className={`flex items-center gap-1 text-xs font-medium ${stat.id === 'total-users' ? 'text-white/90' : 'text-[#10B981]'}`}>
-                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
-                  </svg>
-                  <span>+{stat.change}</span>
-                </div>
-              </div>
-              <h3 className={`text-2xl font-bold ${stat.valueColor} mb-1`}>{stat.value}</h3>
-              <p className={`text-xs ${stat.labelColor}`}>{stat.label}</p>
-            </div>
-          ))}
-        </div>
+        {/* Stats Cards - Removed as per requirements */}
 
         {/* Search and Filters */}
         <div className="bg-white rounded-xl shadow-sm border border-[#E5E7EB] p-5 mb-5">
@@ -175,18 +115,11 @@ const AdminDashboardPage = () => {
             <div className="flex-1 flex gap-2">
               <input
                 type="text"
-                placeholder="Search by name, email or mobile (Press enter to search)"
+                placeholder="Search by name, email or mobile (min 3 characters)"
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+                onChange={handleSearchChange}
                 className="flex-1 px-4 py-2.5 border border-[#D1D5DB] rounded-lg text-sm text-[#111827] placeholder-[#9CA3AF] focus:outline-none focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316] transition-colors"
               />
-              <button
-                onClick={handleSearch}
-                className="px-6 py-2.5 bg-[#F97316] text-white rounded-lg text-sm font-medium hover:bg-[#EA580C] transition-colors"
-              >
-                Search
-              </button>
             </div>
             <button
               onClick={handleExportCSV}
@@ -283,15 +216,7 @@ const AdminDashboardPage = () => {
         <div className="bg-white rounded-xl shadow-sm border border-[#E5E7EB] overflow-hidden">
           <div className="px-6 py-4 border-b border-[#E5E7EB] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <div>
-              <h2 className="text-base font-semibold text-[#111827]">Users</h2>
-              <div className="flex items-center gap-4 mt-1.5">
-                <button className="text-xs text-[#6B7280] hover:text-[#F97316] transition-colors">
-                  Context all users
-                </button>
-                <button className="text-xs text-[#6B7280] hover:text-[#F97316] transition-colors">
-                  Copy Context Link
-                </button>
-              </div>
+              <h2 className="text-base font-semibold text-[#111827]">Users ({totalUsers})</h2>
             </div>
             <button className="px-5 py-2.5 bg-[#10B981] text-white rounded-lg text-sm font-medium hover:bg-[#059669] transition-colors flex items-center gap-2 whitespace-nowrap">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -366,31 +291,31 @@ const AdminDashboardPage = () => {
                   users.map((user) => (
                     <tr key={user.id || user.email} className="hover:bg-[#F9FAFB] transition-colors">
                       <td className="px-4 py-3.5 whitespace-nowrap text-sm text-[#111827] font-medium">
-                        {user.name || `${user.first_name || ''} ${user.last_name || ''}`.trim() || 'N/A'}
+                        {formatDisplayValue(user.name || `${user.first_name || ''} ${user.last_name || ''}`.trim())}
                       </td>
                       <td className="px-4 py-3.5 whitespace-nowrap text-sm text-[#6B7280]">
-                        {user.email || 'N/A'}
+                        {formatDisplayValue(user.email)}
                       </td>
                       <td className="px-4 py-3.5 whitespace-nowrap text-sm text-[#6B7280]">
-                        {user.mobile || user.phone_number || user.profile?.phone_number || 'N/A'}
+                        {formatDisplayValue(user.mobile || user.phone_number || user.profile?.phone_number)}
                       </td>
                       <td className="px-4 py-3.5 whitespace-nowrap text-sm text-[#6B7280]">
-                        {user.city || user.profile?.city_id || 'N/A'}
+                        {formatDisplayValue(user.city || user.profile?.city_id)}
                       </td>
                       <td className="px-4 py-3.5 whitespace-nowrap text-sm text-[#6B7280]">
-                        {user.tickets || 'N/A'}
+                        {formatDisplayValue(user.tickets)}
                       </td>
                       <td className="px-4 py-3.5 whitespace-nowrap text-sm text-[#6B7280]">
-                        {user.membership || 'N/A'}
+                        {formatDisplayValue(user.membership)}
                       </td>
                       <td className="px-4 py-3.5 whitespace-nowrap text-sm text-[#6B7280]">
-                        {user.status || 'N/A'}
+                        {formatDisplayValue(user.status)}
                       </td>
                       <td className="px-4 py-3.5 whitespace-nowrap text-sm text-[#6B7280]">
-                        {user.nextDinner || user.next_dinner || 'Not Booked'}
+                        {formatDisplayValue(user.nextDinner || user.next_dinner || 'Not Booked')}
                       </td>
                       <td className="px-4 py-3.5 whitespace-nowrap text-sm text-[#6B7280]">
-                        {user.pastDinner || user.past_dinner || 'Not Booked'}
+                        {formatDisplayValue(user.pastDinner || user.past_dinner || 'Not Booked')}
                       </td>
                       <td className="px-4 py-3.5 whitespace-nowrap text-sm text-[#6B7280]">
                         <button className="p-1 hover:bg-[#F3F4F6] rounded transition-colors">
@@ -405,6 +330,46 @@ const AdminDashboardPage = () => {
               </tbody>
             </table>
           </div>
+
+          {/* Pagination */}
+          {!loading && parseInt(totalUsers) > 0 && (
+            <div className="px-6 py-4 border-t border-[#E5E7EB] flex flex-col sm:flex-row items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <span className="text-sm text-[#6B7280]">
+                  Showing {currentPage * pageSize + 1} to {Math.min((currentPage + 1) * pageSize, parseInt(totalUsers))} of {totalUsers} results
+                </span>
+                <select
+                  value={pageSize}
+                  onChange={(e) => {
+                    setPageSize(parseInt(e.target.value));
+                    setCurrentPage(0);
+                  }}
+                  className="px-3 py-1.5 border border-[#D1D5DB] rounded-lg text-sm focus:outline-none focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316]"
+                >
+                  <option value="10">10 per page</option>
+                  <option value="25">25 per page</option>
+                  <option value="50">50 per page</option>
+                  <option value="100">100 per page</option>
+                </select>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setCurrentPage(Math.max(0, currentPage - 1))}
+                  disabled={currentPage === 0}
+                  className="px-4 py-2 border border-[#E5E7EB] rounded-lg text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
+                >
+                  Previous
+                </button>
+                <button
+                  onClick={() => setCurrentPage(currentPage + 1)}
+                  disabled={(currentPage + 1) * pageSize >= parseInt(totalUsers)}
+                  className="px-4 py-2 border border-[#E5E7EB] rounded-lg text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -1,41 +1,129 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { api, API_ENDPOINTS } from '../../utils/api';
+import { toast } from 'react-hot-toast';
+import { debounce, formatDisplayValue, isValidSearchQuery, capitalizeWords } from '../../utils/searchHelper';
 
 const GroupAttendeesPage = () => {
   const [activeTab, setActiveTab] = useState('groups'); // 'groups' or 'users'
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedDinner, setSelectedDinner] = useState('');
   const [dinners, setDinners] = useState([]);
+  const [restaurants, setRestaurants] = useState([]);
   const [dinnerRequests, setDinnerRequests] = useState([]);
   const [groups, setGroups] = useState([]);
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  
+  // Modals
   const [showCreateGroupModal, setShowCreateGroupModal] = useState(false);
+  const [showMakeBookingModal, setShowMakeBookingModal] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showViewProfile, setShowViewProfile] = useState(false);
+  const [selectedGroup, setSelectedGroup] = useState(null);
+  const [selectedProfile, setSelectedProfile] = useState(null);
+  
+  // Form data
   const [groupName, setGroupName] = useState('');
+  const [selectedDinnerForGroup, setSelectedDinnerForGroup] = useState('');
+  const [selectedRestaurant, setSelectedRestaurant] = useState('');
+  
+  // Infinity Scroll - Groups
+  const [groupsPage, setGroupsPage] = useState(0);
+  const [groupsPageSize] = useState(10);
+  const [groupsTotal, setGroupsTotal] = useState(0);
+  const [hasMoreGroups, setHasMoreGroups] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const groupsObserverRef = useRef(null);
+  const lastGroupElementRef = useCallback(node => {
+    if (loading || isLoadingMore) return;
+    if (groupsObserverRef.current) groupsObserverRef.current.disconnect();
+    
+    groupsObserverRef.current = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting && hasMoreGroups) {
+        setGroupsPage(prev => prev + 1);
+      }
+    });
+    
+    if (node) groupsObserverRef.current.observe(node);
+  }, [loading, isLoadingMore, hasMoreGroups]);
+  
+  // Pagination - Requests
+  const [requestsPage, setRequestsPage] = useState(0);
+  const [requestsPageSize, setRequestsPageSize] = useState(10);
+  const [requestsTotal, setRequestsTotal] = useState(0);
+  
+  // Filters - Groups
+  const [filterCity, setFilterCity] = useState('');
+  const [filterDinner, setFilterDinner] = useState('');
+  const [filterDateFrom, setFilterDateFrom] = useState('');
+  const [filterDateTo, setFilterDateTo] = useState('');
+  
+  // Filters - Requests
+  const [filterRequestCity, setFilterRequestCity] = useState('');
+  const [filterRequestDinner, setFilterRequestDinner] = useState('');
+  const [filterRequestDateFrom, setFilterRequestDateFrom] = useState('');
+  const [filterRequestDateTo, setFilterRequestDateTo] = useState('');
 
-  // Fetch dinners on component mount
   useEffect(() => {
     fetchDinners();
+    fetchRestaurants();
     fetchGroups();
   }, []);
 
-  // Fetch dinner requests when a dinner is selected
   useEffect(() => {
     if (selectedDinner && activeTab === 'users') {
       fetchDinnerRequests();
     }
-  }, [selectedDinner, activeTab]);
+  }, [selectedDinner, activeTab, requestsPage, searchQuery, filterRequestCity, filterRequestDinner, filterRequestDateFrom, filterRequestDateTo]); // eslint-disable-line
+
+  useEffect(() => {
+    if (activeTab === 'groups') {
+      if (groupsPage === 0) {
+        fetchGroups(false);
+      } else {
+        fetchGroups(true); // Load more
+      }
+    }
+  }, [activeTab, groupsPage]); // eslint-disable-line
+
+  // Reset and fetch when filters change
+  useEffect(() => {
+    if (activeTab === 'groups') {
+      setGroupsPage(0);
+      setGroups([]);
+      setHasMoreGroups(true);
+      fetchGroups(false);
+    }
+  }, [searchQuery, filterCity, filterDinner, filterDateFrom, filterDateTo]); // eslint-disable-line
+
+  // Debounced search for both tabs
+  const debouncedSearch = useCallback(
+    debounce((query) => {
+      if (isValidSearchQuery(query) || query.length === 0) {
+        if (activeTab === 'groups') {
+          setGroupsPage(0);
+          setGroups([]);
+          setHasMoreGroups(true);
+        } else {
+          setRequestsPage(0);
+        }
+      }
+    }, 500),
+    [activeTab] // eslint-disable-line react-hooks/exhaustive-deps
+  );
+
+  const handleSearchChange = (e) => {
+    const value = e.target.value;
+    setSearchQuery(value);
+    debouncedSearch(value);
+  };
 
   const fetchDinners = async () => {
     try {
-      setLoading(true);
-      const response = await api.get(API_ENDPOINTS.DINNER_LIST, {
-        params: { index: 0, offset: 100 }
-      });
-      
+      const response = await api.get(`${API_ENDPOINTS.DINNER_LIST}?index=0&offset=100`);
       if (response.success) {
         setDinners(response.data || []);
         if (response.data && response.data.length > 0) {
@@ -44,9 +132,17 @@ const GroupAttendeesPage = () => {
       }
     } catch (err) {
       console.error('Error fetching dinners:', err);
-      setError('Failed to load dinners');
-    } finally {
-      setLoading(false);
+    }
+  };
+
+  const fetchRestaurants = async () => {
+    try {
+      const response = await api.get(`${API_ENDPOINTS.RESTAURANT_LIST}?index=0&offset=100`);
+      if (response.success) {
+        setRestaurants(response.data || []);
+      }
+    } catch (err) {
+      console.error('Error fetching restaurants:', err);
     }
   };
 
@@ -54,17 +150,26 @@ const GroupAttendeesPage = () => {
     try {
       setLoading(true);
       setError('');
-      const response = await api.get(API_ENDPOINTS.DINNER_REQUESTS_LIST, {
-        params: { 
-          index: 0, 
-          offset: 100,
-          dinner_id: selectedDinner,
-          search: searchQuery 
-        }
-      });
+      
+      const params = new URLSearchParams();
+      params.append('index', requestsPage);
+      params.append('offset', requestsPageSize);
+      if (selectedDinner) params.append('dinner_id', selectedDinner);
+      
+      // Only add search if valid (3+ characters)
+      if (isValidSearchQuery(searchQuery)) {
+        params.append('search', searchQuery);
+      }
+      if (filterRequestCity) params.append('city', filterRequestCity);
+      if (filterRequestDinner) params.append('dinner', filterRequestDinner);
+      if (filterRequestDateFrom) params.append('date_from', filterRequestDateFrom);
+      if (filterRequestDateTo) params.append('date_to', filterRequestDateTo);
+      
+      const response = await api.get(`${API_ENDPOINTS.DINNER_REQUESTS_LIST}?${params}`);
       
       if (response.success) {
         setDinnerRequests(response.data || []);
+        setRequestsTotal(response.total || response.data?.length || 0);
       }
     } catch (err) {
       console.error('Error fetching dinner requests:', err);
@@ -74,21 +179,49 @@ const GroupAttendeesPage = () => {
     }
   };
 
-  const fetchGroups = async () => {
+  const fetchGroups = async (isLoadMore = false) => {
     try {
-      setLoading(true);
-      const response = await api.get(API_ENDPOINTS.GROUP_LIST, {
-        params: { index: 0, offset: 100 }
-      });
+      if (isLoadMore) {
+        setIsLoadingMore(true);
+      } else {
+        setLoading(true);
+      }
+      
+      const params = new URLSearchParams();
+      params.append('index', groupsPage);
+      params.append('offset', groupsPageSize);
+      
+      // Only add search if valid (3+ characters)
+      if (isValidSearchQuery(searchQuery)) {
+        params.append('search', searchQuery);
+      }
+      if (filterCity) params.append('city', filterCity);
+      if (filterDinner) params.append('dinner', filterDinner);
+      if (filterDateFrom) params.append('date_from', filterDateFrom);
+      if (filterDateTo) params.append('date_to', filterDateTo);
+      
+      const response = await api.get(`${API_ENDPOINTS.GROUP_LIST}?${params}`);
       
       if (response.success) {
-        setGroups(response.groups || []);
+        const newGroups = response.groups || [];
+        
+        if (isLoadMore) {
+          // Append to existing groups for infinity scroll
+          setGroups(prev => [...prev, ...newGroups]);
+        } else {
+          // Replace groups for initial load or filter change
+          setGroups(newGroups);
+        }
+        
+        setGroupsTotal(response.total || 0);
+        setHasMoreGroups(newGroups.length === groupsPageSize);
       }
     } catch (err) {
       console.error('Error fetching groups:', err);
       setError('Failed to load groups');
     } finally {
       setLoading(false);
+      setIsLoadingMore(false);
     }
   };
 
@@ -111,12 +244,17 @@ const GroupAttendeesPage = () => {
 
   const handleCreateGroup = async () => {
     if (selectedUsers.length === 0) {
-      setError('Please select at least one user');
+      toast.error('Please select at least one user');
       return;
     }
 
     if (!groupName.trim()) {
-      setError('Please enter a group name');
+      toast.error('Please enter a group name');
+      return;
+    }
+
+    if (!selectedDinnerForGroup) {
+      toast.error('Please select a dinner');
       return;
     }
 
@@ -127,39 +265,90 @@ const GroupAttendeesPage = () => {
       const response = await api.post(API_ENDPOINTS.GROUP_CREATE, {
         name: groupName,
         users: selectedUsers,
-        dinner_id: selectedDinner
+        dinner_id: selectedDinnerForGroup,
+        restaurant_id: selectedRestaurant || null
       });
 
       if (response.success) {
-        alert('Group created successfully!');
+        toast.success('Group created successfully!');
         setShowCreateGroupModal(false);
         setGroupName('');
+        setSelectedDinnerForGroup('');
+        setSelectedRestaurant('');
         setSelectedUsers([]);
         fetchGroups();
         setActiveTab('groups');
       }
     } catch (err) {
       console.error('Error creating group:', err);
-      setError(err.message || 'Failed to create group');
+      toast.error(err.message || 'Failed to create group');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleMarkAsBooked = async (groupId) => {
+  const handleMakeBooking = async () => {
+    if (!selectedGroup) return;
+
     try {
       setLoading(true);
       const response = await api.put(API_ENDPOINTS.GROUP_MARK_BOOKED, {
-        group_id: groupId
+        group_id: selectedGroup.id,
+        restaurant_id: selectedRestaurant || null
       });
 
       if (response.success) {
-        alert('Group marked as booked!');
+        toast.success('Booking confirmed successfully!');
+        setShowMakeBookingModal(false);
+        setSelectedGroup(null);
+        setSelectedRestaurant('');
         fetchGroups();
       }
     } catch (err) {
-      console.error('Error marking group as booked:', err);
-      setError('Failed to mark group as booked');
+      console.error('Error making booking:', err);
+      toast.error('Failed to confirm booking');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteGroup = async () => {
+    if (!selectedGroup) return;
+
+    try {
+      setLoading(true);
+      // Assuming there's a delete endpoint
+      const response = await api.delete(`${API_ENDPOINTS.GROUP_LIST}/${selectedGroup.id}`);
+      
+      if (response.success) {
+        toast.success('Group deleted successfully');
+        setShowDeleteConfirm(false);
+        setSelectedGroup(null);
+        fetchGroups();
+      }
+    } catch (err) {
+      console.error('Error deleting group:', err);
+      toast.error('Failed to delete group');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleUpdateRequestStatus = async (requestId, status) => {
+    try {
+      setLoading(true);
+      // Assuming there's an update endpoint for request status
+      const response = await api.put(`${API_ENDPOINTS.DINNER_REQUESTS_LIST}/${requestId}`, {
+        status: status
+      });
+
+      if (response.success) {
+        toast.success(`Request ${status} successfully`);
+        fetchDinnerRequests();
+      }
+    } catch (err) {
+      console.error('Error updating request status:', err);
+      toast.error('Failed to update request status');
     } finally {
       setLoading(false);
     }
@@ -175,18 +364,18 @@ const GroupAttendeesPage = () => {
       const url = window.URL.createObjectURL(new Blob([response]));
       const link = document.createElement('a');
       link.href = url;
-      link.setAttribute('download', 'users.csv');
+      link.setAttribute('download', `export-${new Date().toISOString().split('T')[0]}.csv`);
       document.body.appendChild(link);
       link.click();
       link.remove();
     } catch (err) {
       console.error('Error exporting CSV:', err);
-      setError('Failed to export CSV');
+      toast.error('Failed to export CSV');
     }
   };
 
   const calculateAge = (dateOfBirth) => {
-    if (!dateOfBirth) return 'N/A';
+    if (!dateOfBirth) return '-';
     const today = new Date();
     const birthDate = new Date(dateOfBirth);
     let age = today.getFullYear() - birthDate.getFullYear();
@@ -197,141 +386,300 @@ const GroupAttendeesPage = () => {
     return age;
   };
 
-  // Helper for Gender Badge
   const GenderBadge = ({ gender }) => {
+    if (!gender) return <span>-</span>;
+    
     const normalizedGender = gender?.toUpperCase();
     const isValid = normalizedGender === 'F' || normalizedGender === 'M' || normalizedGender === 'FEMALE' || normalizedGender === 'MALE';
     const isFemale = normalizedGender === 'F' || normalizedGender === 'FEMALE';
-    const displayGender = isFemale ? 'F' : normalizedGender === 'M' || normalizedGender === 'MALE' ? 'M' : 'N/A';
+    const displayGender = isFemale ? 'F' : normalizedGender === 'M' || normalizedGender === 'MALE' ? 'M' : '-';
+    
+    if (displayGender === '-') return <span>-</span>;
     
     return (
-    <span className={`inline-flex items-center justify-center w-6 h-6 rounded text-xs font-medium ${
-        !isValid 
-          ? 'bg-gray-100 text-gray-600'
-          : isFemale 
+      <span className={`inline-flex items-center justify-center w-6 h-6 rounded text-xs font-medium ${
+        isFemale 
           ? 'bg-pink-100 text-pink-600' 
           : 'bg-blue-100 text-blue-600'
       }`}>
         {displayGender}
-    </span>
-  );
+      </span>
+    );
   };
 
-  // Helper for Dietary Check
-  const DietaryCheck = ({ label, available }) => (
-    <div className="flex items-center gap-2 text-sm">
-      <span className="text-[#374151] w-20">{label}:</span>
-      {available ? (
-        <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-        </svg>
-      ) : (
-        <svg className="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-        </svg>
-      )}
-    </div>
-  );
-
-  // User Table Component
-  const UserTable = ({ data, showActions = true, isRequestsTable = false }) => {
-    const allSelected = isRequestsTable && data.length > 0 && selectedUsers.length === data.length;
-    
+  // Groups Table Component with Infinity Scroll
+  const GroupsTable = () => {
     return (
-    <div className="overflow-x-auto">
-      <table className="w-full min-w-max">
-        <thead className="bg-[#F9FAFB] border-b border-[#E5E7EB]">
-          <tr>
-              {isRequestsTable && (
-               <th className="px-4 py-3 w-10">
+      <div className="bg-white rounded-xl shadow-sm border border-[#E5E7EB] overflow-hidden">
+        <div className="overflow-x-auto max-h-[calc(100vh-300px)] overflow-y-auto">
+          <table className="w-full min-w-max">
+            <thead className="bg-[#F9FAFB] border-b border-[#E5E7EB] sticky top-0">
+              <tr>
+                <th className="px-4 py-3 text-left text-xs font-medium text-[#6B7280] uppercase tracking-wide">Group Name</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-[#6B7280] uppercase tracking-wide">Dinner</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-[#6B7280] uppercase tracking-wide">Restaurant</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-[#6B7280] uppercase tracking-wide">Members</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-[#6B7280] uppercase tracking-wide">Area</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-[#6B7280] uppercase tracking-wide">Booked</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-[#6B7280] uppercase tracking-wide">Status</th>
+                <th className="px-4 py-3 text-right text-xs font-medium text-[#6B7280] uppercase tracking-wide">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-[#F3F4F6]">
+              {groups.length === 0 && !loading ? (
+                <tr>
+                  <td colSpan="8" className="px-4 py-8 text-center text-sm text-[#6B7280]">
+                    No groups found
+                  </td>
+                </tr>
+              ) : (
+                <>
+                  {groups.map((group, index) => {
+                    const isLastElement = groups.length === index + 1;
+                    return (
+                      <tr 
+                        key={group.id} 
+                        ref={isLastElement ? lastGroupElementRef : null}
+                        className="hover:bg-[#F9FAFB] transition-colors"
+                      >
+                        <td className="px-4 py-3.5 whitespace-nowrap text-sm text-[#111827] font-medium">
+                          {formatDisplayValue(group.name)}
+                        </td>
+                        <td className="px-4 py-3.5 whitespace-nowrap text-sm text-[#6B7280]">
+                          {formatDisplayValue(group.dinner?.title)}
+                        </td>
+                        <td className="px-4 py-3.5 whitespace-nowrap text-sm text-[#6B7280]">
+                          {group.restaurant?.name ? capitalizeWords(group.restaurant.name) : 'Not assigned'}
+                        </td>
+                        <td className="px-4 py-3.5 whitespace-nowrap text-sm text-[#6B7280]">
+                          {group.total_members || group.members?.length || 0}
+                        </td>
+                        <td className="px-4 py-3.5 whitespace-nowrap text-sm text-[#6B7280]">
+                          {formatDisplayValue(group.dinner?.location)}
+                        </td>
+                        <td className="px-4 py-3.5 whitespace-nowrap">
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium ${
+                            group.is_booked 
+                              ? 'bg-green-100 text-green-800'
+                              : 'bg-gray-100 text-gray-800'
+                          }`}>
+                            {group.is_booked ? 'Yes' : 'No'}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3.5 whitespace-nowrap">
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium bg-yellow-100 text-yellow-800">
+                            {capitalizeWords(group.status || 'Not Responded')}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3.5 whitespace-nowrap text-right">
+                          <div className="flex items-center justify-end gap-2">
+                            {!group.is_booked && (
+                              <button
+                                onClick={() => {
+                                  setSelectedGroup(group);
+                                  setShowMakeBookingModal(true);
+                                }}
+                                className="px-3 py-1.5 bg-[#F97316] text-white rounded text-xs font-medium hover:bg-[#EA580C] transition-colors"
+                              >
+                                Make Booking
+                              </button>
+                            )}
+                            <button
+                              onClick={() => {
+                                setSelectedGroup(group);
+                                setShowDeleteConfirm(true);
+                              }}
+                              className="p-1.5 text-red-600 hover:bg-red-50 rounded transition-colors"
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                              </svg>
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                  {isLoadingMore && (
+                    <tr>
+                      <td colSpan="8" className="px-4 py-4 text-center text-sm text-[#6B7280]">
+                        <div className="flex items-center justify-center">
+                          <svg className="animate-spin h-5 w-5 text-[#F97316]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          </svg>
+                          <span className="ml-2">Loading more...</span>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                </>
+              )}
+            </tbody>
+          </table>
+        </div>
+        
+        {/* Showing count */}
+        {groups.length > 0 && (
+          <div className="px-6 py-4 border-t border-[#E5E7EB]">
+            <div className="text-sm text-[#6B7280]">
+              Showing {groups.length} of {groupsTotal} groups {hasMoreGroups && '(scroll for more)'}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  // Requests Table Component
+  const RequestsTable = () => {
+    const allSelected = dinnerRequests.length > 0 && selectedUsers.length === dinnerRequests.length;
+
+    return (
+      <div className="bg-white rounded-xl shadow-sm border border-[#E5E7EB] overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-max">
+            <thead className="bg-[#F9FAFB] border-b border-[#E5E7EB]">
+              <tr>
+                <th className="px-4 py-3 w-10">
                   <input 
                     type="checkbox" 
                     className="rounded border-gray-300 text-orange-500 focus:ring-orange-500"
                     checked={allSelected}
                     onChange={(e) => handleSelectAll(e.target.checked)}
                   />
-               </th>
-            )}
-            <th className="px-4 py-3 text-left text-xs font-medium text-[#6B7280] uppercase tracking-wide">Name</th>
-            <th className="px-4 py-3 text-left text-xs font-medium text-[#6B7280] uppercase tracking-wide">Email</th>
-            <th className="px-4 py-3 text-left text-xs font-medium text-[#6B7280] uppercase tracking-wide">Gender</th>
-            <th className="px-4 py-3 text-left text-xs font-medium text-[#6B7280] uppercase tracking-wide">Age</th>
-            <th className="px-4 py-3 text-left text-xs font-medium text-[#6B7280] uppercase tracking-wide">Nationality</th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-[#6B7280] uppercase tracking-wide">Industry</th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-[#6B7280] uppercase tracking-wide">Status</th>
-            <th className="px-4 py-3 text-right text-xs font-medium text-[#6B7280] uppercase tracking-wide"></th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-[#F3F4F6]">
-            {data.length === 0 ? (
-              <tr>
-                <td colSpan={isRequestsTable ? 9 : 8} className="px-4 py-8 text-center text-sm text-[#6B7280]">
-                  {isRequestsTable ? 'No dinner requests found' : 'No data available'}
-                </td>
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-[#6B7280] uppercase tracking-wide">Name</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-[#6B7280] uppercase tracking-wide">Email</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-[#6B7280] uppercase tracking-wide">Gender</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-[#6B7280] uppercase tracking-wide">Age</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-[#6B7280] uppercase tracking-wide">Area</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-[#6B7280] uppercase tracking-wide">Language</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-[#6B7280] uppercase tracking-wide">Meal Pref.</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-[#6B7280] uppercase tracking-wide">Budget</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-[#6B7280] uppercase tracking-wide">Status</th>
+                <th className="px-4 py-3 text-right text-xs font-medium text-[#6B7280] uppercase tracking-wide">Actions</th>
               </tr>
-            ) : (
-              data.map((item, index) => {
-                const user = isRequestsTable ? item.user : item;
-                const userId = user.id;
-                const profile = user.profile || {};
-                const isSelected = selectedUsers.includes(userId);
-                
-                return (
-                  <tr key={`${userId}-${index}`} className="hover:bg-[#F9FAFB] transition-colors">
-                    {isRequestsTable && (
-                 <td className="px-4 py-3">
+            </thead>
+            <tbody className="divide-y divide-[#F3F4F6]">
+              {dinnerRequests.length === 0 ? (
+                <tr>
+                  <td colSpan="11" className="px-4 py-8 text-center text-sm text-[#6B7280]">
+                    No dinner requests found
+                  </td>
+                </tr>
+              ) : (
+                dinnerRequests.map((item) => {
+                  const user = item.user;
+                  const profile = user.profile || {};
+                  const isSelected = selectedUsers.includes(user.id);
+
+                  return (
+                    <tr key={user.id} className="hover:bg-[#F9FAFB] transition-colors">
+                      <td className="px-4 py-3">
                         <input 
                           type="checkbox" 
                           className="rounded border-gray-300 text-orange-500 focus:ring-orange-500"
                           checked={isSelected}
-                          onChange={(e) => handleSelectUser(userId, e.target.checked)}
+                          onChange={(e) => handleSelectUser(user.id, e.target.checked)}
                         />
-                 </td>
-               )}
-                    <td className="px-4 py-3.5 whitespace-nowrap text-sm text-[#111827]">
-                      {user.first_name || user.last_name ? `${user.first_name} ${user.last_name}`.trim() : 'N/A'}
-                    </td>
-              <td className="px-4 py-3.5 whitespace-nowrap text-sm text-[#6B7280]">{user.email}</td>
-                    <td className="px-4 py-3.5 whitespace-nowrap">
-                      <GenderBadge gender={profile.gender || 'N/A'} />
-                    </td>
-                    <td className="px-4 py-3.5 whitespace-nowrap text-sm text-[#6B7280]">
-                      {calculateAge(profile.date_of_birth)}
-                    </td>
-                    <td className="px-4 py-3.5 whitespace-nowrap text-sm text-[#6B7280]">
-                      {profile.nationality || 'N/A'}
-                    </td>
-                    <td className="px-4 py-3.5 whitespace-nowrap text-sm text-[#6B7280]">
-                      {profile.industry || 'N/A'}
-                    </td>
-              <td className="px-4 py-3.5 whitespace-nowrap">
-                      {isRequestsTable && (
+                      </td>
+                      <td className="px-4 py-3.5 whitespace-nowrap text-sm text-[#111827]">
+                        {formatDisplayValue(user.first_name || user.last_name ? `${user.first_name} ${user.last_name}`.trim() : '')}
+                      </td>
+                      <td className="px-4 py-3.5 whitespace-nowrap text-sm text-[#6B7280]">{formatDisplayValue(user.email)}</td>
+                      <td className="px-4 py-3.5 whitespace-nowrap">
+                        <GenderBadge gender={profile.gender} />
+                      </td>
+                      <td className="px-4 py-3.5 whitespace-nowrap text-sm text-[#6B7280]">
+                        {calculateAge(profile.date_of_birth)}
+                      </td>
+                      <td className="px-4 py-3.5 whitespace-nowrap text-sm text-[#6B7280]">
+                        {formatDisplayValue(profile.area)}
+                      </td>
+                      <td className="px-4 py-3.5 whitespace-nowrap text-sm text-[#6B7280]">
+                        {formatDisplayValue(profile.language)}
+                      </td>
+                      <td className="px-4 py-3.5 whitespace-nowrap text-sm text-[#6B7280]">
+                        {formatDisplayValue(profile.meal_preference)}
+                      </td>
+                      <td className="px-4 py-3.5 whitespace-nowrap text-sm text-[#6B7280]">
+                        {formatDisplayValue(profile.budget)}
+                      </td>
+                      <td className="px-4 py-3.5 whitespace-nowrap">
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium ${
                           item.request_status === 'pending' 
                             ? 'bg-yellow-100 text-yellow-800'
                             : item.request_status === 'approved'
                             ? 'bg-green-100 text-green-800'
-                            : 'bg-gray-100 text-gray-800'
+                            : 'bg-red-100 text-red-800'
                         }`}>
-                          {item.request_status}
-                </span>
-                      )}
-              </td>
-              <td className="px-4 py-3.5 whitespace-nowrap text-right">
-                <button className="text-[#9CA3AF] hover:text-[#111827]">
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
-                  </svg>
-                </button>
-              </td>
-            </tr>
-                );
-              })
-            )}
-        </tbody>
-      </table>
-    </div>
-  );
+                          {capitalizeWords(item.request_status)}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3.5 whitespace-nowrap text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <button
+                            onClick={() => {
+                              setSelectedProfile(user);
+                              setShowViewProfile(true);
+                            }}
+                            className="px-3 py-1.5 text-blue-600 hover:bg-blue-50 rounded text-xs font-medium transition-colors"
+                          >
+                            View Profile
+                          </button>
+                          {item.request_status !== 'approved' && (
+                            <button
+                              onClick={() => handleUpdateRequestStatus(item.id, 'approved')}
+                              className="px-3 py-1.5 bg-green-600 text-white rounded text-xs font-medium hover:bg-green-700 transition-colors"
+                            >
+                              Approve
+                            </button>
+                          )}
+                          {item.request_status !== 'rejected' && (
+                            <button
+                              onClick={() => handleUpdateRequestStatus(item.id, 'rejected')}
+                              className="px-3 py-1.5 bg-red-600 text-white rounded text-xs font-medium hover:bg-red-700 transition-colors"
+                            >
+                              Reject
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
+            </tbody>
+          </table>
+        </div>
+        
+        {/* Pagination */}
+        {requestsTotal > 0 && (
+          <div className="px-6 py-4 border-t border-[#E5E7EB] flex items-center justify-between">
+            <div className="text-sm text-[#6B7280]">
+              Showing {requestsPage * requestsPageSize + 1} to {Math.min((requestsPage + 1) * requestsPageSize, requestsTotal)} of {requestsTotal} results
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setRequestsPage(Math.max(0, requestsPage - 1))}
+                disabled={requestsPage === 0}
+                className="px-4 py-2 border border-[#E5E7EB] rounded-lg text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+              >
+                Previous
+              </button>
+              <button
+                onClick={() => setRequestsPage(requestsPage + 1)}
+                disabled={(requestsPage + 1) * requestsPageSize >= requestsTotal}
+                className="px-4 py-2 border border-[#E5E7EB] rounded-lg text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    );
   };
 
   return (
@@ -344,69 +692,74 @@ const GroupAttendeesPage = () => {
             <p className="text-sm text-[#6B7280] mt-1">Manage dinner requests and create groups</p>
           </div>
           <div className="flex items-center gap-3 flex-wrap">
-             {activeTab === 'users' ? (
-                 <>
-                   <select
-                     value={selectedDinner}
-                     onChange={(e) => setSelectedDinner(e.target.value)}
-                     className="px-4 py-2 border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-orange-500 bg-white"
-                   >
-                     <option value="">Select Dinner</option>
-                     {dinners.map(dinner => (
-                       <option key={dinner.id} value={dinner.id}>
-                         {dinner.title} - {new Date(dinner.date).toLocaleDateString()}
-                       </option>
-                     ))}
-                   </select>
-                   <div className="relative">
-                      <input
-                        type="text"
-                        placeholder="Search by email"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        onKeyPress={(e) => e.key === 'Enter' && fetchDinnerRequests()}
-                        className="pl-4 pr-4 py-2 border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-orange-500 w-64 bg-[#F9FAFB]"
-                      />
-                   </div>
-                   <button 
-                     onClick={handleExportCSV}
-                     className="px-4 py-2 bg-white border border-[#E5E7EB] text-[#374151] rounded-lg text-sm font-medium hover:bg-gray-50 flex items-center gap-2"
-                   >
-                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                     </svg>
-                     Export All CSV
-                   </button>
-                   <button 
-                     onClick={() => setShowCreateGroupModal(true)}
-                     disabled={selectedUsers.length === 0}
-                     className="px-4 py-2 bg-[#FFAA55] text-white rounded-lg text-sm font-medium hover:bg-[#FF9933] disabled:opacity-50 disabled:cursor-not-allowed"
-                   >
-                     Create Group ({selectedUsers.length})
-                   </button>
-                 </>
-             ) : (
-                <>
-                  <div className="relative">
-                      <input
-                        type="text"
-                        placeholder="Search groups"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="pl-4 pr-4 py-2 border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-orange-500 w-64 bg-[#F9FAFB]"
-                      />
-                   </div>
-                   <button 
-                     onClick={handleExportCSV}
-                     className="px-4 py-2 bg-white border border-[#E5E7EB] text-[#374151] rounded-lg text-sm font-medium hover:bg-gray-50 flex items-center gap-2"
-                   >
-                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                     </svg>
-                     Export All CSV
-                   </button>
-                </>
-             )}
+            {activeTab === 'users' ? (
+              <>
+                <select
+                  value={selectedDinner}
+                  onChange={(e) => setSelectedDinner(e.target.value)}
+                  className="px-4 py-2 border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-orange-500 bg-white"
+                >
+                  <option value="">Select Dinner</option>
+                  {dinners.map(dinner => (
+                    <option key={dinner.id} value={dinner.id}>
+                      {dinner.title} - {new Date(dinner.date).toLocaleDateString()}
+                    </option>
+                  ))}
+                </select>
+                <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Search by email (min 3 characters)"
+                  value={searchQuery}
+                  onChange={handleSearchChange}
+                  className="pl-4 pr-4 py-2 border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-orange-500 w-64 bg-[#F9FAFB]"
+                />
+                </div>
+                <button 
+                  onClick={handleExportCSV}
+                  className="px-4 py-2 bg-white border border-[#E5E7EB] text-[#374151] rounded-lg text-sm font-medium hover:bg-gray-50 flex items-center gap-2"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                  </svg>
+                  Export All CSV
+                </button>
+                <button 
+                  onClick={() => setShowCreateGroupModal(true)}
+                  disabled={selectedUsers.length === 0}
+                  className="px-4 py-2 bg-[#F97316] text-white rounded-lg text-sm font-medium hover:bg-[#EA580C] disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Create Group ({selectedUsers.length})
+                </button>
+              </>
+            ) : (
+              <>
+                <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Search groups (min 3 characters)"
+                  value={searchQuery}
+                  onChange={handleSearchChange}
+                  className="pl-4 pr-4 py-2 border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-orange-500 w-64 bg-[#F9FAFB]"
+                />
+                </div>
+                <button 
+                  onClick={handleExportCSV}
+                  className="px-4 py-2 bg-white border border-[#E5E7EB] text-[#374151] rounded-lg text-sm font-medium hover:bg-gray-50 flex items-center gap-2"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                  </svg>
+                  Export All CSV
+                </button>
+                <button 
+                  onClick={() => setShowCreateGroupModal(true)}
+                  className="px-4 py-2 bg-[#F97316] text-white rounded-lg text-sm font-medium hover:bg-[#EA580C]"
+                >
+                  Create Group
+                </button>
+              </>
+            )}
           </div>
         </div>
 
@@ -435,6 +788,73 @@ const GroupAttendeesPage = () => {
         </div>
       </div>
 
+      {/* Filters Section */}
+      <div className="bg-white px-8 py-4 border-b border-[#E5E7EB]">
+        <div className="flex flex-wrap items-center gap-3">
+          <select
+            value={activeTab === 'groups' ? filterCity : filterRequestCity}
+            onChange={(e) => activeTab === 'groups' ? setFilterCity(e.target.value) : setFilterRequestCity(e.target.value)}
+            className="px-4 py-2 border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-orange-500 bg-white"
+          >
+            <option value="">All Cities</option>
+            <option value="Cape Town">Cape Town</option>
+            <option value="Johannesburg">Johannesburg</option>
+            <option value="Durban">Durban</option>
+          </select>
+          
+          <select
+            value={activeTab === 'groups' ? filterDinner : filterRequestDinner}
+            onChange={(e) => activeTab === 'groups' ? setFilterDinner(e.target.value) : setFilterRequestDinner(e.target.value)}
+            className="px-4 py-2 border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-orange-500 bg-white"
+          >
+            <option value="">All Dinners</option>
+            {dinners.map(dinner => (
+              <option key={dinner.id} value={dinner.id}>
+                {dinner.title}
+              </option>
+            ))}
+          </select>
+          
+          <input
+            type="date"
+            value={activeTab === 'groups' ? filterDateFrom : filterRequestDateFrom}
+            onChange={(e) => activeTab === 'groups' ? setFilterDateFrom(e.target.value) : setFilterRequestDateFrom(e.target.value)}
+            placeholder="From Date"
+            className="px-4 py-2 border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-orange-500 bg-white"
+          />
+          
+          <input
+            type="date"
+            value={activeTab === 'groups' ? filterDateTo : filterRequestDateTo}
+            onChange={(e) => activeTab === 'groups' ? setFilterDateTo(e.target.value) : setFilterRequestDateTo(e.target.value)}
+            placeholder="To Date"
+            className="px-4 py-2 border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-orange-500 bg-white"
+          />
+          
+          {((activeTab === 'groups' && (filterCity || filterDinner || filterDateFrom || filterDateTo)) ||
+            (activeTab === 'users' && (filterRequestCity || filterRequestDinner || filterRequestDateFrom || filterRequestDateTo))) && (
+            <button
+              onClick={() => {
+                if (activeTab === 'groups') {
+                  setFilterCity('');
+                  setFilterDinner('');
+                  setFilterDateFrom('');
+                  setFilterDateTo('');
+                } else {
+                  setFilterRequestCity('');
+                  setFilterRequestDinner('');
+                  setFilterRequestDateFrom('');
+                  setFilterRequestDateTo('');
+                }
+              }}
+              className="px-4 py-2 text-sm text-[#6B7280] hover:text-[#374151] hover:bg-gray-50 rounded-lg transition-colors"
+            >
+              Clear Filters
+            </button>
+          )}
+        </div>
+      </div>
+
       {/* Error Message */}
       {error && (
         <div className="mx-6 mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
@@ -450,115 +870,23 @@ const GroupAttendeesPage = () => {
           </div>
         )}
 
-        {!loading && activeTab === 'groups' && (
-          <div className="space-y-6">
-            {groups.length === 0 ? (
-              <div className="bg-white rounded-xl shadow-sm border border-[#E5E7EB] p-12 text-center">
-                <svg className="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                </svg>
-                <h3 className="text-lg font-medium text-gray-900 mb-2">No Groups Yet</h3>
-                <p className="text-gray-500">Create your first group from dinner requests</p>
-              </div>
-            ) : (
-              <>
-                <div className="text-sm text-[#6B7280]">
-                  Total: {groups.reduce((acc, g) => acc + g.total_members, 0)} attendees across {groups.length} groups
-                </div>
-                {groups.map((group) => {
-                  const genderCounts = group.members?.reduce((acc, member) => {
-                    const gender = member.profile?.gender || 'N/A';
-                    acc[gender] = (acc[gender] || 0) + 1;
-                    return acc;
-                  }, {});
-                  
-                  return (
-              <div key={group.id} className="bg-white rounded-xl shadow-sm border border-[#E5E7EB] overflow-hidden">
-                {/* Group Header */}
-                <div className="px-6 py-4 border-b border-[#E5E7EB] bg-orange-50/30 flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-lg bg-[#FFF0E0] flex items-center justify-center text-[#F97316]">
-                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                      </svg>
-                    </div>
-                    <div>
-                      <h3 className="text-base font-bold text-[#111827]">{group.name}</h3>
-                            <p className="text-xs text-[#6B7280]">
-                              {group.total_members} members
-                              {genderCounts && Object.keys(genderCounts).length > 0 && 
-                                ` . ${Object.entries(genderCounts).map(([g, c]) => `${c}${g}`).join('/')}`
-                              }
-                            </p>
-                    </div>
-                          {group.is_booked && (
-                            <span className="ml-4 inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                              Booked
-                            </span>
-                          )}
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs text-[#6B7280]">
-                            Created: {new Date(group.created_at).toLocaleDateString()}
-                          </span>
-                             </div>
-                         </div>
-
-                      {/* Group Members */}
-                      <UserTable data={group.members || []} showActions={false} isRequestsTable={false} />
-
-                      {/* Group Actions */}
-                      <div className="p-6 border-t border-[#E5E7EB] bg-white flex justify-end gap-3">
-                        <button className="px-4 py-2 bg-white border border-[#E5E7EB] text-[#374151] rounded-lg text-sm font-medium hover:bg-gray-50">
-                          View Details
-                               </button>
-                        {!group.is_booked && (
-                          <button 
-                            onClick={() => handleMarkAsBooked(group.id)}
-                            className="px-4 py-2 bg-[#FFAA55] text-white rounded-lg text-sm font-medium hover:bg-[#FF9933]"
-                          >
-                                   Mark as Booked
-                               </button>
-                        )}
-                           </div>
-                    </div>
-                  );
-                })}
-              </>
-            )}
+        {!loading && activeTab === 'groups' && <GroupsTable />}
+        {!loading && activeTab === 'users' && selectedDinner && <RequestsTable />}
+        
+        {!loading && activeTab === 'users' && !selectedDinner && (
+          <div className="bg-white rounded-xl shadow-sm border border-[#E5E7EB] p-12 text-center">
+            <svg className="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">Select a Dinner</h3>
+            <p className="text-gray-500">Please select a dinner event to view its requests</p>
           </div>
-        )}
-
-        {!loading && activeTab === 'users' && (
-          <>
-            {!selectedDinner ? (
-              <div className="bg-white rounded-xl shadow-sm border border-[#E5E7EB] p-12 text-center">
-                <svg className="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-                <h3 className="text-lg font-medium text-gray-900 mb-2">Select a Dinner</h3>
-                <p className="text-gray-500">Please select a dinner event to view its requests</p>
-              </div>
-            ) : (
-           <div className="bg-white rounded-xl shadow-sm border border-[#E5E7EB] overflow-hidden">
-                <div className="px-6 py-4 border-b border-[#E5E7EB] bg-gray-50">
-                  <h3 className="text-sm font-medium text-gray-900">
-                    Showing requests for: {dinners.find(d => d.id === selectedDinner)?.title}
-                  </h3>
-                  <p className="text-xs text-gray-500 mt-1">
-                    Total requests: {dinnerRequests.length} | Selected: {selectedUsers.length}
-                  </p>
-                </div>
-                <UserTable data={dinnerRequests} showActions={true} isRequestsTable={true} />
-           </div>
-            )}
-          </>
         )}
       </div>
 
       {/* Create Group Modal */}
       {showCreateGroupModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-bold text-[#111827]">Create New Group</h3>
@@ -566,6 +894,8 @@ const GroupAttendeesPage = () => {
                 onClick={() => {
                   setShowCreateGroupModal(false);
                   setGroupName('');
+                  setSelectedDinnerForGroup('');
+                  setSelectedRestaurant('');
                   setError('');
                 }}
                 className="text-gray-400 hover:text-gray-600"
@@ -579,7 +909,7 @@ const GroupAttendeesPage = () => {
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Group Name
+                  Group Name <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -588,6 +918,42 @@ const GroupAttendeesPage = () => {
                   placeholder="e.g., Group 01"
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
                 />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Select Dinner <span className="text-red-500">*</span>
+                </label>
+                <select
+                  value={selectedDinnerForGroup}
+                  onChange={(e) => setSelectedDinnerForGroup(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                >
+                  <option value="">Select a dinner</option>
+                  {dinners.map(dinner => (
+                    <option key={dinner.id} value={dinner.id}>
+                      {dinner.title} - {new Date(dinner.date).toLocaleDateString()}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Select Restaurant (Optional)
+                </label>
+                <select
+                  value={selectedRestaurant}
+                  onChange={(e) => setSelectedRestaurant(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                >
+                  <option value="">Select a restaurant (optional)</option>
+                  {restaurants.map(restaurant => (
+                    <option key={restaurant.id} value={restaurant.id}>
+                      {restaurant.name} - {restaurant.location}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div>
@@ -618,6 +984,8 @@ const GroupAttendeesPage = () => {
                   onClick={() => {
                     setShowCreateGroupModal(false);
                     setGroupName('');
+                    setSelectedDinnerForGroup('');
+                    setSelectedRestaurant('');
                     setError('');
                   }}
                   className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
@@ -626,10 +994,192 @@ const GroupAttendeesPage = () => {
                 </button>
                 <button
                   onClick={handleCreateGroup}
-                  disabled={loading || !groupName.trim() || selectedUsers.length === 0}
-                  className="flex-1 px-4 py-2 bg-[#FFAA55] text-white rounded-lg hover:bg-[#FF9933] disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={loading || !groupName.trim() || !selectedDinnerForGroup || selectedUsers.length === 0}
+                  className="flex-1 px-4 py-2 bg-[#F97316] text-white rounded-lg hover:bg-[#EA580C] disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {loading ? 'Creating...' : 'Create Group'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Make Booking Modal */}
+      {showMakeBookingModal && selectedGroup && (
+        <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold text-[#111827]">Make Booking</h3>
+              <button 
+                onClick={() => {
+                  setShowMakeBookingModal(false);
+                  setSelectedGroup(null);
+                  setSelectedRestaurant('');
+                }}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <p className="text-sm text-gray-600 mb-4">
+                  Confirm booking for group: <span className="font-semibold">{selectedGroup.name}</span>
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Attach Restaurant (Optional)
+                </label>
+                <select
+                  value={selectedRestaurant}
+                  onChange={(e) => setSelectedRestaurant(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                >
+                  <option value="">Select a restaurant (optional)</option>
+                  {restaurants.map(restaurant => (
+                    <option key={restaurant.id} value={restaurant.id}>
+                      {restaurant.name} - {restaurant.location}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <button
+                  onClick={() => {
+                    setShowMakeBookingModal(false);
+                    setSelectedGroup(null);
+                    setSelectedRestaurant('');
+                  }}
+                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleMakeBooking}
+                  disabled={loading}
+                  className="flex-1 px-4 py-2 bg-[#F97316] text-white rounded-lg hover:bg-[#EA580C] disabled:opacity-50"
+                >
+                  {loading ? 'Confirming...' : 'Confirm Booking'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && selectedGroup && (
+        <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
+            <div className="flex items-center justify-center w-12 h-12 mx-auto mb-4 bg-red-100 rounded-full">
+              <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-semibold text-[#111827] text-center mb-2">Delete Group</h3>
+            <p className="text-sm text-[#6B7280] text-center mb-6">
+              Are you sure you want to delete "{selectedGroup.name}"? This action cannot be undone.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  setShowDeleteConfirm(false);
+                  setSelectedGroup(null);
+                }}
+                className="flex-1 px-4 py-2.5 border border-[#D1D5DB] text-[#374151] rounded-lg text-sm font-medium hover:bg-[#F9FAFB] transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteGroup}
+                className="flex-1 px-4 py-2.5 bg-[#DC2626] text-white rounded-lg text-sm font-medium hover:bg-[#B91C1C] transition-colors"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* View Profile Modal */}
+      {showViewProfile && selectedProfile && (
+        <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold text-[#111827]">User Profile</h3>
+              <button 
+                onClick={() => {
+                  setShowViewProfile(false);
+                  setSelectedProfile(null);
+                }}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium text-gray-500">Name</label>
+                  <p className="text-sm text-gray-900">{formatDisplayValue(`${selectedProfile.first_name || ''} ${selectedProfile.last_name || ''}`.trim())}</p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-gray-500">Email</label>
+                  <p className="text-sm text-gray-900">{formatDisplayValue(selectedProfile.email)}</p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-gray-500">Gender</label>
+                  <p className="text-sm text-gray-900">{formatDisplayValue(selectedProfile.profile?.gender)}</p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-gray-500">Age</label>
+                  <p className="text-sm text-gray-900">{calculateAge(selectedProfile.profile?.date_of_birth)}</p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-gray-500">Area</label>
+                  <p className="text-sm text-gray-900">{formatDisplayValue(selectedProfile.profile?.area)}</p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-gray-500">Language</label>
+                  <p className="text-sm text-gray-900">{capitalizeWords(selectedProfile.profile?.language)}</p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-gray-500">Meal Preference</label>
+                  <p className="text-sm text-gray-900">{capitalizeWords(selectedProfile.profile?.meal_preference)}</p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-gray-500">Budget</label>
+                  <p className="text-sm text-gray-900">{formatDisplayValue(selectedProfile.profile?.budget)}</p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-gray-500">Nationality</label>
+                  <p className="text-sm text-gray-900">{capitalizeWords(selectedProfile.profile?.nationality)}</p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-gray-500">Industry</label>
+                  <p className="text-sm text-gray-900">{capitalizeWords(selectedProfile.profile?.industry)}</p>
+                </div>
+              </div>
+
+              <div className="pt-4">
+                <button
+                  onClick={() => {
+                    setShowViewProfile(false);
+                    setSelectedProfile(null);
+                  }}
+                  className="w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
+                >
+                  Close
                 </button>
               </div>
             </div>
