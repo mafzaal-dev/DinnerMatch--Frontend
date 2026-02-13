@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQuiz } from '@/hooks/useQuiz';
 import { toast } from 'react-hot-toast';
+import { CustomDropdown } from '@/components/common';
 import {
   DndContext, 
   closestCenter,
@@ -350,34 +351,36 @@ const CreateQuizPage = ({ quizId = null, isEdit = false }) => {
                         <label className="block text-sm font-medium text-[#374151] mb-2">
                           Section <span className="text-red-500">*</span>
                         </label>
-                        <select
-                        name="section"
-                        value={formData.section}
-                        onChange={handleChange}
-                        className="w-full px-4 py-2.5 border border-[#D1D5DB] rounded-lg text-sm focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316] outline-none bg-white"
-                        required
-                        >
-                        <option value="basic">Basic</option>
-                        <option value="personality">Personality</option>
-                        <option value="preferences">Preferences</option>
-                        </select>
+                        <CustomDropdown
+                          name="section"
+                          value={formData.section}
+                          onChange={handleChange}
+                          options={[
+                            { value: 'basic', label: 'Basic' },
+                            { value: 'personality', label: 'Personality' },
+                            { value: 'preferences', label: 'Preferences' },
+                          ]}
+                          placeholder="Select section"
+                          required
+                        />
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-[#374151] mb-2">
                           Answer Type <span className="text-red-500">*</span>
                         </label>
-                        <select
-                        name="answer_type"
-                        value={formData.answer_type}
-                        onChange={handleChange}
-                        className="w-full px-4 py-2.5 border border-[#D1D5DB] rounded-lg text-sm focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316] outline-none bg-white"
-                        required
-                        >
-                        <option value="text">Text</option>
-                        <option value="scale">Scale</option>
-                        <option value="boolean">Yes/No</option>
-                        <option value="choice">Select (Multiple Choice)</option>
-                        </select>
+                        <CustomDropdown
+                          name="answer_type"
+                          value={formData.answer_type}
+                          onChange={handleChange}
+                          options={[
+                            { value: 'text', label: 'Text' },
+                            { value: 'scale', label: 'Scale' },
+                            { value: 'boolean', label: 'Yes/No' },
+                            { value: 'choice', label: 'Select (Multiple Choice)' },
+                          ]}
+                          placeholder="Select answer type"
+                          required
+                        />
                     </div>
                 </div>
 

@@ -3,6 +3,7 @@ import { useRouter } from 'next/navigation';
 import { useQuiz } from '@/hooks/useQuiz';
 import { toast } from 'react-hot-toast';
 import { debounce, isValidSearchQuery } from '@/utils/searchHelper';
+import { CustomDropdown } from '@/components/common';
 import {
   DndContext, 
   closestCenter,
@@ -339,35 +340,37 @@ const QuizListPage = () => {
             {/* Filters */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
               <div className="w-full sm:w-48">
-                <select
+                <CustomDropdown
                   value={filterSection}
                   onChange={(e) => {
                     setFilterSection(e.target.value);
                     setCurrentPage(0);
                   }}
-                  className="w-full px-4 py-2.5 border border-[#D1D5DB] rounded-lg text-sm text-[#374151] bg-white focus:outline-none focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316]"
-                >
-                  <option value="">All Sections</option>
-                  <option value="basic">Basic</option>
-                  <option value="personality">Personality</option>
-                  <option value="preferences">Preferences</option>
-                </select>
+                  options={[
+                    { value: '', label: 'All Sections' },
+                    { value: 'basic', label: 'Basic' },
+                    { value: 'personality', label: 'Personality' },
+                    { value: 'preferences', label: 'Preferences' },
+                  ]}
+                  placeholder="All Sections"
+                />
               </div>
               <div className="w-full sm:w-48">
-                <select
+                <CustomDropdown
                   value={filterType}
                   onChange={(e) => {
                     setFilterType(e.target.value);
                     setCurrentPage(0);
                   }}
-                  className="w-full px-4 py-2.5 border border-[#D1D5DB] rounded-lg text-sm text-[#374151] bg-white focus:outline-none focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316]"
-                >
-                  <option value="">All Types</option>
-                  <option value="text">Text</option>
-                  <option value="scale">Scale</option>
-                  <option value="boolean">Yes/No</option>
-                  <option value="choice">Select (Multiple Choice)</option>
-                </select>
+                  options={[
+                    { value: '', label: 'All Types' },
+                    { value: 'text', label: 'Text' },
+                    { value: 'scale', label: 'Scale' },
+                    { value: 'boolean', label: 'Yes/No' },
+                    { value: 'choice', label: 'Select (Multiple Choice)' },
+                  ]}
+                  placeholder="All Types"
+                />
               </div>
               {(filterSection || filterType) && (
                 <button

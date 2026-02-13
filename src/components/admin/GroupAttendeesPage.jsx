@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { api, API_ENDPOINTS } from '../../utils/api';
 import { toast } from 'react-hot-toast';
 import { debounce, formatDisplayValue, isValidSearchQuery, capitalizeWords } from '../../utils/searchHelper';
+import { CustomDropdown } from '@/components/common';
 
 const GroupAttendeesPage = () => {
   const [activeTab, setActiveTab] = useState('groups'); // 'groups' or 'users'
@@ -694,18 +695,19 @@ const GroupAttendeesPage = () => {
           <div className="flex items-center gap-3 flex-wrap">
             {activeTab === 'users' ? (
               <>
-                <select
+                <CustomDropdown
                   value={selectedDinner}
                   onChange={(e) => setSelectedDinner(e.target.value)}
-                  className="px-4 py-2 border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-orange-500 bg-white"
-                >
-                  <option value="">Select Dinner</option>
-                  {dinners.map(dinner => (
-                    <option key={dinner.id} value={dinner.id}>
-                      {dinner.title} - {new Date(dinner.date).toLocaleDateString()}
-                    </option>
-                  ))}
-                </select>
+                  options={[
+                    { value: '', label: 'Select Dinner' },
+                    ...dinners.map(dinner => ({
+                      value: dinner.id,
+                      label: `${dinner.title} - ${new Date(dinner.date).toLocaleDateString()}`,
+                    })),
+                  ]}
+                  placeholder="Select Dinner"
+                  className="min-w-[200px]"
+                />
                 <div className="relative">
                 <input
                   type="text"
@@ -791,29 +793,32 @@ const GroupAttendeesPage = () => {
       {/* Filters Section */}
       <div className="bg-white px-8 py-4 border-b border-[#E5E7EB]">
         <div className="flex flex-wrap items-center gap-3">
-          <select
+          <CustomDropdown
             value={activeTab === 'groups' ? filterCity : filterRequestCity}
             onChange={(e) => activeTab === 'groups' ? setFilterCity(e.target.value) : setFilterRequestCity(e.target.value)}
-            className="px-4 py-2 border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-orange-500 bg-white"
-          >
-            <option value="">All Cities</option>
-            <option value="Cape Town">Cape Town</option>
-            <option value="Johannesburg">Johannesburg</option>
-            <option value="Durban">Durban</option>
-          </select>
+            options={[
+              { value: '', label: 'All Cities' },
+              { value: 'Cape Town', label: 'Cape Town' },
+              { value: 'Johannesburg', label: 'Johannesburg' },
+              { value: 'Durban', label: 'Durban' },
+            ]}
+            placeholder="All Cities"
+            className="min-w-[140px]"
+          />
           
-          <select
+          <CustomDropdown
             value={activeTab === 'groups' ? filterDinner : filterRequestDinner}
             onChange={(e) => activeTab === 'groups' ? setFilterDinner(e.target.value) : setFilterRequestDinner(e.target.value)}
-            className="px-4 py-2 border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-orange-500 bg-white"
-          >
-            <option value="">All Dinners</option>
-            {dinners.map(dinner => (
-              <option key={dinner.id} value={dinner.id}>
-                {dinner.title}
-              </option>
-            ))}
-          </select>
+            options={[
+              { value: '', label: 'All Dinners' },
+              ...dinners.map(dinner => ({
+                value: dinner.id,
+                label: dinner.title,
+              })),
+            ]}
+            placeholder="All Dinners"
+            className="min-w-[160px]"
+          />
           
           <input
             type="date"
@@ -924,36 +929,37 @@ const GroupAttendeesPage = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Select Dinner <span className="text-red-500">*</span>
                 </label>
-                <select
+                <CustomDropdown
                   value={selectedDinnerForGroup}
                   onChange={(e) => setSelectedDinnerForGroup(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                >
-                  <option value="">Select a dinner</option>
-                  {dinners.map(dinner => (
-                    <option key={dinner.id} value={dinner.id}>
-                      {dinner.title} - {new Date(dinner.date).toLocaleDateString()}
-                    </option>
-                  ))}
-                </select>
+                  options={[
+                    { value: '', label: 'Select a dinner' },
+                    ...dinners.map(dinner => ({
+                      value: dinner.id,
+                      label: `${dinner.title} - ${new Date(dinner.date).toLocaleDateString()}`,
+                    })),
+                  ]}
+                  placeholder="Select a dinner"
+                  required
+                />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Select Restaurant (Optional)
                 </label>
-                <select
+                <CustomDropdown
                   value={selectedRestaurant}
                   onChange={(e) => setSelectedRestaurant(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                >
-                  <option value="">Select a restaurant (optional)</option>
-                  {restaurants.map(restaurant => (
-                    <option key={restaurant.id} value={restaurant.id}>
-                      {restaurant.name} - {restaurant.location}
-                    </option>
-                  ))}
-                </select>
+                  options={[
+                    { value: '', label: 'Select a restaurant (optional)' },
+                    ...restaurants.map(restaurant => ({
+                      value: restaurant.id,
+                      label: `${restaurant.name} - ${restaurant.location}`,
+                    })),
+                  ]}
+                  placeholder="Select a restaurant (optional)"
+                />
               </div>
 
               <div>
@@ -1036,18 +1042,18 @@ const GroupAttendeesPage = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Attach Restaurant (Optional)
                 </label>
-                <select
+                <CustomDropdown
                   value={selectedRestaurant}
                   onChange={(e) => setSelectedRestaurant(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                >
-                  <option value="">Select a restaurant (optional)</option>
-                  {restaurants.map(restaurant => (
-                    <option key={restaurant.id} value={restaurant.id}>
-                      {restaurant.name} - {restaurant.location}
-                    </option>
-                  ))}
-                </select>
+                  options={[
+                    { value: '', label: 'Select a restaurant (optional)' },
+                    ...restaurants.map(restaurant => ({
+                      value: restaurant.id,
+                      label: `${restaurant.name} - ${restaurant.location}`,
+                    })),
+                  ]}
+                  placeholder="Select a restaurant (optional)"
+                />
               </div>
 
               <div className="flex gap-3 pt-4">

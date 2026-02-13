@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
 import { useDinner } from '@/hooks/useDinner';
 import { api, API_ENDPOINTS } from '@/utils/api';
+import { CustomDropdown } from '@/components/common';
 
 const CreateEditDinnerPage = ({ dinnerId = null, isEdit = false }) => {
   const router = useRouter();
@@ -234,20 +235,20 @@ const CreateEditDinnerPage = ({ dinnerId = null, isEdit = false }) => {
               <label className="block text-sm font-medium text-[#374151] mb-2">
                 Location <span className="text-red-500">*</span>
               </label>
-              <select
+              <CustomDropdown
                 name="location"
                 value={formData.location}
                 onChange={handleChange}
-                className="w-full px-4 py-2.5 border border-[#D1D5DB] rounded-lg text-sm focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316] outline-none bg-white"
+                options={[
+                  { value: '', label: 'Select location' },
+                  ...locations.map((loc) => ({
+                    value: loc.name,
+                    label: loc.name,
+                  })),
+                ]}
+                placeholder="Select location"
                 required
-              >
-                <option value="">Select location</option>
-                {locations.map((loc) => (
-                  <option key={loc.id} value={loc.name}>
-                    {loc.name}
-                  </option>
-                ))}
-              </select>
+              />
               <p className="mt-1 text-xs text-[#6B7280]">
                 City or venue where the dinner will take place (API required for dynamic locations)
               </p>
@@ -258,15 +259,16 @@ const CreateEditDinnerPage = ({ dinnerId = null, isEdit = false }) => {
               <label className="block text-sm font-medium text-[#374151] mb-2">
                 Status <span className="text-red-500">*</span>
               </label>
-              <select
+              <CustomDropdown
                 name="dinner_type"
                 value={formData.dinner_type}
                 onChange={handleChange}
-                className="w-full px-4 py-2.5 border border-[#D1D5DB] rounded-lg text-sm focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316] outline-none bg-white"
-              >
-                <option value="Open">Open</option>
-                <option value="Upcoming">Upcoming</option>
-              </select>
+                options={[
+                  { value: 'Open', label: 'Open' },
+                  { value: 'Upcoming', label: 'Upcoming' },
+                ]}
+                placeholder="Select status"
+              />
               <p className="mt-1 text-xs text-[#6B7280]">
                 Select whether this is an open or upcoming dinner event
               </p>

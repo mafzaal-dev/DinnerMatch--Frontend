@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useRestaurant } from '@/hooks/useRestaurant';
 import toast from 'react-hot-toast';
 import { debounce, formatDisplayValue, isValidSearchQuery } from '@/utils/searchHelper';
+import { CustomDropdown } from '@/components/common';
 
 const RestaurantManagementPage = () => {
   const router = useRouter();
@@ -149,46 +150,49 @@ const RestaurantManagementPage = () => {
             <div className="flex items-center gap-3">
               <div className="flex-1">
                 <label className="block text-xs text-[#6B7280] mb-1">Rating</label>
-                <select
+                <CustomDropdown
                   value={filterRating}
                   onChange={(e) => setFilterRating(e.target.value)}
-                  className="w-full px-3 py-2 border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-orange-500 bg-white"
-                >
-                  <option value="">All Ratings</option>
-                  <option value="5">5 Stars</option>
-                  <option value="4">4+ Stars</option>
-                  <option value="3">3+ Stars</option>
-                  <option value="2">2+ Stars</option>
-                  <option value="1">1+ Star</option>
-                </select>
+                  options={[
+                    { value: '', label: 'All Ratings' },
+                    { value: '5', label: '5 Stars' },
+                    { value: '4', label: '4+ Stars' },
+                    { value: '3', label: '3+ Stars' },
+                    { value: '2', label: '2+ Stars' },
+                    { value: '1', label: '1+ Star' },
+                  ]}
+                  placeholder="All Ratings"
+                />
               </div>
               <div className="flex-1">
                 <label className="block text-xs text-[#6B7280] mb-1">Budget</label>
-                <select
+                <CustomDropdown
                   value={filterBudget}
                   onChange={(e) => setFilterBudget(e.target.value)}
-                  className="w-full px-3 py-2 border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-orange-500 bg-white"
-                >
-                  <option value="">All Budgets</option>
-                  <option value="R0-R250">R0 - R250</option>
-                  <option value="R250-R500">R250 - R500</option>
-                  <option value="R500-R750">R500 - R750</option>
-                  <option value="R750-R1000">R750 - R1000</option>
-                  <option value="R1000+">R1000+</option>
-                </select>
+                  options={[
+                    { value: '', label: 'All Budgets' },
+                    { value: 'R0-R250', label: 'R0 - R250' },
+                    { value: 'R250-R500', label: 'R250 - R500' },
+                    { value: 'R500-R750', label: 'R500 - R750' },
+                    { value: 'R750-R1000', label: 'R750 - R1000' },
+                    { value: 'R1000+', label: 'R1000+' },
+                  ]}
+                  placeholder="All Budgets"
+                />
               </div>
               <div className="flex-1">
                 <label className="block text-xs text-[#6B7280] mb-1">Location</label>
-                <select
+                <CustomDropdown
                   value={filterLocation}
                   onChange={(e) => setFilterLocation(e.target.value)}
-                  className="w-full px-3 py-2 border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-orange-500 bg-white"
-                >
-                  <option value="">All Locations</option>
-                  <option value="City Centre">City Centre</option>
-                  <option value="Waterfront">Waterfront</option>
-                  <option value="Suburbs">Suburbs</option>
-                </select>
+                  options={[
+                    { value: '', label: 'All Locations' },
+                    { value: 'City Centre', label: 'City Centre' },
+                    { value: 'Waterfront', label: 'Waterfront' },
+                    { value: 'Suburbs', label: 'Suburbs' },
+                  ]}
+                  placeholder="All Locations"
+                />
               </div>
               {(filterRating || filterBudget || filterLocation) && (
                 <div className="pt-5">

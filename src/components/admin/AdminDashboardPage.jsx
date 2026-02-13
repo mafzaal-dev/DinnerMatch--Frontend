@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { api, API_ENDPOINTS } from '../../utils/api';
 import { debounce, formatDisplayValue, isValidSearchQuery } from '../../utils/searchHelper';
+import { CustomDropdown } from '@/components/common';
 
 const AdminDashboardPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -134,81 +135,61 @@ const AdminDashboardPage = () => {
 
           {/* Filter Dropdowns */}
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
-            <div className="relative">
-              <select
-                value={selectedSignupTime}
-                onChange={(e) => setSelectedSignupTime(e.target.value)}
-                className="w-full px-4 py-2.5 border border-[#D1D5DB] rounded-lg text-sm text-[#374151] bg-white focus:outline-none focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316] transition-colors appearance-none cursor-pointer pr-10"
-              >
-                <option>All Signup Times</option>
-                <option>Last 7 Days</option>
-                <option>Last 30 Days</option>
-                <option>Last 90 Days</option>
-              </select>
-              <svg className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6B7280] pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-            </div>
+            <CustomDropdown
+              value={selectedSignupTime}
+              onChange={(e) => setSelectedSignupTime(e.target.value)}
+              options={[
+                { value: 'All Signup Times', label: 'All Signup Times' },
+                { value: 'Last 7 Days', label: 'Last 7 Days' },
+                { value: 'Last 30 Days', label: 'Last 30 Days' },
+                { value: 'Last 90 Days', label: 'Last 90 Days' },
+              ]}
+              placeholder="All Signup Times"
+            />
 
-            <div className="relative">
-              <select
-                value={selectedUserType}
-                onChange={(e) => setSelectedUserType(e.target.value)}
-                className="w-full px-4 py-2.5 border border-[#D1D5DB] rounded-lg text-sm text-[#374151] bg-white focus:outline-none focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316] transition-colors appearance-none cursor-pointer pr-10"
-              >
-                <option>All Users</option>
-                <option>Subscribed</option>
-                <option>Free</option>
-              </select>
-              <svg className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6B7280] pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-            </div>
+            <CustomDropdown
+              value={selectedUserType}
+              onChange={(e) => setSelectedUserType(e.target.value)}
+              options={[
+                { value: 'All Users', label: 'All Users' },
+                { value: 'Subscribed', label: 'Subscribed' },
+                { value: 'Free', label: 'Free' },
+              ]}
+              placeholder="All Users"
+            />
 
-            <div className="relative">
-              <select
-                value={selectedCity}
-                onChange={(e) => setSelectedCity(e.target.value)}
-                className="w-full px-4 py-2.5 border border-[#D1D5DB] rounded-lg text-sm text-[#374151] bg-white focus:outline-none focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316] transition-colors appearance-none cursor-pointer pr-10"
-              >
-                <option>All Cities</option>
-                <option>Cape Town</option>
-                <option>Johannesburg</option>
-              </select>
-              <svg className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6B7280] pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-            </div>
+            <CustomDropdown
+              value={selectedCity}
+              onChange={(e) => setSelectedCity(e.target.value)}
+              options={[
+                { value: 'All Cities', label: 'All Cities' },
+                { value: 'Cape Town', label: 'Cape Town' },
+                { value: 'Johannesburg', label: 'Johannesburg' },
+              ]}
+              placeholder="All Cities"
+            />
 
-            <div className="relative">
-              <select
-                value={selectedUpcomingDinner}
-                onChange={(e) => setSelectedUpcomingDinner(e.target.value)}
-                className="w-full px-4 py-2.5 border border-[#D1D5DB] rounded-lg text-sm text-[#374151] bg-white focus:outline-none focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316] transition-colors appearance-none cursor-pointer pr-10"
-              >
-                <option>Any Upcoming Dinner</option>
-                <option>Has Booking</option>
-                <option>No Booking</option>
-              </select>
-              <svg className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6B7280] pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-            </div>
+            <CustomDropdown
+              value={selectedUpcomingDinner}
+              onChange={(e) => setSelectedUpcomingDinner(e.target.value)}
+              options={[
+                { value: 'Any Upcoming Dinner', label: 'Any Upcoming Dinner' },
+                { value: 'Has Booking', label: 'Has Booking' },
+                { value: 'No Booking', label: 'No Booking' },
+              ]}
+              placeholder="Any Upcoming Dinner"
+            />
 
-            <div className="relative">
-              <select
-                value={selectedStatus}
-                onChange={(e) => setSelectedStatus(e.target.value)}
-                className="w-full px-4 py-2.5 border border-[#D1D5DB] rounded-lg text-sm text-[#374151] bg-white focus:outline-none focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316] transition-colors appearance-none cursor-pointer pr-10"
-              >
-                <option>All Users</option>
-                <option>Active</option>
-                <option>Inactive</option>
-              </select>
-              <svg className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6B7280] pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-            </div>
+            <CustomDropdown
+              value={selectedStatus}
+              onChange={(e) => setSelectedStatus(e.target.value)}
+              options={[
+                { value: 'All Users', label: 'All Users' },
+                { value: 'Active', label: 'Active' },
+                { value: 'Inactive', label: 'Inactive' },
+              ]}
+              placeholder="All Users"
+            />
           </div>
         </div>
 
@@ -338,19 +319,21 @@ const AdminDashboardPage = () => {
                 <span className="text-sm text-[#6B7280]">
                   Showing {currentPage * pageSize + 1} to {Math.min((currentPage + 1) * pageSize, parseInt(totalUsers))} of {totalUsers} results
                 </span>
-                <select
-                  value={pageSize}
+                <CustomDropdown
+                  value={pageSize.toString()}
                   onChange={(e) => {
                     setPageSize(parseInt(e.target.value));
                     setCurrentPage(0);
                   }}
-                  className="px-3 py-1.5 border border-[#D1D5DB] rounded-lg text-sm focus:outline-none focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316]"
-                >
-                  <option value="10">10 per page</option>
-                  <option value="25">25 per page</option>
-                  <option value="50">50 per page</option>
-                  <option value="100">100 per page</option>
-                </select>
+                  options={[
+                    { value: '10', label: '10 per page' },
+                    { value: '25', label: '25 per page' },
+                    { value: '50', label: '50 per page' },
+                    { value: '100', label: '100 per page' },
+                  ]}
+                  placeholder="10 per page"
+                  className="w-auto min-w-[130px]"
+                />
               </div>
               <div className="flex gap-2">
                 <button

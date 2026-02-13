@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
 import { useRestaurant } from '@/hooks/useRestaurant';
+import { CustomDropdown } from '@/components/common';
 
 const CreateEditRestaurantPage = ({ restaurantId = null, isEdit = false }) => {
   const router = useRouter();
@@ -205,20 +206,20 @@ const CreateEditRestaurantPage = ({ restaurantId = null, isEdit = false }) => {
                 <label className="block text-sm font-medium text-[#374151] mb-2">
                   City <span className="text-red-500">*</span>
                 </label>
-                <select
+                <CustomDropdown
                   name="city"
                   value={formData.city}
                   onChange={handleChange}
-                  className="w-full px-4 py-2.5 border border-[#D1D5DB] rounded-lg text-sm focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316] outline-none"
+                  options={[
+                    { value: '', label: 'Select city' },
+                    { value: 'Cape Town', label: 'Cape Town' },
+                    { value: 'Johannesburg', label: 'Johannesburg' },
+                    { value: 'Durban', label: 'Durban' },
+                    { value: 'Pretoria', label: 'Pretoria' },
+                  ]}
+                  placeholder="Select city"
                   required
-                >
-                  <option value="">Select city</option>
-                  {/* TODO: Replace with dynamic cities from backend API */}
-                  <option value="Cape Town">Cape Town</option>
-                  <option value="Johannesburg">Johannesburg</option>
-                  <option value="Durban">Durban</option>
-                  <option value="Pretoria">Pretoria</option>
-                </select>
+                />
                 <p className="mt-1 text-xs text-[#6B7280]">
                   Note: Cities will be fetched from backend API
                 </p>
@@ -228,24 +229,22 @@ const CreateEditRestaurantPage = ({ restaurantId = null, isEdit = false }) => {
                 <label className="block text-sm font-medium text-[#374151] mb-2">
                   Location <span className="text-red-500">*</span>
                 </label>
-                <select
+                <CustomDropdown
                   name="location"
                   value={formData.location}
                   onChange={handleChange}
-                  className="w-full px-4 py-2.5 border border-[#D1D5DB] rounded-lg text-sm focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316] outline-none"
+                  options={[
+                    { value: '', label: 'Select location' },
+                    ...(formData.city ? [
+                      { value: 'City Centre', label: 'City Centre' },
+                      { value: 'Waterfront', label: 'Waterfront' },
+                      { value: 'Suburbs', label: 'Suburbs' },
+                    ] : []),
+                  ]}
+                  placeholder="Select location"
                   required
                   disabled={!formData.city}
-                >
-                  <option value="">Select location</option>
-                  {/* TODO: Replace with dynamic locations based on selected city from backend API */}
-                  {formData.city && (
-                    <>
-                      <option value="City Centre">City Centre</option>
-                      <option value="Waterfront">Waterfront</option>
-                      <option value="Suburbs">Suburbs</option>
-                    </>
-                  )}
-                </select>
+                />
                 <p className="mt-1 text-xs text-[#6B7280]">
                   Note: Locations will be fetched from backend API based on selected city
                 </p>
@@ -295,20 +294,21 @@ const CreateEditRestaurantPage = ({ restaurantId = null, isEdit = false }) => {
               <label className="block text-sm font-medium text-[#374151] mb-2">
                 Budget <span className="text-red-500">*</span>
               </label>
-              <select
+              <CustomDropdown
                 name="budget"
                 value={formData.budget}
                 onChange={handleChange}
-                className="w-full px-4 py-2.5 border border-[#D1D5DB] rounded-lg text-sm focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316] outline-none"
+                options={[
+                  { value: '', label: 'Select budget range' },
+                  { value: 'R0-R250', label: 'R0 - R250' },
+                  { value: 'R250-R500', label: 'R250 - R500' },
+                  { value: 'R500-R750', label: 'R500 - R750' },
+                  { value: 'R750-R1000', label: 'R750 - R1000' },
+                  { value: 'R1000+', label: 'R1000+' },
+                ]}
+                placeholder="Select budget range"
                 required
-              >
-                <option value="">Select budget range</option>
-                <option value="R0-R250">R0 - R250</option>
-                <option value="R250-R500">R250 - R500</option>
-                <option value="R500-R750">R500 - R750</option>
-                <option value="R750-R1000">R750 - R1000</option>
-                <option value="R1000+">R1000+</option>
-              </select>
+              />
             </div>
 
             {/* Food Options */}

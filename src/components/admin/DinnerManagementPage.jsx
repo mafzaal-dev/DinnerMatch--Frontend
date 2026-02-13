@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useDinner } from '@/hooks/useDinner';
 import toast from 'react-hot-toast';
 import { debounce, isValidSearchQuery } from '@/utils/searchHelper';
+import { CustomDropdown } from '@/components/common';
 
 const DinnerManagementPage = () => {
   const router = useRouter();
@@ -176,17 +177,19 @@ const DinnerManagementPage = () => {
 
             {/* Filters */}
             <div className="flex flex-wrap items-center gap-3">
-              <select
+              <CustomDropdown
                 value={filterLocation}
                 onChange={(e) => setFilterLocation(e.target.value)}
-                className="px-4 py-2 border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-orange-500 bg-white"
-              >
-                <option value="">All Locations</option>
-                <option value="Cape Town">Cape Town</option>
-                <option value="Johannesburg">Johannesburg</option>
-                <option value="Durban">Durban</option>
-                <option value="Lahore">Lahore</option>
-              </select>
+                options={[
+                  { value: '', label: 'All Locations' },
+                  { value: 'Cape Town', label: 'Cape Town' },
+                  { value: 'Johannesburg', label: 'Johannesburg' },
+                  { value: 'Durban', label: 'Durban' },
+                  { value: 'Lahore', label: 'Lahore' },
+                ]}
+                placeholder="All Locations"
+                className="min-w-[160px]"
+              />
 
               <input
                 type="date"
@@ -204,25 +207,29 @@ const DinnerManagementPage = () => {
                 className="px-4 py-2 border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-orange-500 bg-white"
               />
 
-              <select
+              <CustomDropdown
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
-                className="px-4 py-2 border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-orange-500 bg-white"
-              >
-                <option value="">All Status</option>
-                <option value="Open">Open</option>
-                <option value="Upcoming">Upcoming</option>
-              </select>
+                options={[
+                  { value: '', label: 'All Status' },
+                  { value: 'Open', label: 'Open' },
+                  { value: 'Upcoming', label: 'Upcoming' },
+                ]}
+                placeholder="All Status"
+                className="min-w-[140px]"
+              />
 
-              <select
+              <CustomDropdown
                 value={filterPublish}
                 onChange={(e) => setFilterPublish(e.target.value)}
-                className="px-4 py-2 border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-orange-500 bg-white"
-              >
-                <option value="">All Publish Status</option>
-                <option value="true">Published</option>
-                <option value="false">Draft</option>
-              </select>
+                options={[
+                  { value: '', label: 'All Publish Status' },
+                  { value: 'true', label: 'Published' },
+                  { value: 'false', label: 'Draft' },
+                ]}
+                placeholder="All Publish Status"
+                className="min-w-[180px]"
+              />
 
               {(filterLocation || startDate || endDate || filterStatus || filterPublish) && (
                 <button
