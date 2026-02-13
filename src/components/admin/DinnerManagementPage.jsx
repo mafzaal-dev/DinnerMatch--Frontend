@@ -132,35 +132,32 @@ const DinnerManagementPage = () => {
   };
 
   return (
-    <div className="flex-1 bg-[#F9FAFB] min-h-screen">
+    <div className="flex flex-col h-full">
       {/* Header */}
-      <div className="bg-white px-8 py-6 border-b border-[#E5E7EB]">
+      <div className="bg-white px-4 sm:px-6 lg:px-8 py-6 border-b border-[#E5E7EB] flex-shrink-0">
         <h1 className="text-2xl font-semibold text-[#111827]">User Data Management</h1>
         <p className="text-sm text-[#6B7280] mt-1">Manage customers data and bookings</p>
       </div>
 
-      {/* Main Content */}
-      <div className="p-6">
-        {/* Section Header */}
-       
-
+      {/* Main Content - Scrollable */}
+      <div className="flex-1 overflow-auto p-4 sm:p-6">
         <div className="bg-white rounded-xl shadow-sm border border-[#E5E7EB] overflow-hidden">
           {/* Controls */}
           <div className="p-4 border-b border-[#E5E7EB]">
-            <div className="flex items-center justify-between gap-3 mb-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
               <div>
                 <h2 className="text-xl font-semibold text-[#111827]">Dinner Management</h2>
                 <p className="text-sm text-[#6B7280] mt-0.5">Manage your existing dinners.</p>
               </div>
               
-              <div className="flex items-center gap-3">
-                <div className="relative">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
+                <div className="relative flex-1 sm:flex-initial">
                 <input
                   type="text"
                   placeholder="Search (min 3 characters)"
                   value={searchQuery}
                   onChange={handleSearchChange}
-                  className="pl-4 pr-10 py-2 border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-orange-500 w-64 bg-white"
+                  className="w-full sm:w-64 pl-4 pr-10 py-2 border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-orange-500 bg-white"
                 />
                   <svg className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9CA3AF]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -168,7 +165,7 @@ const DinnerManagementPage = () => {
                 </div>
                 <button 
                   onClick={handleCreateDinner}
-                  className="px-4 py-2 bg-[#F97316] hover:bg-[#EA580C] text-white rounded-lg text-sm font-medium transition-colors"
+                  className="px-4 py-2 bg-[#F97316] hover:bg-[#EA580C] text-white rounded-lg text-sm font-medium transition-colors whitespace-nowrap"
                 >
                   Create Dinner
                 </button>
@@ -176,7 +173,7 @@ const DinnerManagementPage = () => {
             </div>
 
             {/* Filters */}
-            <div className="flex flex-wrap items-center gap-3">
+            <div className="flex flex-col gap-3">
               <CustomDropdown
                 value={filterLocation}
                 onChange={(e) => setFilterLocation(e.target.value)}
@@ -188,7 +185,6 @@ const DinnerManagementPage = () => {
                   { value: 'Lahore', label: 'Lahore' },
                 ]}
                 placeholder="All Locations"
-                className="min-w-[160px]"
               />
 
               <input
@@ -196,7 +192,7 @@ const DinnerManagementPage = () => {
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
                 placeholder="From Date"
-                className="px-4 py-2 border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-orange-500 bg-white"
+                className="w-full px-4 py-2 border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-orange-500 bg-white"
               />
 
               <input
@@ -204,7 +200,7 @@ const DinnerManagementPage = () => {
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
                 placeholder="To Date"
-                className="px-4 py-2 border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-orange-500 bg-white"
+                className="w-full px-4 py-2 border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-orange-500 bg-white"
               />
 
               <CustomDropdown
@@ -216,7 +212,6 @@ const DinnerManagementPage = () => {
                   { value: 'Upcoming', label: 'Upcoming' },
                 ]}
                 placeholder="All Status"
-                className="min-w-[140px]"
               />
 
               <CustomDropdown
@@ -228,7 +223,6 @@ const DinnerManagementPage = () => {
                   { value: 'false', label: 'Draft' },
                 ]}
                 placeholder="All Publish Status"
-                className="min-w-[180px]"
               />
 
               {(filterLocation || startDate || endDate || filterStatus || filterPublish) && (
@@ -240,7 +234,7 @@ const DinnerManagementPage = () => {
                     setFilterStatus('');
                     setFilterPublish('');
                   }}
-                  className="px-4 py-2 text-sm text-[#6B7280] hover:text-[#374151] hover:bg-gray-50 rounded-lg transition-colors"
+                  className="w-full px-4 py-2 text-sm text-[#6B7280] hover:text-[#374151] hover:bg-gray-50 rounded-lg transition-colors"
                 >
                   Clear Filters
                 </button>
@@ -255,17 +249,17 @@ const DinnerManagementPage = () => {
             ) : dinners.length === 0 ? (
               <div className="p-8 text-center text-[#6B7280]">No dinners found</div>
             ) : (
-              <table className="w-full min-w-max">
+              <table className="w-full">
                 <thead className="bg-[#F9FAFB] border-b border-[#E5E7EB]">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-[#9CA3AF] uppercase tracking-wide">Title</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-[#9CA3AF] uppercase tracking-wide">Location</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-[#9CA3AF] uppercase tracking-wide">Date</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-[#9CA3AF] uppercase tracking-wide">Time</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-[#9CA3AF] uppercase tracking-wide">Groups</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-[#9CA3AF] uppercase tracking-wide">Status</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-[#9CA3AF] uppercase tracking-wide">Publish</th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-[#9CA3AF] uppercase tracking-wide w-10">Actions</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-[#9CA3AF] uppercase tracking-wide whitespace-nowrap">Title</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-[#9CA3AF] uppercase tracking-wide whitespace-nowrap">Location</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-[#9CA3AF] uppercase tracking-wide whitespace-nowrap">Date</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-[#9CA3AF] uppercase tracking-wide whitespace-nowrap">Time</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-[#9CA3AF] uppercase tracking-wide whitespace-nowrap">Groups</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-[#9CA3AF] uppercase tracking-wide whitespace-nowrap">Status</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-[#9CA3AF] uppercase tracking-wide whitespace-nowrap">Publish</th>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-[#9CA3AF] uppercase tracking-wide whitespace-nowrap">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#F3F4F6]">
@@ -333,7 +327,7 @@ const DinnerManagementPage = () => {
 
           {/* Pagination */}
           {!loading && total > 0 && (
-            <div className="px-6 py-4 border-t border-[#E5E7EB] flex items-center justify-between">
+            <div className="px-6 py-4 border-t border-[#E5E7EB] flex flex-col sm:flex-row items-center justify-between gap-3">
               <div className="text-sm text-[#6B7280]">
                 Showing {currentPage * pageSize + 1} to {Math.min((currentPage + 1) * pageSize, total)} of {total} results
               </div>

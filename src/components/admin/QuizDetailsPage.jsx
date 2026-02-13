@@ -55,30 +55,39 @@ const QuizDetailsPage = ({ quizId }) => {
     router.push('/admin/quiz');
   };
 
-  if (loading && !question) return <div className="p-8 text-center">Loading...</div>;
-  if (!question) return <div className="p-8 text-center">Question not found</div>;
+  if (loading && !question) return (
+    <div className="flex flex-col h-full items-center justify-center">
+      <div className="text-center">Loading...</div>
+    </div>
+  );
+  
+  if (!question) return (
+    <div className="flex flex-col h-full items-center justify-center">
+      <div className="text-center">Question not found</div>
+    </div>
+  );
 
   return (
-    <div className="flex-1 bg-[#F9FAFB] min-h-screen">
+    <div className="flex flex-col h-full">
       {/* Header */}
-      <div className="bg-white px-8 py-5 border-b border-[#E5E7EB]">
+      <div className="bg-white px-4 sm:px-6 lg:px-8 py-5 border-b border-[#E5E7EB] flex-shrink-0">
         <h1 className="text-xl font-semibold text-[#111827]">Quiz</h1>
         <p className="text-sm text-[#6B7280] mt-0.5">Question Details</p>
       </div>
 
-      {/* Main Content */}
-      <div className="p-6">
-        <div className="bg-white rounded-xl shadow-sm border border-[#E5E7EB] p-6 max-w-4xl">
+      {/* Main Content - Scrollable */}
+      <div className="flex-1 overflow-auto p-4 sm:p-6">
+        <div className="bg-white rounded-xl shadow-sm border border-[#E5E7EB] p-6 max-w-4xl mx-auto">
           {/* Header */}
-          <div className="flex items-center justify-between mb-6 pb-4 border-b border-[#E5E7EB]">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 pb-4 border-b border-[#E5E7EB] gap-3">
             <div>
                 <h2 className="text-lg font-semibold text-[#111827]">{question.code}</h2>
                 <p className="text-sm text-gray-500">{question.section}</p>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 w-full sm:w-auto">
               <button
                 onClick={handleEditQuestion}
-                className="px-5 py-2.5 bg-[#F97316] text-white rounded-lg text-sm font-medium hover:bg-[#EA580C] transition-colors"
+                className="flex-1 sm:flex-initial px-5 py-2.5 bg-[#F97316] text-white rounded-lg text-sm font-medium hover:bg-[#EA580C] transition-colors"
               >
                 Edit Question
               </button>

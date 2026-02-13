@@ -58,29 +58,19 @@ const AdminSidebar = ({ onLogout, isOpen, onClose }) => {
       ),
       href: '/admin/restaurants',
     },
-    // Email Manager - Hidden for now
-    // {
-    //   id: 'email-manager',
-    //   label: 'Email Manager',
-    //   icon: (
-    //     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    //       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-    //     </svg>
-    //   ),
-    //   href: '/admin/email-manager',
-    // },
   ];
 
   return (
     <aside 
       className={`
-        fixed inset-y-0 left-0 z-30 w-64 bg-white border-r border-[#E5E7EB] transform transition-transform duration-300 ease-in-out flex flex-col
-        lg:translate-x-0 lg:static lg:inset-auto lg:h-auto
+        fixed inset-y-0 left-0 z-30 w-64 bg-white border-r border-[#E5E7EB] flex flex-col h-screen
+        transform transition-transform duration-300 ease-in-out
+        lg:translate-x-0 lg:static lg:w-64 lg:flex-shrink-0
         ${isOpen ? 'translate-x-0' : '-translate-x-full'}
       `}
     >
-      {/* Logo */}
-      <div className="flex items-center justify-between px-6 py-6 border-b border-gray-100 lg:border-none">
+      {/* Logo - Fixed at top */}
+      <div className="flex items-center justify-between px-6 py-6 border-b border-gray-100 flex-shrink-0">
         <h1 className="text-xl font-bold">
           Dinner<span className="text-[#F97316]">Match</span>
         </h1>
@@ -96,12 +86,10 @@ const AdminSidebar = ({ onLogout, isOpen, onClose }) => {
         </button>
       </div>
 
-      {/* Navigation */}
+      {/* Navigation - Scrollable */}
       <nav className="flex-1 px-4 py-4 overflow-y-auto">
         <ul className="space-y-1">
           {menuItems.map((item) => {
-            // Check if current path matches the menu item
-            // For quiz and other pages with sub-routes, check if pathname starts with the href
             const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
             return (
               <li key={item.id}>
@@ -123,8 +111,8 @@ const AdminSidebar = ({ onLogout, isOpen, onClose }) => {
         </ul>
       </nav>
 
-      {/* Logout */}
-      <div className="p-4 border-t border-gray-100 lg:border-none">
+      {/* Logout - Fixed at bottom */}
+      <div className="p-4 border-t border-gray-100 flex-shrink-0">
         <button
           onClick={onLogout}
           className="flex items-center gap-3 px-3 py-2.5 text-[#EF4444] hover:bg-[#FEF2F2] rounded-lg transition-colors w-full text-sm"

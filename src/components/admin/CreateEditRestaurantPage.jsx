@@ -162,9 +162,9 @@ const CreateEditRestaurantPage = ({ restaurantId = null, isEdit = false }) => {
   }
 
   return (
-    <div className="flex-1 bg-[#F9FAFB] min-h-screen">
+    <div className="flex flex-col h-full">
       {/* Header */}
-      <div className="bg-white px-8 py-5 border-b border-[#E5E7EB]">
+      <div className="bg-white px-4 sm:px-6 lg:px-8 py-5 border-b border-[#E5E7EB] flex-shrink-0">
         <h1 className="text-xl font-semibold text-[#111827]">
           {isEdit ? 'Edit Restaurant' : 'Create Restaurant'}
         </h1>
@@ -173,9 +173,9 @@ const CreateEditRestaurantPage = ({ restaurantId = null, isEdit = false }) => {
         </p>
       </div>
 
-      {/* Main Content */}
-      <div className="p-6">
-        <div className="bg-white rounded-xl shadow-sm border border-[#E5E7EB] p-6 max-w-4xl">
+      {/* Main Content - Scrollable */}
+      <div className="flex-1 overflow-auto p-4 sm:p-6">
+        <div className="bg-white rounded-xl shadow-sm border border-[#E5E7EB] p-6 max-w-4xl mx-auto">
           <div className="mb-6">
             <h2 className="text-lg font-semibold text-[#111827] mb-1">
               {isEdit ? 'Edit Restaurant Details' : 'Restaurant Details'}

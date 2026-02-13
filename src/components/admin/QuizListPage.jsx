@@ -298,15 +298,15 @@ const QuizListPage = () => {
   };
 
   return (
-    <div className="flex-1 bg-[#F9FAFB] min-h-screen">
+    <div className="flex flex-col h-full">
       {/* Header */}
-      <div className="bg-white px-8 py-5 border-b border-[#E5E7EB]">
+      <div className="bg-white px-4 sm:px-6 lg:px-8 py-5 border-b border-[#E5E7EB] flex-shrink-0">
         <h1 className="text-xl font-semibold text-[#111827]">Quiz Management</h1>
         <p className="text-sm text-[#6B7280] mt-0.5">Manage quiz questions and options</p>
       </div>
 
-      {/* Main Content */}
-      <div className="p-6">
+      {/* Main Content - Scrollable */}
+      <div className="flex-1 overflow-auto p-4 sm:p-6">
         {/* Questions Section */}
         <div className="bg-white rounded-xl shadow-sm border border-[#E5E7EB] overflow-hidden">
           {/* Section Header */}
@@ -317,61 +317,55 @@ const QuizListPage = () => {
 
           {/* Search and Actions */}
           <div className="px-6 py-4 border-b border-[#E5E7EB]">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
-              <div className="flex-1 w-full sm:w-auto">
-              <input
-                type="text"
-                placeholder="Search by Question or Title (min 3 characters)"
-                value={searchQuery}
-                onChange={handleSearchChange}
-                className="w-full px-4 py-2.5 border border-[#D1D5DB] rounded-lg text-sm text-[#111827] placeholder-[#9CA3AF] focus:outline-none focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316] transition-colors"
-              />
+            <div className="flex flex-col gap-3 mb-4">
+              <div className="flex-1">
+                <input
+                  type="text"
+                  placeholder="Search by Question or Title (min 3 characters)"
+                  value={searchQuery}
+                  onChange={handleSearchChange}
+                  className="w-full px-4 py-2.5 border border-[#D1D5DB] rounded-lg text-sm text-[#111827] placeholder-[#9CA3AF] focus:outline-none focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316] transition-colors"
+                />
               </div>
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={handleCreateQuestion}
-                  className="px-5 py-2.5 bg-[#F97316] text-white rounded-lg text-sm font-medium hover:bg-[#EA580C] transition-colors whitespace-nowrap"
-                >
-                  Create Question
-                </button>
-              </div>
+              <button
+                onClick={handleCreateQuestion}
+                className="w-full px-5 py-2.5 bg-[#F97316] text-white rounded-lg text-sm font-medium hover:bg-[#EA580C] transition-colors whitespace-nowrap"
+              >
+                Create Question
+              </button>
             </div>
             
             {/* Filters */}
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-              <div className="w-full sm:w-48">
-                <CustomDropdown
-                  value={filterSection}
-                  onChange={(e) => {
-                    setFilterSection(e.target.value);
-                    setCurrentPage(0);
-                  }}
-                  options={[
-                    { value: '', label: 'All Sections' },
-                    { value: 'basic', label: 'Basic' },
-                    { value: 'personality', label: 'Personality' },
-                    { value: 'preferences', label: 'Preferences' },
-                  ]}
-                  placeholder="All Sections"
-                />
-              </div>
-              <div className="w-full sm:w-48">
-                <CustomDropdown
-                  value={filterType}
-                  onChange={(e) => {
-                    setFilterType(e.target.value);
-                    setCurrentPage(0);
-                  }}
-                  options={[
-                    { value: '', label: 'All Types' },
-                    { value: 'text', label: 'Text' },
-                    { value: 'scale', label: 'Scale' },
-                    { value: 'boolean', label: 'Yes/No' },
-                    { value: 'choice', label: 'Select (Multiple Choice)' },
-                  ]}
-                  placeholder="All Types"
-                />
-              </div>
+            <div className="flex flex-col gap-3">
+              <CustomDropdown
+                value={filterSection}
+                onChange={(e) => {
+                  setFilterSection(e.target.value);
+                  setCurrentPage(0);
+                }}
+                options={[
+                  { value: '', label: 'All Sections' },
+                  { value: 'basic', label: 'Basic' },
+                  { value: 'personality', label: 'Personality' },
+                  { value: 'preferences', label: 'Preferences' },
+                ]}
+                placeholder="All Sections"
+              />
+              <CustomDropdown
+                value={filterType}
+                onChange={(e) => {
+                  setFilterType(e.target.value);
+                  setCurrentPage(0);
+                }}
+                options={[
+                  { value: '', label: 'All Types' },
+                  { value: 'text', label: 'Text' },
+                  { value: 'scale', label: 'Scale' },
+                  { value: 'boolean', label: 'Yes/No' },
+                  { value: 'choice', label: 'Select (Multiple Choice)' },
+                ]}
+                placeholder="All Types"
+              />
               {(filterSection || filterType) && (
                 <button
                   onClick={() => {
@@ -379,7 +373,7 @@ const QuizListPage = () => {
                     setFilterType('');
                     setCurrentPage(0);
                   }}
-                  className="px-4 py-2.5 text-sm text-[#6B7280] hover:text-[#374151] hover:bg-gray-50 rounded-lg transition-colors"
+                  className="w-full px-4 py-2.5 text-sm text-[#6B7280] hover:text-[#374151] hover:bg-gray-50 rounded-lg transition-colors"
                 >
                   Clear Filters
                 </button>

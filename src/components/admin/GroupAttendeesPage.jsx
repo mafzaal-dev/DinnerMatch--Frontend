@@ -684,15 +684,15 @@ const GroupAttendeesPage = () => {
   };
 
   return (
-    <div className="flex-1 bg-[#F9FAFB] min-h-screen">
+    <div className="flex flex-col h-full">
       {/* Header */}
-      <div className="bg-white px-8 py-6 border-b border-[#E5E7EB]">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+      <div className="bg-white px-4 sm:px-6 lg:px-8 py-6 border-b border-[#E5E7EB] flex-shrink-0">
+        <div className="flex flex-col gap-4 mb-6">
           <div>
             <h1 className="text-xl font-bold text-[#111827]">Group & Attendees Management</h1>
             <p className="text-sm text-[#6B7280] mt-1">Manage dinner requests and create groups</p>
           </div>
-          <div className="flex items-center gap-3 flex-wrap">
+          <div className="flex flex-col gap-3">
             {activeTab === 'users' ? (
               <>
                 <CustomDropdown
@@ -706,20 +706,17 @@ const GroupAttendeesPage = () => {
                     })),
                   ]}
                   placeholder="Select Dinner"
-                  className="min-w-[200px]"
                 />
-                <div className="relative">
                 <input
                   type="text"
                   placeholder="Search by email (min 3 characters)"
                   value={searchQuery}
                   onChange={handleSearchChange}
-                  className="pl-4 pr-4 py-2 border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-orange-500 w-64 bg-[#F9FAFB]"
+                  className="w-full px-4 py-2 border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-orange-500 bg-[#F9FAFB]"
                 />
-                </div>
                 <button 
                   onClick={handleExportCSV}
-                  className="px-4 py-2 bg-white border border-[#E5E7EB] text-[#374151] rounded-lg text-sm font-medium hover:bg-gray-50 flex items-center gap-2"
+                  className="w-full px-4 py-2 bg-white border border-[#E5E7EB] text-[#374151] rounded-lg text-sm font-medium hover:bg-gray-50 flex items-center justify-center gap-2"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -729,25 +726,23 @@ const GroupAttendeesPage = () => {
                 <button 
                   onClick={() => setShowCreateGroupModal(true)}
                   disabled={selectedUsers.length === 0}
-                  className="px-4 py-2 bg-[#F97316] text-white rounded-lg text-sm font-medium hover:bg-[#EA580C] disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full px-4 py-2 bg-[#F97316] text-white rounded-lg text-sm font-medium hover:bg-[#EA580C] disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Create Group ({selectedUsers.length})
                 </button>
               </>
             ) : (
               <>
-                <div className="relative">
                 <input
                   type="text"
                   placeholder="Search groups (min 3 characters)"
                   value={searchQuery}
                   onChange={handleSearchChange}
-                  className="pl-4 pr-4 py-2 border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-orange-500 w-64 bg-[#F9FAFB]"
+                  className="w-full px-4 py-2 border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-orange-500 bg-[#F9FAFB]"
                 />
-                </div>
                 <button 
                   onClick={handleExportCSV}
-                  className="px-4 py-2 bg-white border border-[#E5E7EB] text-[#374151] rounded-lg text-sm font-medium hover:bg-gray-50 flex items-center gap-2"
+                  className="w-full px-4 py-2 bg-white border border-[#E5E7EB] text-[#374151] rounded-lg text-sm font-medium hover:bg-gray-50 flex items-center justify-center gap-2"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -756,7 +751,7 @@ const GroupAttendeesPage = () => {
                 </button>
                 <button 
                   onClick={() => setShowCreateGroupModal(true)}
-                  className="px-4 py-2 bg-[#F97316] text-white rounded-lg text-sm font-medium hover:bg-[#EA580C]"
+                  className="w-full px-4 py-2 bg-[#F97316] text-white rounded-lg text-sm font-medium hover:bg-[#EA580C]"
                 >
                   Create Group
                 </button>
@@ -769,7 +764,7 @@ const GroupAttendeesPage = () => {
         <div className="flex items-center gap-2">
           <button
             onClick={() => setActiveTab('groups')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+            className={`flex-1 sm:flex-initial px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
               activeTab === 'groups'
                 ? 'bg-[#111827] text-white'
                 : 'bg-transparent text-[#6B7280] hover:bg-gray-100'
@@ -779,7 +774,7 @@ const GroupAttendeesPage = () => {
           </button>
           <button
             onClick={() => setActiveTab('users')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+            className={`flex-1 sm:flex-initial px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
               activeTab === 'users'
                 ? 'bg-[#111827] text-white'
                 : 'bg-transparent text-[#6B7280] hover:bg-gray-100'
@@ -791,8 +786,8 @@ const GroupAttendeesPage = () => {
       </div>
 
       {/* Filters Section */}
-      <div className="bg-white px-8 py-4 border-b border-[#E5E7EB]">
-        <div className="flex flex-wrap items-center gap-3">
+      <div className="bg-white px-4 sm:px-6 lg:px-8 py-4 border-b border-[#E5E7EB] flex-shrink-0">
+        <div className="flex flex-col gap-3">
           <CustomDropdown
             value={activeTab === 'groups' ? filterCity : filterRequestCity}
             onChange={(e) => activeTab === 'groups' ? setFilterCity(e.target.value) : setFilterRequestCity(e.target.value)}
@@ -803,7 +798,6 @@ const GroupAttendeesPage = () => {
               { value: 'Durban', label: 'Durban' },
             ]}
             placeholder="All Cities"
-            className="min-w-[140px]"
           />
           
           <CustomDropdown
@@ -817,7 +811,6 @@ const GroupAttendeesPage = () => {
               })),
             ]}
             placeholder="All Dinners"
-            className="min-w-[160px]"
           />
           
           <input
@@ -825,7 +818,7 @@ const GroupAttendeesPage = () => {
             value={activeTab === 'groups' ? filterDateFrom : filterRequestDateFrom}
             onChange={(e) => activeTab === 'groups' ? setFilterDateFrom(e.target.value) : setFilterRequestDateFrom(e.target.value)}
             placeholder="From Date"
-            className="px-4 py-2 border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-orange-500 bg-white"
+            className="w-full px-4 py-2 border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-orange-500 bg-white"
           />
           
           <input
@@ -833,7 +826,7 @@ const GroupAttendeesPage = () => {
             value={activeTab === 'groups' ? filterDateTo : filterRequestDateTo}
             onChange={(e) => activeTab === 'groups' ? setFilterDateTo(e.target.value) : setFilterRequestDateTo(e.target.value)}
             placeholder="To Date"
-            className="px-4 py-2 border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-orange-500 bg-white"
+            className="w-full px-4 py-2 border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-orange-500 bg-white"
           />
           
           {((activeTab === 'groups' && (filterCity || filterDinner || filterDateFrom || filterDateTo)) ||
@@ -852,7 +845,7 @@ const GroupAttendeesPage = () => {
                   setFilterRequestDateTo('');
                 }
               }}
-              className="px-4 py-2 text-sm text-[#6B7280] hover:text-[#374151] hover:bg-gray-50 rounded-lg transition-colors"
+              className="w-full px-4 py-2 text-sm text-[#6B7280] hover:text-[#374151] hover:bg-gray-50 rounded-lg transition-colors"
             >
               Clear Filters
             </button>
@@ -860,15 +853,8 @@ const GroupAttendeesPage = () => {
         </div>
       </div>
 
-      {/* Error Message */}
-      {error && (
-        <div className="mx-6 mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-sm text-red-600">{error}</p>
-        </div>
-      )}
-
-      {/* Content */}
-      <div className="p-6">
+      {/* Main Content - Scrollable */}
+      <div className="flex-1 overflow-auto p-4 sm:p-6">
         {loading && (
           <div className="flex justify-center items-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>

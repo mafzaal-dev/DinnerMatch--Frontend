@@ -112,19 +112,17 @@ const AdminDashboardPage = () => {
 
         {/* Search and Filters */}
         <div className="bg-white rounded-xl shadow-sm border border-[#E5E7EB] p-5 mb-5">
-          <div className="flex flex-col lg:flex-row gap-3 mb-4">
-            <div className="flex-1 flex gap-2">
-              <input
-                type="text"
-                placeholder="Search by name, email or mobile (min 3 characters)"
-                value={searchQuery}
-                onChange={handleSearchChange}
-                className="flex-1 px-4 py-2.5 border border-[#D1D5DB] rounded-lg text-sm text-[#111827] placeholder-[#9CA3AF] focus:outline-none focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316] transition-colors"
-              />
-            </div>
+          <div className="flex flex-col gap-3 mb-4">
+            <input
+              type="text"
+              placeholder="Search by name, email or mobile (min 3 characters)"
+              value={searchQuery}
+              onChange={handleSearchChange}
+              className="w-full px-4 py-2.5 border border-[#D1D5DB] rounded-lg text-sm text-[#111827] placeholder-[#9CA3AF] focus:outline-none focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316] transition-colors"
+            />
             <button
               onClick={handleExportCSV}
-              className="px-5 py-2.5 bg-white border border-[#D1D5DB] text-[#374151] rounded-lg text-sm font-medium hover:bg-[#F9FAFB] transition-colors flex items-center gap-2 justify-center"
+              className="w-full px-5 py-2.5 bg-white border border-[#D1D5DB] text-[#374151] rounded-lg text-sm font-medium hover:bg-[#F9FAFB] transition-colors flex items-center gap-2 justify-center"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -134,7 +132,7 @@ const AdminDashboardPage = () => {
           </div>
 
           {/* Filter Dropdowns */}
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+          <div className="flex flex-col gap-3">
             <CustomDropdown
               value={selectedSignupTime}
               onChange={(e) => setSelectedSignupTime(e.target.value)}
@@ -195,7 +193,7 @@ const AdminDashboardPage = () => {
 
         {/* Users Table */}
         <div className="bg-white rounded-xl shadow-sm border border-[#E5E7EB] overflow-hidden">
-          <div className="px-6 py-4 border-b border-[#E5E7EB] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div className="px-4 sm:px-6 py-4 border-b border-[#E5E7EB] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <div>
               <h2 className="text-base font-semibold text-[#111827]">Users ({totalUsers})</h2>
             </div>
@@ -208,37 +206,37 @@ const AdminDashboardPage = () => {
           </div>
 
           <div className="overflow-x-auto">
-            <table className="w-full min-w-max">
+            <table className="w-full">
               <thead className="bg-[#F9FAFB] border-b border-[#E5E7EB]">
                 <tr>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-[#374151] uppercase tracking-wide min-w-[140px]">
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-[#374151] uppercase tracking-wide whitespace-nowrap">
                     Name
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-[#374151] uppercase tracking-wide min-w-[180px]">
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-[#374151] uppercase tracking-wide whitespace-nowrap">
                     Email
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-[#374151] uppercase tracking-wide min-w-[130px]">
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-[#374151] uppercase tracking-wide whitespace-nowrap">
                     Mobile
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-[#374151] uppercase tracking-wide min-w-[110px]">
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-[#374151] uppercase tracking-wide whitespace-nowrap">
                     City
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-[#374151] uppercase tracking-wide min-w-[80px]">
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-[#374151] uppercase tracking-wide whitespace-nowrap">
                     Tickets
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-[#374151] uppercase tracking-wide min-w-[100px]">
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-[#374151] uppercase tracking-wide whitespace-nowrap">
                     Membership
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-[#374151] uppercase tracking-wide min-w-[80px]">
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-[#374151] uppercase tracking-wide whitespace-nowrap">
                     Status
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-[#374151] uppercase tracking-wide min-w-[100px]">
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-[#374151] uppercase tracking-wide whitespace-nowrap">
                     Next Dinner
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-[#374151] uppercase tracking-wide min-w-[100px]">
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-[#374151] uppercase tracking-wide whitespace-nowrap">
                     Past Dinner
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-[#374151] uppercase tracking-wide w-[50px]">
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-[#374151] uppercase tracking-wide whitespace-nowrap">
                     
                   </th>
                 </tr>
@@ -314,8 +312,8 @@ const AdminDashboardPage = () => {
 
           {/* Pagination */}
           {!loading && parseInt(totalUsers) > 0 && (
-            <div className="px-6 py-4 border-t border-[#E5E7EB] flex flex-col sm:flex-row items-center justify-between gap-3">
-              <div className="flex items-center gap-3">
+            <div className="px-4 sm:px-6 py-4 border-t border-[#E5E7EB] flex flex-col sm:flex-row items-center justify-between gap-3">
+              <div className="flex flex-col sm:flex-row items-center gap-3">
                 <span className="text-sm text-[#6B7280]">
                   Showing {currentPage * pageSize + 1} to {Math.min((currentPage + 1) * pageSize, parseInt(totalUsers))} of {totalUsers} results
                 </span>
@@ -332,7 +330,7 @@ const AdminDashboardPage = () => {
                     { value: '100', label: '100 per page' },
                   ]}
                   placeholder="10 per page"
-                  className="w-auto min-w-[130px]"
+                  className="w-full sm:w-auto min-w-[130px]"
                 />
               </div>
               <div className="flex gap-2">
