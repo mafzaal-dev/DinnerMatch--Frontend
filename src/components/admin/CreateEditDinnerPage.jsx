@@ -3,9 +3,6 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
-import { useForm, Controller } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import { dinnerSchema } from '@/constants/validationSchemas';
 import { useDinner } from '@/hooks/useDinner';
 import { api, API_ENDPOINTS } from '@/utils/api';
 import { CustomDropdown } from '@/components/common';
@@ -15,26 +12,14 @@ const CreateEditDinnerPage = ({ dinnerId = null, isEdit = false }) => {
   const { getDinner, createDinner, updateDinner, deleteDinner, loading } = useDinner();
   const [initialLoading, setInitialLoading] = useState(isEdit);
   const [locations, setLocations] = useState([]);
-
-  const {
-    register,
-    handleSubmit,
-    control,
-    setValue,
-    watch,
-    formState: { errors },
-  } = useForm({
-    resolver: yupResolver(dinnerSchema),
-    defaultValues: {
-      title: '',
-      date: '',
-      location: '',
-      dinner_type: 'Open',
-      is_published: false,
-    },
+  
+  const [formData, setFormData] = useState({
+    title: '',
+    date: '',
+    location: '',
+    dinner_type: 'Open',
+    is_published: false,
   });
-
-  const watchedIsPublished = watch('is_published');
 
   useEffect(() => {
     fetchLocations();
@@ -46,7 +31,6 @@ const CreateEditDinnerPage = ({ dinnerId = null, isEdit = false }) => {
   const fetchLocations = async () => {
     try {
       // TODO: Replace with actual API endpoint when backend is ready
-      // For now, using hardcoded locations
       setLocations([
         { id: 'cape-town', name: 'Cape Town' },
         { id: 'johannesburg', name: 'Johannesburg' },
@@ -54,12 +38,6 @@ const CreateEditDinnerPage = ({ dinnerId = null, isEdit = false }) => {
         { id: 'pretoria', name: 'Pretoria' },
         { id: 'lahore', name: 'Lahore' },
       ]);
-      
-      // Uncomment when backend API is ready:
-      // const response = await api.get(API_ENDPOINTS.LOCATIONS_LIST);
-      // if (response.success) {
-      //   setLocations(response.data || []);
-      // }
     } catch (err) {
       console.error('Error fetching locations:', err);
     }
@@ -76,11 +54,13 @@ const CreateEditDinnerPage = ({ dinnerId = null, isEdit = false }) => {
                            dinner.dinner_status === 'Upcoming' || 
                            dinner.dinner_status === 'Published';
         
-        setValue('title', dinner.title || '');
-        setValue('date', dinner.date ? formatDateForInput(dinner.date) : '');
-        setValue('location', dinner.location || '');
-        setValue('dinner_type', dinner.dinner_type || 'Open');
-        setValue('is_published', isPublished);
+        setFormData({
+            title: dinner.title || '',
+            date: dinner.date ? formatDateForInput(dinner.date) : '',
+            location: dinner.location || '',
+            dinner_type: dinner.dinner_type || 'Open',
+            is_published: isPublished
+        });
       } else {
         toast.error('Dinner not found');
         router.push('/admin/dinner-management');
@@ -114,7 +94,7 @@ const CreateEditDinnerPage = ({ dinnerId = null, isEdit = false }) => {
     }));
   };
 
-  const handleSubmit = async () => {
+  const handleSaveDinner = async () => {
     // Validation
     if (!formData.title.trim()) {
       toast.error('Please enter a title');
@@ -345,7 +325,7 @@ const CreateEditDinnerPage = ({ dinnerId = null, isEdit = false }) => {
                 Cancel
               </button>
               <button
-                onClick={handleSubmit(onSubmit)}
+                onClick={handleSaveDinner}
                 className="px-5 py-2.5 bg-[#F97316] text-white rounded-lg text-sm font-medium hover:bg-[#EA580C] transition-colors disabled:opacity-50 flex items-center gap-2"
                 disabled={loading}
               >

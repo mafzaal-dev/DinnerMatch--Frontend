@@ -33,7 +33,13 @@ export const forgotPasswordSchema = yup.object().shape({
 export const editProfileSchema = yup.object().shape({
   fullName: requiredString('Full name'),
   email: yup.string().email('Invalid email').optional(), // Read-only typically, but good to validate if passed
-  phoneNumber: phoneValidation.optional().or([yup.string().length(0)]), // Allow empty or valid
+  phoneNumber: yup.string()
+    .test('is-valid-phone', 'Please enter a valid phone number', function(value) {
+      if (!value) return true; // Allow empty
+      return /^[\d\s\-\+\(\)]+$/.test(value) && value.length >= 10;
+    })
+    .nullable()
+    .optional(),
   languages: yup.array().of(yup.string()).min(1, 'Select at least one language'),
   priceRange: requiredString('Price range'),
   menuPreferences: yup.array().of(yup.string()).optional(),
@@ -105,4 +111,10 @@ export const contactSchema = yup.object().shape({
   reason: requiredString('Reason'),
   subject: requiredString('Subject'),
   description: requiredString('Description'),
+});
+
+export const createGroupSchema = yup.object().shape({
+  groupName: requiredString('Group Name'),
+  selectedDinnerForGroup: requiredString('Dinner'),
+  selectedUsers: yup.array().of(yup.string()).min(1, 'Select at least one user'),
 });

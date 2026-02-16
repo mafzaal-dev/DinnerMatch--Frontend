@@ -14,6 +14,9 @@ export const useRestaurant = () => {
       if (params.index !== undefined) queryParams.append('index', params.index);
       if (params.offset !== undefined) queryParams.append('offset', params.offset);
       if (params.search) queryParams.append('search', params.search);
+      if (params.rating) queryParams.append('rating', params.rating);
+      if (params.budget) queryParams.append('budget', params.budget);
+      if (params.location) queryParams.append('location', params.location);
 
       const response = await api.get(`${API_ENDPOINTS.RESTAURANT_LIST}?${queryParams}`);
       if (response.success) {
