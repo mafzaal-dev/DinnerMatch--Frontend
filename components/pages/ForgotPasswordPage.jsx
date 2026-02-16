@@ -1,14 +1,22 @@
 "use client";
 
-import React, { useState } from 'react';
+import React from 'react';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { forgotPasswordSchema } from '@/constants/validationSchemas';
 
 const ForgotPasswordPage = ({ onSubmit, onBack, onSignIn }) => {
-  const [email, setEmail] = useState('');
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(forgotPasswordSchema),
+  });
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const onFormSubmit = (data) => {
     if (onSubmit) {
-      onSubmit({ email });
+      onSubmit(data);
     }
   };
 
@@ -28,7 +36,7 @@ const ForgotPasswordPage = ({ onSubmit, onBack, onSignIn }) => {
           </p>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-6">
             {/* Email Input */}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-[#E0E0E0] mb-2">
@@ -37,12 +45,13 @@ const ForgotPasswordPage = ({ onSubmit, onBack, onSignIn }) => {
               <input
                 type="email"
                 id="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                {...register('email')}
                 placeholder="Enter your email"
-                className="w-full px-4 py-3 bg-[#0F1419] border border-white rounded-lg text-[#F5F5F5] placeholder-[#A0A0A0] focus:outline-none focus:border-[#FFAA55] transition-colors"
-                required
+                className={`w-full px-4 py-3 bg-[#0F1419] border rounded-lg text-[#F5F5F5] placeholder-[#A0A0A0] focus:outline-none focus:border-[#FFAA55] transition-colors ${errors.email ? 'border-red-500' : 'border-white'}`}
               />
+              {errors.email && (
+                <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>
+              )}
             </div>
 
             {/* Submit Button */}

@@ -1,16 +1,24 @@
 "use client";
 
 import React, { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { loginSchema } from '@/constants/validationSchemas';
 
 const LoginPage = ({ onLogin, onSignUp, isLoading, error }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(loginSchema),
+  });
+
+  const onSubmit = (data) => {
     if (onLogin) {
-      onLogin({ email, password });
+      onLogin(data);
     }
   };
 
@@ -34,7 +42,7 @@ const LoginPage = ({ onLogin, onSignUp, isLoading, error }) => {
           )}
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             {/* Email Input */}
             <div>
               <label htmlFor="email" className="block text-sm font-semibold text-[#757575] mb-2">
@@ -43,13 +51,14 @@ const LoginPage = ({ onLogin, onSignUp, isLoading, error }) => {
               <input
                 type="email"
                 id="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                {...register('email')}
                 placeholder="Enter your email"
-                className="w-full px-4 py-3 bg-[#111121] border border-[#2F3A51] rounded-lg text-[#F5F5F5] placeholder-[#424242] focus:outline-none focus:border-[#FFAA55] transition-colors disabled:opacity-50"
-                required
+                className={`w-full px-4 py-3 bg-[#111121] border rounded-lg text-[#F5F5F5] placeholder-[#424242] focus:outline-none focus:border-[#FFAA55] transition-colors disabled:opacity-50 ${errors.email ? 'border-red-500' : 'border-[#2F3A51]'}`}
                 disabled={isLoading}
               />
+              {errors.email && (
+                <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>
+              )}
             </div>
 
             {/* Password Input */}
@@ -61,11 +70,9 @@ const LoginPage = ({ onLogin, onSignUp, isLoading, error }) => {
                 <input
                   type={showPassword ? 'text' : 'password'}
                   id="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  {...register('password')}
                   placeholder="Enter your password"
-                  className="w-full px-4 py-3 bg-[#111121] border border-[#2F3A51] rounded-lg text-[#F5F5F5] placeholder-[#424242] focus:outline-none focus:border-[#FFAA55] transition-colors pr-12 disabled:opacity-50"
-                  required
+                  className={`w-full px-4 py-3 bg-[#111121] border rounded-lg text-[#F5F5F5] placeholder-[#424242] focus:outline-none focus:border-[#FFAA55] transition-colors pr-12 disabled:opacity-50 ${errors.password ? 'border-red-500' : 'border-[#2F3A51]'}`}
                   disabled={isLoading}
                 />
                 <button
@@ -86,6 +93,9 @@ const LoginPage = ({ onLogin, onSignUp, isLoading, error }) => {
                   )}
                 </button>
               </div>
+              {errors.password && (
+                <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>
+              )}
             </div>
 
             {/* Forgot Password */}

@@ -1,13 +1,32 @@
 "use client";
 
 import React, { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { loginSchema } from '@/constants/validationSchemas';
 
-const LoginModal = ({ isOpen, onClose }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+const LoginModal = ({ isOpen, onClose, onLogin }) => { // Added onLogin prop if it was missing or implied
   const [showPassword, setShowPassword] = useState(false);
 
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(loginSchema),
+  });
+
   if (!isOpen) return null;
+
+  const onSubmit = (data) => {
+    // Handle login
+    console.log('Login data:', data);
+    // If there is an onLogin prop, use it.
+    // The original code didn't have onLogin in props destructuring but the user might expect it or it might be handled inside via API call directly?
+    // The original code just had `onSubmit={(e) => e.preventDefault()}` so it was a dummy form.
+    // I should probably just leave it as validatable form that logs or calls a prop if exists.
+    if (onLogin) onLogin(data);
+  };
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
@@ -30,7 +49,7 @@ const LoginModal = ({ isOpen, onClose }) => {
         </div>
 
         {/* Form */}
-        <form className="space-y-5" onSubmit={(e) => e.preventDefault()}>
+        <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
           {/* Email Input */}
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-[#757575] mb-1">
@@ -39,11 +58,11 @@ const LoginModal = ({ isOpen, onClose }) => {
             <input
               type="email"
               id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              {...register('email')}
               placeholder="Enter your email"
-              className="w-full h-12 px-3 bg-white border border-gray-500 rounded-lg text-white placeholder-[#bdbdbd] focus:outline-none focus:border-[#F97315] focus:ring-1 focus:ring-[#F97315] transition-colors"
+              className={`w-full h-12 px-3 bg-white border rounded-lg text-white placeholder-[#bdbdbd] focus:outline-none focus:border-[#F97315] focus:ring-1 focus:ring-[#F97315] transition-colors ${errors.email ? 'border-red-500' : 'border-gray-500'}`}
             />
+            {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
           </div>
 
           {/* Password Input */}
@@ -55,11 +74,9 @@ const LoginModal = ({ isOpen, onClose }) => {
               <input
                 type={showPassword ? 'text' : 'password'}
                 id="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                {...register('password')}
                 placeholder="Enter your password"
-                className="w-full h-12 px-3 bg-white border border-gray-700
-                 rounded-lg  placeholder-[#bdbdbd] focus:outline-none focus:border-[#F97315] focus:ring-1 focus:ring-[#F97315] transition-colors pr-12"
+                className={`w-full h-12 px-3 bg-white border rounded-lg placeholder-[#bdbdbd] focus:outline-none focus:border-[#F97315] focus:ring-1 focus:ring-[#F97315] transition-colors pr-12 ${errors.password ? 'border-red-500' : 'border-gray-700'}`}
               />
               <button
                 type="button"

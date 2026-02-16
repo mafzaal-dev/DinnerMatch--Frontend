@@ -449,7 +449,7 @@ const CreateQuizPage = ({ quizId = null, isEdit = false }) => {
                     </div>
                 </div> */}
 
-                {formData.answer_type === 'choice' && (
+                {watchedAnswerType === 'choice' && (
                     <div className="space-y-2">
                         <DndContext 
                             sensors={sensors}
@@ -547,7 +547,7 @@ const CreateQuizPage = ({ quizId = null, isEdit = false }) => {
               Cancel
             </button>
             <button
-              onClick={handleSubmit}
+              onClick={handleSubmit(onSubmit)}
               className="px-5 py-2.5 bg-[#F97316] text-white rounded-lg text-sm font-medium hover:bg-[#EA580C] transition-colors disabled:opacity-50 flex items-center gap-2"
               disabled={loading}
             >

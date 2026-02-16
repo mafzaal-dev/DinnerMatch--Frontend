@@ -1,28 +1,24 @@
 "use client";
 
 import React, { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { signupSchema } from '@/constants/validationSchemas';
 
 const SignupPage = ({ onRegister, onLogin, isLoading, error }) => {
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-    first_name: '',
-    last_name: '',
-  });
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(signupSchema),
+  });
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const onSubmit = (data) => {
     if (onRegister) {
-      onRegister(formData);
+      onRegister(data);
     }
   };
 
@@ -46,7 +42,7 @@ const SignupPage = ({ onRegister, onLogin, isLoading, error }) => {
           )}
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             {/* Name Fields Row */}
             <div className="grid grid-cols-2 gap-4">
               {/* First Name */}
@@ -57,14 +53,14 @@ const SignupPage = ({ onRegister, onLogin, isLoading, error }) => {
                 <input
                   type="text"
                   id="first_name"
-                  name="first_name"
-                  value={formData.first_name}
-                  onChange={handleChange}
+                  {...register('first_name')}
                   placeholder="First name"
-                  className="w-full px-4 py-3 bg-[#111121] border border-[#2F3A51] rounded-lg text-[#F5F5F5] placeholder-[#424242] focus:outline-none focus:border-[#FFAA55] transition-colors disabled:opacity-50"
-                  required
+                  className={`w-full px-4 py-3 bg-[#111121] border rounded-lg text-[#F5F5F5] placeholder-[#424242] focus:outline-none focus:border-[#FFAA55] transition-colors disabled:opacity-50 ${errors.first_name ? 'border-red-500' : 'border-[#2F3A51]'}`}
                   disabled={isLoading}
                 />
+                {errors.first_name && (
+                  <p className="text-red-500 text-xs mt-1">{errors.first_name.message}</p>
+                )}
               </div>
 
               {/* Last Name */}
@@ -75,14 +71,14 @@ const SignupPage = ({ onRegister, onLogin, isLoading, error }) => {
                 <input
                   type="text"
                   id="last_name"
-                  name="last_name"
-                  value={formData.last_name}
-                  onChange={handleChange}
+                  {...register('last_name')}
                   placeholder="Last name"
-                  className="w-full px-4 py-3 bg-[#111121] border border-[#2F3A51] rounded-lg text-[#F5F5F5] placeholder-[#424242] focus:outline-none focus:border-[#FFAA55] transition-colors disabled:opacity-50"
-                  required
+                  className={`w-full px-4 py-3 bg-[#111121] border rounded-lg text-[#F5F5F5] placeholder-[#424242] focus:outline-none focus:border-[#FFAA55] transition-colors disabled:opacity-50 ${errors.last_name ? 'border-red-500' : 'border-[#2F3A51]'}`}
                   disabled={isLoading}
                 />
+                {errors.last_name && (
+                  <p className="text-red-500 text-xs mt-1">{errors.last_name.message}</p>
+                )}
               </div>
             </div>
 
@@ -94,14 +90,14 @@ const SignupPage = ({ onRegister, onLogin, isLoading, error }) => {
               <input
                 type="email"
                 id="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
+                {...register('email')}
                 placeholder="Enter your email"
-                className="w-full px-4 py-3 bg-[#111121] border border-[#2F3A51] rounded-lg text-[#F5F5F5] placeholder-[#424242] focus:outline-none focus:border-[#FFAA55] transition-colors disabled:opacity-50"
-                required
+                className={`w-full px-4 py-3 bg-[#111121] border rounded-lg text-[#F5F5F5] placeholder-[#424242] focus:outline-none focus:border-[#FFAA55] transition-colors disabled:opacity-50 ${errors.email ? 'border-red-500' : 'border-[#2F3A51]'}`}
                 disabled={isLoading}
               />
+              {errors.email && (
+                <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>
+              )}
             </div>
 
             {/* Password Input */}
@@ -113,14 +109,14 @@ const SignupPage = ({ onRegister, onLogin, isLoading, error }) => {
                 <input
                   type={showPassword ? 'text' : 'password'}
                   id="password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
+                  {...register('password')}
                   placeholder="Create a password"
-                  className="w-full px-4 py-3 bg-[#111121] border border-[#2F3A51] rounded-lg text-[#F5F5F5] placeholder-[#424242] focus:outline-none focus:border-[#FFAA55] transition-colors pr-12 disabled:opacity-50"
-                  required
+                  className={`w-full px-4 py-3 bg-[#111121] border rounded-lg text-[#F5F5F5] placeholder-[#424242] focus:outline-none focus:border-[#FFAA55] transition-colors pr-12 disabled:opacity-50 ${errors.password ? 'border-red-500' : 'border-[#2F3A51]'}`}
                   disabled={isLoading}
                 />
+                {errors.password && (
+                  <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>
+                )}
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}

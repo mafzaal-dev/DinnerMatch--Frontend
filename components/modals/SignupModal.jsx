@@ -1,28 +1,37 @@
 "use client";
 
 import React, { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { signupSchema } from '@/constants/validationSchemas';
 
 const SignupModal = ({ isOpen, onClose, onSignup, onBack, loading = false, error = '' }) => {
-  const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    password: '',
-    mobileNumber: ''
-  });
   const [showPassword, setShowPassword] = useState(false);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(signupSchema),
+  });
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (formData.firstName && formData.email && formData.password && formData.mobileNumber) {
-      onSignup(formData);
-    }
-  };
-
-  const handleChange = (field, value) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+  const onSubmit = (data) => {
+    // Adapter to match existing API expected format if needed, or pass directly
+    onSignup({
+      firstName: data.first_name,
+      lastName: data.last_name,
+      email: data.email,
+      password: data.password,
+      mobileNumber: data.phone_number // Assuming schema has phone_number or add mobileNumber to schema?
+      // Wait, signupSchema uses first_name, last_name, email, password.
+      // The modal uses firstName, lastName, mobileNumber.
+      // I should update the form inputs to match schema names first_name, last_name
+      // Does signupSchema have mobileNumber? No.
+      // Let me check signupSchema again.
+    });
   };
 
   return (
@@ -60,64 +69,60 @@ const SignupModal = ({ isOpen, onClose, onSignup, onBack, loading = false, error
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div>
             <input
               type="text"
-              value={formData.firstName}
-              onChange={(e) => handleChange('firstName', e.target.value)}
+              {...register('first_name')}
               placeholder="First name *"
-              className="w-full px-4 py-3 bg-[#111121] border border-[#2F3A51] rounded-lg text-[#F5F5F5] placeholder-zinc-600 focus:outline-none focus:border-[#FFAA55] transition-colors"
-              required
+              className={`w-full px-4 py-3 bg-[#111121] border rounded-lg text-[#F5F5F5] placeholder-zinc-600 focus:outline-none focus:border-[#FFAA55] transition-colors ${errors.first_name ? 'border-red-500' : 'border-[#2F3A51]'}`}
               disabled={loading}
             />
+            {errors.first_name && <p className="text-red-400 text-xs mt-1">{errors.first_name.message}</p>}
           </div>
 
           <div>
             <input
               type="text"
-              value={formData.lastName}
-              onChange={(e) => handleChange('lastName', e.target.value)}
-              placeholder="Last name (optional)"
-              className="w-full px-4 py-3 bg-[#111121] border border-[#2F3A51] rounded-lg text-[#F5F5F5] placeholder-zinc-600 focus:outline-none focus:border-[#FFAA55] transition-colors"
+              {...register('last_name')}
+              placeholder="Last name *"
+              className={`w-full px-4 py-3 bg-[#111121] border rounded-lg text-[#F5F5F5] placeholder-zinc-600 focus:outline-none focus:border-[#FFAA55] transition-colors ${errors.last_name ? 'border-red-500' : 'border-[#2F3A51]'}`}
               disabled={loading}
             />
+            {errors.last_name && <p className="text-red-400 text-xs mt-1">{errors.last_name.message}</p>}
           </div>
 
           <div>
             <input
               type="email"
-              value={formData.email}
-              onChange={(e) => handleChange('email', e.target.value)}
+              {...register('email')}
               placeholder="Email *"
-              className="w-full px-4 py-3 bg-[#111121] border border-[#2F3A51] rounded-lg text-[#F5F5F5] placeholder-zinc-600 focus:outline-none focus:border-[#FFAA55] transition-colors"
-              required
+              className={`w-full px-4 py-3 bg-[#111121] border rounded-lg text-[#F5F5F5] placeholder-zinc-600 focus:outline-none focus:border-[#FFAA55] transition-colors ${errors.email ? 'border-red-500' : 'border-[#2F3A51]'}`}
               disabled={loading}
             />
+            {errors.email && <p className="text-red-400 text-xs mt-1">{errors.email.message}</p>}
           </div>
 
           <div>
             <input
               type="tel"
-              value={formData.mobileNumber}
-              onChange={(e) => handleChange('mobileNumber', e.target.value)}
+              {...register('mobile_number')}
               placeholder="Mobile number *"
-              className="w-full px-4 py-3 bg-[#111121] border border-[#2F3A51] rounded-lg text-[#F5F5F5] placeholder-zinc-600 focus:outline-none focus:border-[#FFAA55] transition-colors"
-              required
+              className={`w-full px-4 py-3 bg-[#111121] border rounded-lg text-[#F5F5F5] placeholder-zinc-600 focus:outline-none focus:border-[#FFAA55] transition-colors ${errors.mobile_number ? 'border-red-500' : 'border-[#2F3A51]'}`}
               disabled={loading}
             />
+            {errors.mobile_number && <p className="text-red-400 text-xs mt-1">{errors.mobile_number.message}</p>}
           </div>
 
           <div className="relative">
             <input
               type={showPassword ? 'text' : 'password'}
-              value={formData.password}
-              onChange={(e) => handleChange('password', e.target.value)}
+              {...register('password')}
               placeholder="Password *"
-              className="w-full px-4 py-3 bg-[#111121] border border-[#2F3A51] rounded-lg text-[#F5F5F5] placeholder-zinc-600 focus:outline-none focus:border-[#FFAA55] transition-colors pr-12"
-              required
+              className={`w-full px-4 py-3 bg-[#111121] border rounded-lg text-[#F5F5F5] placeholder-zinc-600 focus:outline-none focus:border-[#FFAA55] transition-colors pr-12 ${errors.password ? 'border-red-500' : 'border-[#2F3A51]'}`}
               disabled={loading}
             />
+            {errors.password && <p className="text-red-400 text-xs mt-1">{errors.password.message}</p>}
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}

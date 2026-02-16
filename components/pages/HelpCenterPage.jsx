@@ -1,17 +1,24 @@
 "use client";
 
 import React, { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { contactSchema } from '@/constants/validationSchemas';
 
 const HelpCenterPage = ({ onSubmit, onBack }) => {
-  const [formData, setFormData] = useState({
-    email:'',
-    subject: '',
-    message: '',
-    description:'',
-    reason:''
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(contactSchema),
   });
 
-  const faqData = [
+  const onFormSubmit = (data) => {
+    if (onSubmit) {
+      onSubmit(data);
+    }
+  };
     {
       question: "Is this a dating app?",
       answer: "No, DinnerMatch is not a dating app. It's a social platform designed to help people make new friends and have meaningful conversations over dinner. While people do sometimes form romantic connections, our primary focus is on platonic social matching."
@@ -39,13 +46,6 @@ const HelpCenterPage = ({ onSubmit, onBack }) => {
   ];
 
   const [activeFaqIndex, setActiveFaqIndex] = useState(null);
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (onSubmit) {
-      onSubmit(formData);
-    }
-  };
 
   const toggleFAQ = (index) => {
     setActiveFaqIndex(activeFaqIndex === index ? null : index);

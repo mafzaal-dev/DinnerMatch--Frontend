@@ -3,6 +3,9 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
+import { useForm, Controller } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { restaurantSchema } from '@/constants/validationSchemas';
 import { useRestaurant } from '@/hooks/useRestaurant';
 import { CustomDropdown } from '@/components/common';
 
@@ -10,20 +13,39 @@ const CreateEditRestaurantPage = ({ restaurantId = null, isEdit = false }) => {
   const router = useRouter();
   const { getRestaurant, createRestaurant, updateRestaurant, deleteRestaurant, loading } = useRestaurant();
   const [initialLoading, setInitialLoading] = useState(isEdit);
-  const [formData, setFormData] = useState({
-    name: '',
-    city: '',
-    location: '',
-    number: '',
-    price: '',
-    budget: '',
-    is_meat: false,
-    is_vegetarian: false,
-    is_vegan: false,
-    is_fish: false,
-    is_halal: false,
-    is_others: false,
+
+  const {
+    register,
+    handleSubmit,
+    control,
+    setValue,
+    watch,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(restaurantSchema),
+    defaultValues: {
+      name: '',
+      city: '',
+      location: '',
+      number: '',
+      price: '',
+      budget: '',
+      is_meat: false,
+      is_vegetarian: false,
+      is_vegan: false,
+      is_fish: false,
+      is_halal: false,
+      is_others: false,
+    },
   });
+
+  const watchedCity = watch('city');
+  const watchedIsMeat = watch('is_meat');
+  const watchedIsVegetarian = watch('is_vegetarian');
+  const watchedIsVegan = watch('is_vegan');
+  const watchedIsFish = watch('is_fish');
+  const watchedIsHalal = watch('is_halal');
+  const watchedIsOthers = watch('is_others');
 
   // TODO: Fetch cities and locations from backend API
   const [cities, setCities] = useState([]);
@@ -41,20 +63,18 @@ const CreateEditRestaurantPage = ({ restaurantId = null, isEdit = false }) => {
       const restaurant = await getRestaurant(restaurantId);
       
       if (restaurant) {
-        setFormData({
-          name: restaurant.name || '',
-          city: restaurant.city || '',
-          location: restaurant.location || '',
-          number: restaurant.number || '',
-          price: restaurant.price || '',
-          budget: restaurant.budget || '',
-          is_meat: restaurant.is_meat || false,
-          is_vegetarian: restaurant.is_vegetarian || false,
-          is_vegan: restaurant.is_vegan || false,
-          is_fish: restaurant.is_fish || false,
-          is_halal: restaurant.is_halal || false,
-          is_others: restaurant.is_others || false,
-        });
+        setValue('name', restaurant.name || '');
+        setValue('city', restaurant.city || '');
+        setValue('location', restaurant.location || '');
+        setValue('number', restaurant.number || '');
+        setValue('price', restaurant.price || '');
+        setValue('budget', restaurant.budget || '');
+        setValue('is_meat', restaurant.is_meat || false);
+        setValue('is_vegetarian', restaurant.is_vegetarian || false);
+        setValue('is_vegan', restaurant.is_vegan || false);
+        setValue('is_fish', restaurant.is_fish || false);
+        setValue('is_halal', restaurant.is_halal || false);
+        setValue('is_others', restaurant.is_others || false);
       } else {
         toast.error('Restaurant not found');
         router.push('/admin/restaurants');
@@ -68,55 +88,21 @@ const CreateEditRestaurantPage = ({ restaurantId = null, isEdit = false }) => {
     }
   };
 
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }));
-  };
-
-  const handleSubmit = async () => {
-    // Validation
-    if (!formData.name.trim()) {
-      toast.error('Please enter restaurant name');
-      return;
-    }
-    if (!formData.city.trim()) {
-      toast.error('Please enter city');
-      return;
-    }
-    if (!formData.location.trim()) {
-      toast.error('Please enter location');
-      return;
-    }
-    if (!formData.number.trim()) {
-      toast.error('Please enter contact number');
-      return;
-    }
-    if (!formData.price || parseFloat(formData.price) <= 0) {
-      toast.error('Please enter a valid price');
-      return;
-    }
-    if (!formData.budget) {
-      toast.error('Please select a budget');
-      return;
-    }
-
+  const onSubmit = async (data) => {
     try {
       const payload = {
-        name: formData.name,
-        city: formData.city,
-        location: formData.location,
-        number: formData.number,
-        price: parseFloat(formData.price).toFixed(2),
-        budget: formData.budget,
-        is_meat: formData.is_meat,
-        is_vegetarian: formData.is_vegetarian,
-        is_vegan: formData.is_vegan,
-        is_fish: formData.is_fish,
-        is_halal: formData.is_halal,
-        is_others: formData.is_others,
+        name: data.name,
+        city: data.city,
+        location: data.location,
+        number: data.number,
+        price: parseFloat(data.price).toFixed(2),
+        budget: data.budget,
+        is_meat: data.is_meat,
+        is_vegetarian: data.is_vegetarian,
+        is_vegan: data.is_vegan,
+        is_fish: data.is_fish,
+        is_halal: data.is_halal,
+        is_others: data.is_others,
       };
 
       if (isEdit && restaurantId) {
@@ -191,13 +177,11 @@ const CreateEditRestaurantPage = ({ restaurantId = null, isEdit = false }) => {
               </label>
               <input
                 type="text"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
+                {...register('name')}
                 placeholder="Enter restaurant name"
-                className="w-full px-4 py-2.5 border border-[#D1D5DB] rounded-lg text-sm focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316] outline-none"
-                required
+                className={`w-full px-4 py-2.5 border rounded-lg text-sm focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316] outline-none ${errors.name ? 'border-red-500' : 'border-[#D1D5DB]'}`}
               />
+              {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>}
             </div>
 
             {/* City and Location - Backend Driven */}
@@ -206,20 +190,27 @@ const CreateEditRestaurantPage = ({ restaurantId = null, isEdit = false }) => {
                 <label className="block text-sm font-medium text-[#374151] mb-2">
                   City <span className="text-red-500">*</span>
                 </label>
-                <CustomDropdown
+                <Controller
                   name="city"
-                  value={formData.city}
-                  onChange={handleChange}
-                  options={[
-                    { value: '', label: 'Select city' },
-                    { value: 'Cape Town', label: 'Cape Town' },
-                    { value: 'Johannesburg', label: 'Johannesburg' },
-                    { value: 'Durban', label: 'Durban' },
-                    { value: 'Pretoria', label: 'Pretoria' },
-                  ]}
-                  placeholder="Select city"
-                  required
+                  control={control}
+                  render={({ field }) => (
+                    <CustomDropdown
+                      value={field.value}
+                      onChange={(e) => field.onChange(e.target.value)}
+                      options={[
+                        { value: '', label: 'Select city' },
+                        { value: 'Cape Town', label: 'Cape Town' },
+                        { value: 'Johannesburg', label: 'Johannesburg' },
+                        { value: 'Durban', label: 'Durban' },
+                        { value: 'Pretoria', label: 'Pretoria' },
+                      ]}
+                      placeholder="Select city"
+                      required
+                      className={errors.city ? 'border-red-500' : ''}
+                    />
+                  )}
                 />
+                {errors.city && <p className="text-red-500 text-xs mt-1">{errors.city.message}</p>}
                 <p className="mt-1 text-xs text-[#6B7280]">
                   Note: Cities will be fetched from backend API
                 </p>
@@ -229,22 +220,29 @@ const CreateEditRestaurantPage = ({ restaurantId = null, isEdit = false }) => {
                 <label className="block text-sm font-medium text-[#374151] mb-2">
                   Location <span className="text-red-500">*</span>
                 </label>
-                <CustomDropdown
+                <Controller
                   name="location"
-                  value={formData.location}
-                  onChange={handleChange}
-                  options={[
-                    { value: '', label: 'Select location' },
-                    ...(formData.city ? [
-                      { value: 'City Centre', label: 'City Centre' },
-                      { value: 'Waterfront', label: 'Waterfront' },
-                      { value: 'Suburbs', label: 'Suburbs' },
-                    ] : []),
-                  ]}
-                  placeholder="Select location"
-                  required
-                  disabled={!formData.city}
+                  control={control}
+                  render={({ field }) => (
+                    <CustomDropdown
+                      value={field.value}
+                      onChange={(e) => field.onChange(e.target.value)}
+                      options={[
+                        { value: '', label: 'Select location' },
+                        ...(watchedCity ? [
+                          { value: 'City Centre', label: 'City Centre' },
+                          { value: 'Waterfront', label: 'Waterfront' },
+                          { value: 'Suburbs', label: 'Suburbs' },
+                        ] : []),
+                      ]}
+                      placeholder="Select location"
+                      required
+                      disabled={!watchedCity}
+                      className={errors.location ? 'border-red-500' : ''}
+                    />
+                  )}
                 />
+                {errors.location && <p className="text-red-500 text-xs mt-1">{errors.location.message}</p>}
                 <p className="mt-1 text-xs text-[#6B7280]">
                   Note: Locations will be fetched from backend API based on selected city
                 </p>
@@ -259,13 +257,11 @@ const CreateEditRestaurantPage = ({ restaurantId = null, isEdit = false }) => {
                 </label>
                 <input
                   type="tel"
-                  name="number"
-                  value={formData.number}
-                  onChange={handleChange}
+                  {...register('number')}
                   placeholder="Enter contact number"
-                  className="w-full px-4 py-2.5 border border-[#D1D5DB] rounded-lg text-sm focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316] outline-none"
-                  required
+                  className={`w-full px-4 py-2.5 border rounded-lg text-sm focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316] outline-none ${errors.number ? 'border-red-500' : 'border-[#D1D5DB]'}`}
                 />
+                {errors.number && <p className="text-red-500 text-xs mt-1">{errors.number.message}</p>}
               </div>
 
               <div>
@@ -276,16 +272,14 @@ const CreateEditRestaurantPage = ({ restaurantId = null, isEdit = false }) => {
                   <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-[#6B7280]">R</span>
                   <input
                     type="number"
-                    name="price"
-                    value={formData.price}
-                    onChange={handleChange}
+                    {...register('price')}
                     placeholder="0.00"
                     step="0.01"
                     min="0"
-                    className="w-full pl-8 pr-4 py-2.5 border border-[#D1D5DB] rounded-lg text-sm focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316] outline-none"
-                    required
+                    className={`w-full pl-8 pr-4 py-2.5 border rounded-lg text-sm focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316] outline-none ${errors.price ? 'border-red-500' : 'border-[#D1D5DB]'}`}
                   />
                 </div>
+                {errors.price && <p className="text-red-500 text-xs mt-1">{errors.price.message}</p>}
               </div>
             </div>
 
@@ -294,21 +288,28 @@ const CreateEditRestaurantPage = ({ restaurantId = null, isEdit = false }) => {
               <label className="block text-sm font-medium text-[#374151] mb-2">
                 Budget <span className="text-red-500">*</span>
               </label>
-              <CustomDropdown
+              <Controller
                 name="budget"
-                value={formData.budget}
-                onChange={handleChange}
-                options={[
-                  { value: '', label: 'Select budget range' },
-                  { value: 'R0-R250', label: 'R0 - R250' },
-                  { value: 'R250-R500', label: 'R250 - R500' },
-                  { value: 'R500-R750', label: 'R500 - R750' },
-                  { value: 'R750-R1000', label: 'R750 - R1000' },
-                  { value: 'R1000+', label: 'R1000+' },
-                ]}
-                placeholder="Select budget range"
-                required
+                control={control}
+                render={({ field }) => (
+                  <CustomDropdown
+                    value={field.value}
+                    onChange={(e) => field.onChange(e.target.value)}
+                    options={[
+                      { value: '', label: 'Select budget range' },
+                      { value: 'R0-R250', label: 'R0 - R250' },
+                      { value: 'R250-R500', label: 'R250 - R500' },
+                      { value: 'R500-R750', label: 'R500 - R750' },
+                      { value: 'R750-R1000', label: 'R750 - R1000' },
+                      { value: 'R1000+', label: 'R1000+' },
+                    ]}
+                    placeholder="Select budget range"
+                    required
+                    className={errors.budget ? 'border-red-500' : ''}
+                  />
+                )}
               />
+              {errors.budget && <p className="text-red-500 text-xs mt-1">{errors.budget.message}</p>}
             </div>
 
             {/* Food Options */}
@@ -320,9 +321,8 @@ const CreateEditRestaurantPage = ({ restaurantId = null, isEdit = false }) => {
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
                     type="checkbox"
-                    name="is_meat"
-                    checked={formData.is_meat}
-                    onChange={handleChange}
+                    checked={watchedIsMeat}
+                    onChange={(e) => setValue('is_meat', e.target.checked)}
                     className="w-4 h-4 text-[#F97316] border-[#D1D5DB] rounded focus:ring-[#F97316]"
                   />
                   <span className="text-sm text-[#374151]">Meat</span>
@@ -331,9 +331,8 @@ const CreateEditRestaurantPage = ({ restaurantId = null, isEdit = false }) => {
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
                     type="checkbox"
-                    name="is_vegetarian"
-                    checked={formData.is_vegetarian}
-                    onChange={handleChange}
+                    checked={watchedIsVegetarian}
+                    onChange={(e) => setValue('is_vegetarian', e.target.checked)}
                     className="w-4 h-4 text-[#F97316] border-[#D1D5DB] rounded focus:ring-[#F97316]"
                   />
                   <span className="text-sm text-[#374151]">Vegetarian</span>
@@ -342,9 +341,8 @@ const CreateEditRestaurantPage = ({ restaurantId = null, isEdit = false }) => {
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
                     type="checkbox"
-                    name="is_vegan"
-                    checked={formData.is_vegan}
-                    onChange={handleChange}
+                    checked={watchedIsVegan}
+                    onChange={(e) => setValue('is_vegan', e.target.checked)}
                     className="w-4 h-4 text-[#F97316] border-[#D1D5DB] rounded focus:ring-[#F97316]"
                   />
                   <span className="text-sm text-[#374151]">Vegan</span>
@@ -353,9 +351,8 @@ const CreateEditRestaurantPage = ({ restaurantId = null, isEdit = false }) => {
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
                     type="checkbox"
-                    name="is_fish"
-                    checked={formData.is_fish}
-                    onChange={handleChange}
+                    checked={watchedIsFish}
+                    onChange={(e) => setValue('is_fish', e.target.checked)}
                     className="w-4 h-4 text-[#F97316] border-[#D1D5DB] rounded focus:ring-[#F97316]"
                   />
                   <span className="text-sm text-[#374151]">Fish</span>
@@ -364,9 +361,8 @@ const CreateEditRestaurantPage = ({ restaurantId = null, isEdit = false }) => {
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
                     type="checkbox"
-                    name="is_halal"
-                    checked={formData.is_halal}
-                    onChange={handleChange}
+                    checked={watchedIsHalal}
+                    onChange={(e) => setValue('is_halal', e.target.checked)}
                     className="w-4 h-4 text-[#F97316] border-[#D1D5DB] rounded focus:ring-[#F97316]"
                   />
                   <span className="text-sm text-[#374151]">Halal</span>
@@ -375,9 +371,8 @@ const CreateEditRestaurantPage = ({ restaurantId = null, isEdit = false }) => {
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
                     type="checkbox"
-                    name="is_others"
-                    checked={formData.is_others}
-                    onChange={handleChange}
+                    checked={watchedIsOthers}
+                    onChange={(e) => setValue('is_others', e.target.checked)}
                     className="w-4 h-4 text-[#F97316] border-[#D1D5DB] rounded focus:ring-[#F97316]"
                   />
                   <span className="text-sm text-[#374151]">Others</span>
@@ -417,7 +412,7 @@ const CreateEditRestaurantPage = ({ restaurantId = null, isEdit = false }) => {
                 Cancel
               </button>
               <button
-                onClick={handleSubmit}
+                onClick={handleSubmit(onSubmit)}
                 className="px-5 py-2.5 bg-[#F97316] text-white rounded-lg text-sm font-medium hover:bg-[#EA580C] transition-colors disabled:opacity-50 flex items-center gap-2"
                 disabled={loading}
               >

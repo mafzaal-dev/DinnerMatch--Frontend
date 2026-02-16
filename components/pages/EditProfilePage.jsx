@@ -1,25 +1,45 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
+import { useForm, Controller } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { editProfileSchema } from '@/constants/validationSchemas';
 
 const EditProfilePage = ({ onSave, onBack, initialData = {} }) => {
-  const [formData, setFormData] = useState({
-    fullName: initialData.full_name || `${initialData.first_name || ''} ${initialData.last_name || ''}`.trim() || '',
-    email: initialData.email || '',
-    phoneNumber: initialData.phone_number || initialData.phoneNumber || '',
-    languages: initialData.languages || ['English'],
-    menuPreferences: initialData.menuPreferences || [],
-    priceRange: initialData.priceRange || '',
+  const {
+    register,
+    handleSubmit,
+    control,
+    setValue,
+    watch,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(editProfileSchema),
+    defaultValues: {
+      fullName: '',
+      email: '',
+      phoneNumber: '',
+      languages: ['English'],
+      menuPreferences: [],
+      priceRange: '',
+    },
   });
 
+  // Watch values for custom UI components (buttons)
+  const watchedLanguages = watch('languages');
+  const watchedMenuPreferences = watch('menuPreferences');
+  const watchedPriceRange = watch('priceRange');
+
   useEffect(() => {
-    setFormData((prev) => ({
-      ...prev,
-      fullName: initialData.full_name || `${initialData.first_name || ''} ${initialData.last_name || ''}`.trim() || prev.fullName,
-      email: initialData.email || prev.email,
-      phoneNumber: initialData.phone_number || initialData.phoneNumber || prev.phoneNumber,
-    }));
-  }, [initialData]);
+    if (initialData) {
+      setValue('fullName', initialData.full_name || `${initialData.first_name || ''} ${initialData.last_name || ''}`.trim() || '');
+      setValue('email', initialData.email || '');
+      setValue('phoneNumber', initialData.phone_number || initialData.phoneNumber || '');
+      setValue('languages', initialData.languages || ['English']);
+      setValue('menuPreferences', initialData.menuPreferences || []);
+      setValue('priceRange', initialData.priceRange || '');
+    }
+  }, [initialData, setValue]);
 
   const languages = ['English', 'Afrikaans', 'Xhosa'];
   const menuOptions = ['I eat everything', 'Vegetarian', 'Meat', 'Fish', 'Vegan', 'Halaal'];
@@ -30,37 +50,35 @@ const EditProfilePage = ({ onSave, onBack, initialData = {} }) => {
   ];
 
   const toggleLanguage = (lang) => {
-    setFormData(prev => ({
-      ...prev,
-      languages: prev.languages.includes(lang)
-        ? prev.languages.filter(l => l !== lang)
-        : [...prev.languages, lang]
-    }));
+    const current = watchedLanguages || [];
+    const updated = current.includes(lang)
+      ? current.filter(l => l !== lang)
+      : [...current, lang];
+    setValue('languages', updated, { shouldValidate: true });
   };
 
   const toggleMenuPreference = (pref) => {
-    setFormData(prev => ({
-      ...prev,
-      menuPreferences: prev.menuPreferences.includes(pref)
-        ? prev.menuPreferences.filter(p => p !== pref)
-        : [...prev.menuPreferences, pref]
-    }));
+    const current = watchedMenuPreferences || [];
+    const updated = current.includes(pref)
+      ? current.filter(p => p !== pref)
+      : [...current, pref];
+    setValue('menuPreferences', updated);
   };
 
-  const handleSave = () => {
+  const onSubmit = (data) => {
     if (onSave) {
       // Split full name back into first and last for API if needed
-      const nameParts = formData.fullName.split(' ');
+      const nameParts = data.fullName.split(' ');
       const firstName = nameParts[0] || '';
       const lastName = nameParts.slice(1).join(' ') || '';
 
       onSave({
         first_name: firstName,
         last_name: lastName,
-        phone_number: formData.phoneNumber,
-        languages: formData.languages,
-        menu_preferences: formData.menuPreferences,
-        price_range: formData.priceRange
+        phone_number: data.phoneNumber,
+        languages: data.languages,
+        menu_preferences: data.menuPreferences,
+        price_range: data.priceRange
       });
     }
   };
@@ -89,17 +107,17 @@ const EditProfilePage = ({ onSave, onBack, initialData = {} }) => {
                 <label className="block text-sm text-[#757575] font-semibold mb-2">Full Name</label>
                 <input
                   type="text"
-                  value={formData.fullName}
-                  onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                  className="w-full px-4 py-3 bg-[#111121] border border-[#2F3A51] rounded-lg text-[#F5F5F5] placeholder-[#424242] focus:outline-none focus:border-[#FFAA55] transition-colors"
+                  {...register('fullName')}
+                  className={`w-full px-4 py-3 bg-[#111121] border rounded-lg text-[#F5F5F5] placeholder-[#424242] focus:outline-none focus:border-[#FFAA55] transition-colors ${errors.fullName ? 'border-red-500' : 'border-[#2F3A51]'}`}
                   placeholder="John Doe"
                 />
+                {errors.fullName && <p className="text-red-500 text-xs mt-1">{errors.fullName.message}</p>}
               </div>
               <div>
                 <label className="block text-sm text-[#757575] font-semibold mb-2">Email</label>
                 <input
                   type="email"
-                  value={formData.email}
+                  {...register('email')}
                   readOnly
                   className="w-full px-4 py-3 bg-[#111121] border border-[#2F3A51] rounded-lg text-[#757575] focus:outline-none cursor-not-allowed"
                   placeholder="john.doe@gmail.com"
@@ -109,11 +127,11 @@ const EditProfilePage = ({ onSave, onBack, initialData = {} }) => {
                 <label className="block text-sm text-[#757575] font-semibold mb-2">Phone Number</label>
                 <input
                   type="tel"
-                  value={formData.phoneNumber}
-                  onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
-                  className="w-full px-4 py-3 bg-[#111121] border border-[#2F3A51] rounded-lg text-[#F5F5F5] placeholder-[#424242] focus:outline-none focus:border-[#FFAA55] transition-colors"
+                  {...register('phoneNumber')}
+                  className={`w-full px-4 py-3 bg-[#111121] border rounded-lg text-[#F5F5F5] placeholder-[#424242] focus:outline-none focus:border-[#FFAA55] transition-colors ${errors.phoneNumber ? 'border-red-500' : 'border-[#2F3A51]'}`}
                   placeholder="+1 (XXX) XXX-XXXX"
                 />
+                {errors.phoneNumber && <p className="text-red-500 text-xs mt-1">{errors.phoneNumber.message}</p>}
               </div>
             </div>
           </div>
@@ -130,8 +148,9 @@ const EditProfilePage = ({ onSave, onBack, initialData = {} }) => {
                   <button
                     key={lang}
                     onClick={() => toggleLanguage(lang)}
+                    type="button"
                     className={`px-6 py-2.5 rounded-lg border transition-all text-sm font-bold ${
-                      formData.languages.includes(lang)
+                      watchedLanguages?.includes(lang)
                         ? 'bg-[#FFAA55] border-[#FFAA55] text-[#212121]'
                         : 'bg-[#111121] border-[#2F3A51] text-[#F5F5F5] hover:border-[#FFAA55]'
                     }`}
@@ -140,6 +159,7 @@ const EditProfilePage = ({ onSave, onBack, initialData = {} }) => {
                   </button>
                 ))}
               </div>
+              {errors.languages && <p className="text-red-500 text-xs mt-1">{errors.languages.message}</p>}
             </div>
 
             {/* Menu Preferences */}
@@ -150,8 +170,9 @@ const EditProfilePage = ({ onSave, onBack, initialData = {} }) => {
                   <button
                     key={option}
                     onClick={() => toggleMenuPreference(option)}
+                    type="button"
                     className={`w-full px-4 py-3 rounded-lg border text-left transition-all text-sm font-semibold ${
-                      formData.menuPreferences.includes(option)
+                      watchedMenuPreferences?.includes(option)
                         ? 'bg-[#FFAA55] border-[#FFAA55] text-[#212121]'
                         : 'bg-[#111121] border-[#2F3A51] text-[#F5F5F5] hover:border-[#FFAA55]'
                     }`}
@@ -169,9 +190,10 @@ const EditProfilePage = ({ onSave, onBack, initialData = {} }) => {
                 {priceOptions.map((option) => (
                   <button
                     key={option.id}
-                    onClick={() => setFormData({ ...formData, priceRange: option.id })}
+                    onClick={() => setValue('priceRange', option.id, { shouldValidate: true })}
+                    type="button"
                     className={`w-full px-4 py-3 rounded-lg border text-left transition-all text-sm font-semibold ${
-                      formData.priceRange === option.id
+                      watchedPriceRange === option.id
                         ? 'bg-[#FFAA55] border-[#FFAA55] text-[#212121]'
                         : 'bg-[#111121] border-[#2F3A51] text-[#F5F5F5] hover:border-[#FFAA55]'
                     }`}
@@ -180,6 +202,7 @@ const EditProfilePage = ({ onSave, onBack, initialData = {} }) => {
                   </button>
                 ))}
               </div>
+              {errors.priceRange && <p className="text-red-500 text-xs mt-1">{errors.priceRange.message}</p>}
             </div>
           </div>
         </div>
@@ -187,7 +210,7 @@ const EditProfilePage = ({ onSave, onBack, initialData = {} }) => {
         {/* Save Button */}
         <div className="mt-10">
           <button
-            onClick={handleSave}
+            onClick={handleSubmit(onSubmit)}
             className="w-full bg-[#FFAA55] text-[#212121] py-4 rounded-lg font-bold text-base uppercase tracking-wide hover:bg-[#FF9955] transition-colors shadow-lg"
           >
             Save Changes

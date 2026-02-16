@@ -5,6 +5,9 @@ import { api, API_ENDPOINTS } from '../../utils/api';
 import { toast } from 'react-hot-toast';
 import { debounce, formatDisplayValue, isValidSearchQuery, capitalizeWords } from '../../utils/searchHelper';
 import { CustomDropdown } from '@/components/common';
+import { useForm, Controller } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { createGroupSchema } from '@/constants/validationSchemas';
 
 const GroupAttendeesPage = () => {
   const [activeTab, setActiveTab] = useState('groups'); // 'groups' or 'users'
@@ -26,11 +29,25 @@ const GroupAttendeesPage = () => {
   const [selectedGroup, setSelectedGroup] = useState(null);
   const [selectedProfile, setSelectedProfile] = useState(null);
   
-  // Form data
-  const [groupName, setGroupName] = useState('');
-  const [selectedDinnerForGroup, setSelectedDinnerForGroup] = useState('');
   const [selectedRestaurant, setSelectedRestaurant] = useState('');
   
+  // React Hook Form for Create Group
+  const {
+    register: registerGroup,
+    handleSubmit: handleSubmitGroup,
+    control: controlGroup,
+    setValue: setValueGroup,
+    reset: resetGroup,
+    formState: { errors: errorsGroup },
+  } = useForm({
+    resolver: yupResolver(createGroupSchema),
+    defaultValues: {
+      groupName: '',
+      selectedDinnerForGroup: '',
+      selectedUsers: [],
+    },
+  });
+
   // Infinity Scroll - Groups
   const [groupsPage, setGroupsPage] = useState(0);
   const [groupsPageSize] = useState(10);
@@ -251,54 +268,51 @@ const GroupAttendeesPage = () => {
   });
 
   const handleSelectUser = (userId, checked) => {
+    let newSelectedUsers;
     if (checked) {
-      setSelectedUsers([...selectedUsers, userId]);
+      newSelectedUsers = [...selectedUsers, userId];
     } else {
-      setSelectedUsers(selectedUsers.filter(id => id !== userId));
+      newSelectedUsers = selectedUsers.filter(id => id !== userId);
+    }
+    setSelectedUsers(newSelectedUsers);
+    
+    // Update RHF value if modal is open
+    if (showCreateGroupModal) {
+       setValueGroup('selectedUsers', newSelectedUsers, { shouldValidate: true });
     }
   };
 
   const handleSelectAll = (checked) => {
+    let newSelectedUsers;
     if (checked) {
-      const allUserIds = dinnerRequests.map(request => request.user.id);
-      setSelectedUsers(allUserIds);
+      newSelectedUsers = dinnerRequests.map(request => request.user.id);
     } else {
-      setSelectedUsers([]);
+      newSelectedUsers = [];
+    }
+    setSelectedUsers(newSelectedUsers);
+
+    // Update RHF value if modal is open
+    if (showCreateGroupModal) {
+       setValueGroup('selectedUsers', newSelectedUsers, { shouldValidate: true });
     }
   };
 
-  const handleCreateGroup = async () => {
-    if (selectedUsers.length === 0) {
-      toast.error('Please select at least one user');
-      return;
-    }
-
-    if (!groupName.trim()) {
-      toast.error('Please enter a group name');
-      return;
-    }
-
-    if (!selectedDinnerForGroup) {
-      toast.error('Please select a dinner');
-      return;
-    }
-
+  const handleCreateGroup = async (data) => {
     try {
       setLoading(true);
       setError('');
       
       const response = await api.post(API_ENDPOINTS.GROUP_CREATE, {
-        name: groupName,
-        users: selectedUsers,
-        dinner_id: selectedDinnerForGroup,
+        name: data.groupName,
+        users: data.selectedUsers,
+        dinner_id: data.selectedDinnerForGroup,
         restaurant_id: selectedRestaurant || null
       });
 
       if (response.success) {
         toast.success('Group created successfully!');
         setShowCreateGroupModal(false);
-        setGroupName('');
-        setSelectedDinnerForGroup('');
+        resetGroup();
         setSelectedRestaurant('');
         setSelectedUsers([]);
         fetchGroups();
@@ -748,7 +762,11 @@ const GroupAttendeesPage = () => {
                   Export All CSV
                 </button>
                 <button 
-                  onClick={() => setShowCreateGroupModal(true)}
+                  onClick={() => {
+                    setShowCreateGroupModal(true);
+                    // Initialize form with current selection if any
+                    setValueGroup('selectedUsers', selectedUsers); 
+                  }}
                   disabled={selectedUsers.length === 0}
                   className="w-full px-4 py-2 bg-[#F97316] text-white rounded-lg text-sm font-medium hover:bg-[#EA580C] disabled:opacity-50 disabled:cursor-not-allowed"
                 >
@@ -774,7 +792,10 @@ const GroupAttendeesPage = () => {
                   Export All CSV
                 </button>
                 <button 
-                  onClick={() => setShowCreateGroupModal(true)}
+                  onClick={() => {
+                    setShowCreateGroupModal(true);
+                    setValueGroup('selectedUsers', selectedUsers);
+                  }}
                   className="w-full px-4 py-2 bg-[#F97316] text-white rounded-lg text-sm font-medium hover:bg-[#EA580C]"
                 >
                   Create Group
@@ -908,8 +929,7 @@ const GroupAttendeesPage = () => {
               <button 
                 onClick={() => {
                   setShowCreateGroupModal(false);
-                  setGroupName('');
-                  setSelectedDinnerForGroup('');
+                  resetGroup();
                   setSelectedRestaurant('');
                   setError('');
                 }}
@@ -928,30 +948,38 @@ const GroupAttendeesPage = () => {
                 </label>
                 <input
                   type="text"
-                  value={groupName}
-                  onChange={(e) => setGroupName(e.target.value)}
+                  {...registerGroup('groupName')}
                   placeholder="e.g., Group 01"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 ${errorsGroup.groupName ? 'border-red-500' : 'border-gray-300'}`}
                 />
+                {errorsGroup.groupName && <p className="text-red-500 text-xs mt-1">{errorsGroup.groupName.message}</p>}
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Select Dinner <span className="text-red-500">*</span>
                 </label>
-                <CustomDropdown
-                  value={selectedDinnerForGroup}
-                  onChange={(e) => setSelectedDinnerForGroup(e.target.value)}
-                  options={[
-                    { value: '', label: 'Select a dinner' },
-                    ...dinners.map(dinner => ({
-                      value: dinner.id,
-                      label: `${dinner.title} - ${new Date(dinner.date).toLocaleDateString()}`,
-                    })),
-                  ]}
-                  placeholder="Select a dinner"
-                  required
+                <Controller
+                  name="selectedDinnerForGroup"
+                  control={controlGroup}
+                  render={({ field }) => (
+                    <CustomDropdown
+                      value={field.value}
+                      onChange={(e) => field.onChange(e.target.value)}
+                      options={[
+                        { value: '', label: 'Select a dinner' },
+                        ...dinners.map(dinner => ({
+                          value: dinner.id,
+                          label: `${dinner.title} - ${new Date(dinner.date).toLocaleDateString()}`,
+                        })),
+                      ]}
+                      placeholder="Select a dinner"
+                      required
+                      className={errorsGroup.selectedDinnerForGroup ? 'border-red-500' : ''}
+                    />
+                  )}
                 />
+                {errorsGroup.selectedDinnerForGroup && <p className="text-red-500 text-xs mt-1">{errorsGroup.selectedDinnerForGroup.message}</p>}
               </div>
 
               <div>
@@ -974,33 +1002,39 @@ const GroupAttendeesPage = () => {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Selected Users
+                  Selected Users <span className="text-red-500">*</span>
                 </label>
-                <div className="bg-gray-50 rounded-lg p-3 max-h-48 overflow-y-auto">
+                {/* Hidden input to register selectedUsers array for validation */}
+                <input type="hidden" {...registerGroup('selectedUsers')} />
+                <div className={`bg-gray-50 rounded-lg p-3 max-h-48 overflow-y-auto ${errorsGroup.selectedUsers ? 'border border-red-500' : ''}`}>
                   {selectedUsers.length === 0 ? (
                     <p className="text-sm text-gray-500">No users selected</p>
                   ) : (
                     <ul className="space-y-1">
                       {selectedUsers.map(userId => {
                         const request = dinnerRequests.find(r => r.user.id === userId);
-                        const user = request?.user;
+                        // If coming from existing groups list or searched users not in requests, might need user fetch or store user info.
+                        // Assuming dinnerRequests contains all eligible users for now or fetching logic is separate.
+                        const user = request?.user; 
+                        // Fallback display if user not found in current list (e.g. pagination) - might be just ID if not found
+                        const displayName = user ? `${user.first_name} ${user.last_name} (${user.email})` : `User ID: ${userId}`;
                         return (
                           <li key={userId} className="text-sm text-gray-700">
-                            • {user?.first_name} {user?.last_name} ({user?.email})
+                            • {displayName}
                           </li>
                         );
                       })}
                     </ul>
                   )}
                 </div>
+                {errorsGroup.selectedUsers && <p className="text-red-500 text-xs mt-1">{errorsGroup.selectedUsers.message}</p>}
               </div>
 
               <div className="flex gap-3 pt-4">
                 <button
                   onClick={() => {
                     setShowCreateGroupModal(false);
-                    setGroupName('');
-                    setSelectedDinnerForGroup('');
+                    resetGroup();
                     setSelectedRestaurant('');
                     setError('');
                   }}
@@ -1009,8 +1043,8 @@ const GroupAttendeesPage = () => {
                   Cancel
                 </button>
                 <button
-                  onClick={handleCreateGroup}
-                  disabled={loading || !groupName.trim() || !selectedDinnerForGroup || selectedUsers.length === 0}
+                  onClick={handleSubmitGroup(handleCreateGroup)}
+                  disabled={loading}
                   className="flex-1 px-4 py-2 bg-[#F97316] text-white rounded-lg hover:bg-[#EA580C] disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {loading ? 'Creating...' : 'Create Group'}

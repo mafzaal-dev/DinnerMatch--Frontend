@@ -1,26 +1,25 @@
 "use client";
 
-import React, { useState } from 'react';
+import React from 'react';
 import { useRouter } from 'next/navigation';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { adminLoginSchema } from '@/constants/validationSchemas';
 
 const AdminLoginPage = ({ onLogin, isLoading, error }) => {
   const router = useRouter();
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(adminLoginSchema),
   });
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    
+  const onSubmit = (data) => {
     // Handle admin login logic here
     if (onLogin) {
-      onLogin(formData);
+      onLogin(data);
     }
   };
 
@@ -56,7 +55,7 @@ const AdminLoginPage = ({ onLogin, isLoading, error }) => {
         )}
 
         {/* Form */}
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+        <form onSubmit={handleSubmit(onSubmit)} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
           {/* Email Field */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             <label 
@@ -69,21 +68,21 @@ const AdminLoginPage = ({ onLogin, isLoading, error }) => {
             <input
               type="email"
               id="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
+              {...register('email')}
               placeholder="Write here"
-              className="w-full bg-white border rounded-lg focus:outline-none focus:border-[#F97316] transition-colors"
+              className={`w-full bg-white border rounded-lg focus:outline-none focus:border-[#F97316] transition-colors ${errors.email ? 'border-red-500' : ''}`}
               style={{
-                borderColor: '#EEEEEE',
+                borderColor: errors.email ? '#EF4444' : '#EEEEEE',
                 height: '48px',
                 padding: '0 16px',
                 fontSize: '11px',
                 color: '#212121',
               }}
-              required
               disabled={isLoading}
             />
+            {errors.email && (
+              <span className="text-red-500" style={{ fontSize: '10px' }}>{errors.email.message}</span>
+            )}
           </div>
 
           {/* Password Field */}
@@ -98,21 +97,21 @@ const AdminLoginPage = ({ onLogin, isLoading, error }) => {
             <input
               type="password"
               id="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
+              {...register('password')}
               placeholder="Write here"
-              className="w-full bg-white border rounded-lg focus:outline-none focus:border-[#F97316] transition-colors"
+              className={`w-full bg-white border rounded-lg focus:outline-none focus:border-[#F97316] transition-colors ${errors.password ? 'border-red-500' : ''}`}
               style={{
-                borderColor: '#EEEEEE',
+                borderColor: errors.password ? '#EF4444' : '#EEEEEE',
                 height: '48px',
                 padding: '0 16px',
                 fontSize: '11px',
                 color: '#212121',
               }}
-              required
               disabled={isLoading}
             />
+            {errors.password && (
+              <span className="text-red-500" style={{ fontSize: '10px' }}>{errors.password.message}</span>
+            )}
           </div>
 
           {/* Submit Button */}
