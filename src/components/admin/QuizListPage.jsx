@@ -21,6 +21,25 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
+// Helper function to format display text
+const formatDisplayText = (text) => {
+  if (!text) return '';
+  return text.charAt(0).toUpperCase() + text.slice(1);
+};
+
+// Helper function to format answer type for display
+const formatAnswerType = (type) => {
+  if (!type) return '';
+  
+  // Check if it starts with "scale"
+  if (type.toLowerCase().startsWith('scale')) {
+    return 'Range';
+  }
+  
+  // Capitalize first letter for other types
+  return type.charAt(0).toUpperCase() + type.slice(1);
+};
+
 const SortableRow = ({ question, handleViewQuestion, handleEditQuestion, handleDeleteClick, handleToggleActive }) => {
   const {
     attributes,
@@ -63,13 +82,13 @@ const SortableRow = ({ question, handleViewQuestion, handleEditQuestion, handleD
         {question.code}
       </td>
       <td className="px-6 py-4 text-sm text-[#6B7280] max-w-md truncate">
-        {question.text}
+        {formatDisplayText(question.text)}
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-sm text-[#6B7280]">
-        {question.section}
+        {formatDisplayText(question.section)}
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-sm text-[#6B7280]">
-        {question.answer_type}
+        {formatAnswerType(question.answer_type)}
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
         <span
@@ -162,9 +181,9 @@ const QuizListPage = () => {
     fetchQuestions();
   }, []);
 
-  const fetchQuestions = async () => {
+  const fetchQuestions = async (query = '') => {
     try {
-      const data = await getQuestions();
+      const data = await getQuestions(query);
       // Sort by sort_order if available
       const sortedData = [...data].sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
       setQuestions(sortedData);
@@ -177,17 +196,24 @@ const QuizListPage = () => {
   // Debounced search function
   const debouncedSearch = useCallback(
     debounce((query) => {
-      if (isValidSearchQuery(query) || query.length === 0) {
         setCurrentPage(0); // Reset to first page on new search
-      }
+        fetchQuestions(query);
     }, 500),
     [] // eslint-disable-line react-hooks/exhaustive-deps
   );
 
   const handleSearchChange = (e) => {
     const value = e.target.value;
+    const wasValidSearch = searchQuery.length >= 3;
+    const isValidSearch = value.length >= 3;
+    
     setSearchQuery(value);
-    debouncedSearch(value);
+    
+    if (isValidSearch) {
+      debouncedSearch(value);
+    } else if (wasValidSearch && !isValidSearch) {
+      debouncedSearch('');
+    }
   };
 
   const handleDragEnd = async (event) => {
@@ -233,13 +259,9 @@ const QuizListPage = () => {
 
   const filteredQuestions = questions
     .filter(q => {
-      // Only apply search if query is valid (3+ chars) or empty
-      const matchesSearch = !searchQuery || searchQuery.length < 3 || 
-                          q.text?.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          q.code?.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesSection = !filterSection || q.section === filterSection;
       const matchesType = !filterType || q.answer_type === filterType;
-      return matchesSearch && matchesSection && matchesType;
+      return matchesSection && matchesType;
     });
   
   // Disable DnD when searching or filtering
@@ -336,7 +358,7 @@ const QuizListPage = () => {
             </div>
             
             {/* Filters */}
-            <div className="flex flex-col gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               <CustomDropdown
                 value={filterSection}
                 onChange={(e) => {

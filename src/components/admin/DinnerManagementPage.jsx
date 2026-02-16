@@ -24,16 +24,18 @@ const DinnerManagementPage = () => {
   const [dinnerToDelete, setDinnerToDelete] = useState(null);
 
   // Fetch dinners from API
-  const fetchDinners = async () => {
+  const fetchDinners = async (query = null) => {
     try {
       const params = {
         index: currentPage,
         offset: pageSize,
       };
       
+      const term = query !== null ? query : searchQuery;
+
       // Only add search if valid (3+ characters)
-      if (isValidSearchQuery(searchQuery)) {
-        params.search = searchQuery;
+      if (isValidSearchQuery(term)) {
+        params.search = term;
       }
       
       if (startDate) {
@@ -65,13 +67,16 @@ const DinnerManagementPage = () => {
     }
   };
 
+  const fetchDinnersRef = React.useRef(fetchDinners);
+  React.useEffect(() => {
+    fetchDinnersRef.current = fetchDinners;
+  });
+
   // Debounced search function
   const debouncedSearch = useCallback(
     debounce((query) => {
-      if (isValidSearchQuery(query) || query.length === 0) {
         setCurrentPage(0);
-        fetchDinners();
-      }
+        fetchDinnersRef.current(query);
     }, 500),
     [] // eslint-disable-line react-hooks/exhaustive-deps
   );
@@ -82,8 +87,16 @@ const DinnerManagementPage = () => {
 
   const handleSearchChange = (e) => {
     const value = e.target.value;
+    const wasValidSearch = searchQuery.length >= 3;
+    const isValidSearch = value.length >= 3;
+    
     setSearchQuery(value);
-    debouncedSearch(value);
+    
+    if (isValidSearch) {
+      debouncedSearch(value);
+    } else if (wasValidSearch && !isValidSearch) {
+      debouncedSearch('');
+    }
   };
 
   // Handle Create Dinner - Navigate to create page
@@ -173,7 +186,7 @@ const DinnerManagementPage = () => {
             </div>
 
             {/* Filters */}
-            <div className="flex flex-col gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               <CustomDropdown
                 value={filterLocation}
                 onChange={(e) => setFilterLocation(e.target.value)}

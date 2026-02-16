@@ -5,11 +5,15 @@ export const useQuiz = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const getQuestions = useCallback(async () => {
+  const getQuestions = useCallback(async (search = '') => {
     setLoading(true);
     setError(null);
     try {
-      const response = await api.get(API_ENDPOINTS.QUIZ_QUESTIONS_LIST);
+      const params = new URLSearchParams();
+      if (search) params.append('search', search);
+
+      const endpoint = `${API_ENDPOINTS.QUIZ_QUESTIONS_LIST}?${params.toString()}`;
+      const response = await api.get(endpoint);
       if (response.success) {
         return response.data;
       }

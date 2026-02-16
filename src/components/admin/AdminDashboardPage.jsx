@@ -66,11 +66,18 @@ const AdminDashboardPage = () => {
 
   const handleSearchChange = (e) => {
     const value = e.target.value;
+    const isDeleting = value.length < searchQuery.length;
+    const wasValidSearch = searchQuery.length >= 3;
+    const isValidSearch = value.length >= 3;
+    
     setSearchQuery(value);
     
     // Trigger search on type (debounced)
-    if (value.length === 0 || value.length >= 3) {
+    if (isValidSearch) {
       debouncedFetchUsers(value);
+    } else if (wasValidSearch && !isValidSearch) {
+      // Reset if we just went below the threshold
+      debouncedFetchUsers('');
     }
   };
 
@@ -112,17 +119,17 @@ const AdminDashboardPage = () => {
 
         {/* Search and Filters */}
         <div className="bg-white rounded-xl shadow-sm border border-[#E5E7EB] p-5 mb-5">
-          <div className="flex flex-col gap-3 mb-4">
+          <div className="flex flex-col sm:flex-row gap-3 mb-4">
             <input
               type="text"
               placeholder="Search by name, email or mobile (min 3 characters)"
               value={searchQuery}
               onChange={handleSearchChange}
-              className="w-full px-4 py-2.5 border border-[#D1D5DB] rounded-lg text-sm text-[#111827] placeholder-[#9CA3AF] focus:outline-none focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316] transition-colors"
+              className="flex-1 px-4 py-2.5 border border-[#D1D5DB] rounded-lg text-sm text-[#111827] placeholder-[#9CA3AF] focus:outline-none focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316] transition-colors"
             />
             <button
               onClick={handleExportCSV}
-              className="w-full px-5 py-2.5 bg-white border border-[#D1D5DB] text-[#374151] rounded-lg text-sm font-medium hover:bg-[#F9FAFB] transition-colors flex items-center gap-2 justify-center"
+              className="w-full sm:w-auto px-5 py-2.5 bg-white border border-[#D1D5DB] text-[#374151] rounded-lg text-sm font-medium hover:bg-[#F9FAFB] transition-colors flex items-center gap-2 justify-center whitespace-nowrap"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -132,7 +139,7 @@ const AdminDashboardPage = () => {
           </div>
 
           {/* Filter Dropdowns */}
-          <div className="flex flex-col gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
             <CustomDropdown
               value={selectedSignupTime}
               onChange={(e) => setSelectedSignupTime(e.target.value)}

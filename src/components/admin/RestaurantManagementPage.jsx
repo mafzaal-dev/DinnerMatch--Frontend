@@ -22,16 +22,18 @@ const RestaurantManagementPage = () => {
   const [filterLocation, setFilterLocation] = useState('');
 
   // Fetch restaurants from API
-  const fetchRestaurants = async () => {
+  const fetchRestaurants = async (query = null) => {
     try {
       const params = {
         index: currentPage,
         offset: pageSize,
       };
       
+      const term = query !== null ? query : searchQuery;
+
       // Only add search if valid (3+ characters)
-      if (isValidSearchQuery(searchQuery)) {
-        params.search = searchQuery;
+      if (isValidSearchQuery(term)) {
+        params.search = term;
       }
       
       if (filterRating) {
@@ -53,13 +55,16 @@ const RestaurantManagementPage = () => {
     }
   };
 
+  const fetchRestaurantsRef = React.useRef(fetchRestaurants);
+  React.useEffect(() => {
+    fetchRestaurantsRef.current = fetchRestaurants;
+  });
+
   // Debounced search function
   const debouncedSearch = useCallback(
     debounce((query) => {
-      if (isValidSearchQuery(query) || query.length === 0) {
         setCurrentPage(0);
-        fetchRestaurants();
-      }
+        fetchRestaurantsRef.current(query);
     }, 500),
     [] // eslint-disable-line react-hooks/exhaustive-deps
   );
@@ -70,8 +75,16 @@ const RestaurantManagementPage = () => {
 
   const handleSearchChange = (e) => {
     const value = e.target.value;
+    const wasValidSearch = searchQuery.length >= 3;
+    const isValidSearch = value.length >= 3;
+    
     setSearchQuery(value);
-    debouncedSearch(value);
+    
+    if (isValidSearch) {
+      debouncedSearch(value);
+    } else if (wasValidSearch && !isValidSearch) {
+      debouncedSearch('');
+    }
   };
 
   // Handle Create Restaurant - Navigate to create page
@@ -147,7 +160,7 @@ const RestaurantManagementPage = () => {
             </div>
 
             {/* Filters */}
-            <div className="flex flex-col sm:flex-row items-stretch gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
               <div className="flex-1">
                 <label className="block text-xs text-[#6B7280] mb-1">Rating</label>
                 <CustomDropdown
@@ -202,7 +215,7 @@ const RestaurantManagementPage = () => {
                       setFilterBudget('');
                       setFilterLocation('');
                     }}
-                    className="w-full sm:w-auto px-3 py-2 text-sm text-[#6B7280] hover:text-[#374151] hover:bg-gray-50 rounded-lg transition-colors whitespace-nowrap"
+                    className="w-full px-3 py-2 text-sm text-[#6B7280] hover:text-[#374151] hover:bg-gray-50 rounded-lg transition-colors whitespace-nowrap"
                   >
                     Clear Filters
                   </button>

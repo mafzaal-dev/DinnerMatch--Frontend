@@ -75,10 +75,10 @@ const GroupAttendeesPage = () => {
   }, []);
 
   useEffect(() => {
-    if (selectedDinner && activeTab === 'users') {
+    if (selectedDinner) {
       fetchDinnerRequests();
     }
-  }, [selectedDinner, activeTab, requestsPage, searchQuery, filterRequestCity, filterRequestDinner, filterRequestDateFrom, filterRequestDateTo]); // eslint-disable-line
+  }, [selectedDinner, requestsPage, filterRequestCity, filterRequestDinner, filterRequestDateFrom, filterRequestDateTo]); // eslint-disable-line
 
   useEffect(() => {
     if (activeTab === 'groups') {
@@ -98,28 +98,41 @@ const GroupAttendeesPage = () => {
       setHasMoreGroups(true);
       fetchGroups(false);
     }
-  }, [searchQuery, filterCity, filterDinner, filterDateFrom, filterDateTo]); // eslint-disable-line
+  }, [filterCity, filterDinner, filterDateFrom, filterDateTo]); // eslint-disable-line
+
+  const fetchGroupsRef = useRef(null);
+  const fetchDinnerRequestsRef = useRef(null);
 
   // Debounced search for both tabs
   const debouncedSearch = useCallback(
     debounce((query) => {
-      if (isValidSearchQuery(query) || query.length === 0) {
         if (activeTab === 'groups') {
           setGroupsPage(0);
           setGroups([]);
           setHasMoreGroups(true);
+          // fetchGroups is async, but we don't await here.
+          // passing query to ensure latest is used
+          if (fetchGroupsRef.current) fetchGroupsRef.current(false, query);
         } else {
           setRequestsPage(0);
+          if (fetchDinnerRequestsRef.current) fetchDinnerRequestsRef.current(query);
         }
-      }
     }, 500),
     [activeTab] // eslint-disable-line react-hooks/exhaustive-deps
   );
 
   const handleSearchChange = (e) => {
     const value = e.target.value;
+    const wasValidSearch = searchQuery.length >= 3;
+    const isValidSearch = value.length >= 3;
+    
     setSearchQuery(value);
-    debouncedSearch(value);
+    
+    if (isValidSearch) {
+      debouncedSearch(value);
+    } else if (wasValidSearch && !isValidSearch) {
+      debouncedSearch('');
+    }
   };
 
   const fetchDinners = async () => {
@@ -147,9 +160,10 @@ const GroupAttendeesPage = () => {
     }
   };
 
-  const fetchDinnerRequests = async () => {
+  const fetchDinnerRequests = async (query = null) => {
     try {
-      setLoading(true);
+      const isBackground = activeTab !== 'users';
+      if (!isBackground) setLoading(true);
       setError('');
       
       const params = new URLSearchParams();
@@ -157,9 +171,11 @@ const GroupAttendeesPage = () => {
       params.append('offset', requestsPageSize);
       if (selectedDinner) params.append('dinner_id', selectedDinner);
       
+      const term = query !== null ? query : searchQuery;
+
       // Only add search if valid (3+ characters)
-      if (isValidSearchQuery(searchQuery)) {
-        params.append('search', searchQuery);
+      if (isValidSearchQuery(term)) {
+        params.append('search', term);
       }
       if (filterRequestCity) params.append('city', filterRequestCity);
       if (filterRequestDinner) params.append('dinner', filterRequestDinner);
@@ -176,11 +192,12 @@ const GroupAttendeesPage = () => {
       console.error('Error fetching dinner requests:', err);
       setError('Failed to load dinner requests');
     } finally {
-      setLoading(false);
+      const isBackground = activeTab !== 'users';
+      if (!isBackground) setLoading(false);
     }
   };
 
-  const fetchGroups = async (isLoadMore = false) => {
+  const fetchGroups = async (isLoadMore = false, query = null) => {
     try {
       if (isLoadMore) {
         setIsLoadingMore(true);
@@ -192,9 +209,11 @@ const GroupAttendeesPage = () => {
       params.append('index', groupsPage);
       params.append('offset', groupsPageSize);
       
+      const term = query !== null ? query : searchQuery;
+
       // Only add search if valid (3+ characters)
-      if (isValidSearchQuery(searchQuery)) {
-        params.append('search', searchQuery);
+      if (isValidSearchQuery(term)) {
+        params.append('search', term);
       }
       if (filterCity) params.append('city', filterCity);
       if (filterDinner) params.append('dinner', filterDinner);
@@ -225,6 +244,11 @@ const GroupAttendeesPage = () => {
       setIsLoadingMore(false);
     }
   };
+
+  useEffect(() => {
+    fetchGroupsRef.current = fetchGroups;
+    fetchDinnerRequestsRef.current = fetchDinnerRequests;
+  });
 
   const handleSelectUser = (userId, checked) => {
     if (checked) {
@@ -576,7 +600,7 @@ const GroupAttendeesPage = () => {
                   const isSelected = selectedUsers.includes(user.id);
 
                   return (
-                    <tr key={user.id} className="hover:bg-[#F9FAFB] transition-colors">
+                    <tr key={`${user.id}-${item.id || index}`} className="hover:bg-[#F9FAFB] transition-colors">
                       <td className="px-4 py-3">
                         <input 
                           type="checkbox" 
@@ -692,7 +716,7 @@ const GroupAttendeesPage = () => {
             <h1 className="text-xl font-bold text-[#111827]">Group & Attendees Management</h1>
             <p className="text-sm text-[#6B7280] mt-1">Manage dinner requests and create groups</p>
           </div>
-          <div className="flex flex-col gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {activeTab === 'users' ? (
               <>
                 <CustomDropdown
@@ -780,14 +804,14 @@ const GroupAttendeesPage = () => {
                 : 'bg-transparent text-[#6B7280] hover:bg-gray-100'
             }`}
           >
-            Dinner Requests ({dinnerRequests.length})
+            Dinner Requests ({requestsTotal})
           </button>
         </div>
       </div>
 
       {/* Filters Section */}
       <div className="bg-white px-4 sm:px-6 lg:px-8 py-4 border-b border-[#E5E7EB] flex-shrink-0">
-        <div className="flex flex-col gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           <CustomDropdown
             value={activeTab === 'groups' ? filterCity : filterRequestCity}
             onChange={(e) => activeTab === 'groups' ? setFilterCity(e.target.value) : setFilterRequestCity(e.target.value)}
@@ -1169,7 +1193,7 @@ const GroupAttendeesPage = () => {
                     setShowViewProfile(false);
                     setSelectedProfile(null);
                   }}
-                  className="w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
+                  className="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
                 >
                   Close
                 </button>

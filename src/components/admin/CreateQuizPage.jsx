@@ -217,26 +217,28 @@ const CreateQuizPage = ({ quizId = null, isEdit = false }) => {
     }
     
     try {
-      // Prepare options payload
-      const formattedOptions = options.map((opt, index) => {
-          const optionPayload = {
-              value: opt.value || opt.label, // Use label if value is empty
-              label: opt.label,
-              sort_order: index + 1
-          };
-          // Include ID only if it's not a temp ID
-          if (opt.id && !String(opt.id).startsWith('temp-')) {
-              optionPayload.id = opt.id;
-          }
-          return optionPayload;
-      }).filter(opt => opt.label); // Ensure we don't send empty options
+      let formattedOptions = [];
+      
+      if (formData.answer_type === 'choice') {
+        formattedOptions = options.map((opt, index) => {
+            const optionPayload = {
+                value: opt.value || opt.label, // Use label if value is empty
+                label: opt.label,
+                sort_order: index + 1
+            };
+            if (opt.id && !String(opt.id).startsWith('temp-')) {
+                optionPayload.id = opt.id;
+            }
+            return optionPayload;
+        }).filter(opt => opt.label); //
+      }
 
       const payload = {
         ...formData,
         min_value: formData.min_value ? parseInt(formData.min_value) : null,
         max_value: formData.max_value ? parseInt(formData.max_value) : null,
         sort_order: parseInt(formData.sort_order),
-        options: formattedOptions
+        ...(formData.answer_type === 'choice' && { options: formattedOptions })
       };
 
       if (isEdit && quizId) {
@@ -403,8 +405,7 @@ const CreateQuizPage = ({ quizId = null, isEdit = false }) => {
                       <p className="mt-1 text-xs text-[#6B7280]">{formData.text.length}/150 characters</p>
                     </div>
 
-                    {/* No. of Options - Editable */}
-                    {(formData.answer_type === 'choice' || formData.answer_type === 'boolean') && (
+                    {formData.answer_type === 'choice' && (
                         <div className="w-full md:w-48">
                             <label className="block text-sm font-medium text-[#374151] mb-2">No. of Options</label>
                             <input
@@ -448,8 +449,7 @@ const CreateQuizPage = ({ quizId = null, isEdit = false }) => {
                     </div>
                 </div> */}
 
-                {/* Options Inputs with DnD */}
-                {(formData.answer_type === 'choice' || formData.answer_type === 'boolean') && (
+                {formData.answer_type === 'choice' && (
                     <div className="space-y-2">
                         <DndContext 
                             sensors={sensors}
@@ -523,7 +523,7 @@ const CreateQuizPage = ({ quizId = null, isEdit = false }) => {
                 )}
 
                 <div className="flex justify-between items-center mt-6">
-                    {(formData.answer_type === 'choice' || formData.answer_type === 'boolean') && (
+                    {formData.answer_type === 'choice' && (
                         <button 
                             type="button"
                             onClick={handleAddNewOption}
