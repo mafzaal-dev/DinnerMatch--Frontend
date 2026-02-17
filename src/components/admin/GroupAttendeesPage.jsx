@@ -446,124 +446,131 @@ const GroupAttendeesPage = () => {
     );
   };
 
-  // Groups Table Component with Infinity Scroll
+  // Groups List Component (Cards)
   const GroupsTable = () => {
     return (
-      <div className="bg-white rounded-xl shadow-sm border border-[#E5E7EB] overflow-hidden">
-        <div className="overflow-x-auto max-h-[calc(100vh-300px)] overflow-y-auto">
-          <table className="w-full min-w-max">
-            <thead className="bg-[#F9FAFB] border-b border-[#E5E7EB] sticky top-0">
-              <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-[#6B7280] uppercase tracking-wide">Group Name</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-[#6B7280] uppercase tracking-wide">Dinner</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-[#6B7280] uppercase tracking-wide">Restaurant</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-[#6B7280] uppercase tracking-wide">Members</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-[#6B7280] uppercase tracking-wide">Area</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-[#6B7280] uppercase tracking-wide">Booked</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-[#6B7280] uppercase tracking-wide">Status</th>
-                <th className="px-4 py-3 text-right text-xs font-medium text-[#6B7280] uppercase tracking-wide">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[#F3F4F6]">
-              {groups.length === 0 && !loading ? (
-                <tr>
-                  <td colSpan="8" className="px-4 py-8 text-center text-sm text-[#6B7280]">
-                    No groups found
-                  </td>
-                </tr>
-              ) : (
-                <>
-                  {groups.map((group, index) => {
-                    const isLastElement = groups.length === index + 1;
-                    return (
-                      <tr 
-                        key={group.id} 
-                        ref={isLastElement ? lastGroupElementRef : null}
-                        className="hover:bg-[#F9FAFB] transition-colors"
-                      >
-                        <td className="px-4 py-3.5 whitespace-nowrap text-sm text-[#111827] font-medium">
-                          {formatDisplayValue(group.name)}
-                        </td>
-                        <td className="px-4 py-3.5 whitespace-nowrap text-sm text-[#6B7280]">
-                          {formatDisplayValue(group.dinner?.title)}
-                        </td>
-                        <td className="px-4 py-3.5 whitespace-nowrap text-sm text-[#6B7280]">
-                          {group.restaurant?.name ? capitalizeWords(group.restaurant.name) : 'Not assigned'}
-                        </td>
-                        <td className="px-4 py-3.5 whitespace-nowrap text-sm text-[#6B7280]">
-                          {group.total_members || group.members?.length || 0}
-                        </td>
-                        <td className="px-4 py-3.5 whitespace-nowrap text-sm text-[#6B7280]">
-                          {formatDisplayValue(group.dinner?.location)}
-                        </td>
-                        <td className="px-4 py-3.5 whitespace-nowrap">
-                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium ${
-                            group.is_booked 
-                              ? 'bg-green-100 text-green-800'
-                              : 'bg-gray-100 text-gray-800'
-                          }`}>
-                            {group.is_booked ? 'Yes' : 'No'}
-                          </span>
-                        </td>
-                        <td className="px-4 py-3.5 whitespace-nowrap">
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium bg-yellow-100 text-yellow-800">
-                            {capitalizeWords(group.status || 'Not Responded')}
-                          </span>
-                        </td>
-                        <td className="px-4 py-3.5 whitespace-nowrap text-right">
-                          <div className="flex items-center justify-end gap-2">
-                            {!group.is_booked && (
-                              <button
-                                onClick={() => {
-                                  setSelectedGroup(group);
-                                  setShowMakeBookingModal(true);
-                                }}
-                                className="px-3 py-1.5 bg-[#F97316] text-white rounded text-xs font-medium hover:bg-[#EA580C] transition-colors"
-                              >
-                                Make Booking
-                              </button>
-                            )}
-                            <button
-                              onClick={() => {
-                                setSelectedGroup(group);
-                                setShowDeleteConfirm(true);
-                              }}
-                              className="p-1.5 text-red-600 hover:bg-red-50 rounded transition-colors"
-                            >
-                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                              </svg>
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                  {isLoadingMore && (
-                    <tr>
-                      <td colSpan="8" className="px-4 py-4 text-center text-sm text-[#6B7280]">
-                        <div className="flex items-center justify-center">
-                          <svg className="animate-spin h-5 w-5 text-[#F97316]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                          </svg>
-                          <span className="ml-2">Loading more...</span>
+      <div className="space-y-6">
+        {groups.length === 0 && !loading ? (
+          <div className="text-center py-12 bg-white rounded-xl border border-[#E5E7EB]">
+            <p className="text-sm text-[#6B7280]">No groups found</p>
+          </div>
+        ) : (
+          <>
+            {groups.map((group, index) => {
+              const isLastElement = groups.length === index + 1;
+              const members = group.members || [];
+              
+              // Calculate stats if needed (e.g. 3F/2M)
+              const femaleCount = members.filter(m => m.profile?.gender === 'Female' || m.profile?.gender === 'F').length;
+              const maleCount = members.filter(m => m.profile?.gender === 'Male' || m.profile?.gender === 'M').length;
+              
+              return (
+                <div 
+                  key={group.id} 
+                  ref={isLastElement ? lastGroupElementRef : null}
+                  className="bg-white rounded-xl shadow-sm border border-[#E5E7EB] overflow-hidden"
+                >
+                  {/* Group Header */}
+                  <div className="px-6 py-5 border-b border-[#E5E7EB] flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 bg-[#FFF7ED] rounded-lg flex items-center justify-center text-[#F97316]">
+                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                      </div>
+                      <div>
+                        <h3 className="text-base font-bold text-[#111827]">{group.name}</h3>
+                        <div className="flex items-center gap-2 text-sm text-[#6B7280] mt-0.5">
+                          <span>{members.length} peoples</span>
+                          <span>•</span>
+                          <span>{femaleCount}F/{maleCount}M</span>
+                          {/* Age range could be calculated if ages available */}
+                          {/* <span>•</span>
+                          <span>Age 25-32</span> */}
                         </div>
-                      </td>
-                    </tr>
-                  )}
-                </>
-              )}
-            </tbody>
-          </table>
-        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <button
+                        onClick={() => {
+                            setSelectedGroup(group);
+                            setShowDeleteConfirm(true);
+                        }}
+                        className="text-[#EF4444] text-sm font-medium hover:text-[#DC2626] transition-colors"
+                      >
+                        Delete Group
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Members Table */}
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead className="bg-[#F9FAFB] border-b border-[#E5E7EB]">
+                        <tr>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-[#6B7280] uppercase tracking-wide w-10">
+                            {/* Icon/Handle */}
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-[#6B7280] uppercase tracking-wide">
+                            Name
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-[#6B7280] uppercase tracking-wide">
+                            Email
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-[#6B7280] uppercase tracking-wide">
+                            Gender
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-[#F3F4F6]">
+                        {members.length === 0 ? (
+                          <tr>
+                            <td colSpan="4" className="px-6 py-4 text-center text-sm text-[#6B7280]">
+                              No members in this group
+                            </td>
+                          </tr>
+                        ) : (
+                          members.map((member) => (
+                            <tr key={member.id} className="hover:bg-[#F9FAFB] transition-colors">
+                              <td className="px-6 py-4 text-[#9CA3AF]">
+                                <svg className="w-4 h-4 cursor-move" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8h16M4 16h16" />
+                                </svg>
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-[#111827]">
+                                {formatDisplayValue(`${member.first_name || ''} ${member.last_name || ''}`.trim())}
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm text-[#6B7280]">
+                                {formatDisplayValue(member.email)}
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <GenderBadge gender={member.profile?.gender} />
+                              </td>
+                            </tr>
+                          ))
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              );
+            })}
+            {isLoadingMore && (
+              <div className="flex justify-center items-center py-4">
+                <svg className="animate-spin h-5 w-5 text-[#F97316]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span className="ml-2 text-sm text-[#6B7280]">Loading more...</span>
+              </div>
+            )}
+          </>
+        )}
         
         {/* Showing count */}
         {groups.length > 0 && (
-          <div className="px-6 py-4 border-t border-[#E5E7EB]">
-            <div className="text-sm text-[#6B7280]">
-              Showing {groups.length} of {groupsTotal} groups {hasMoreGroups && '(scroll for more)'}
-            </div>
+          <div className="text-center py-4 text-sm text-[#6B7280]">
+            Showing {groups.length} of {groupsTotal} groups {hasMoreGroups && '(scroll for more)'}
           </div>
         )}
       </div>
@@ -580,110 +587,88 @@ const GroupAttendeesPage = () => {
           <table className="w-full min-w-max">
             <thead className="bg-[#F9FAFB] border-b border-[#E5E7EB]">
               <tr>
-                <th className="px-4 py-3 w-10">
+                <th className="px-6 py-3 w-10">
                   <input 
                     type="checkbox" 
-                    className="rounded border-gray-300 text-orange-500 focus:ring-orange-500"
+                    className="rounded border-gray-300 text-orange-500 focus:ring-orange-500 h-4 w-4"
                     checked={allSelected}
                     onChange={(e) => handleSelectAll(e.target.checked)}
                   />
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-[#6B7280] uppercase tracking-wide">Name</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-[#6B7280] uppercase tracking-wide">Email</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-[#6B7280] uppercase tracking-wide">Gender</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-[#6B7280] uppercase tracking-wide">Age</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-[#6B7280] uppercase tracking-wide">Area</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-[#6B7280] uppercase tracking-wide">Language</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-[#6B7280] uppercase tracking-wide">Meal Pref.</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-[#6B7280] uppercase tracking-wide">Budget</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-[#6B7280] uppercase tracking-wide">Status</th>
-                <th className="px-4 py-3 text-right text-xs font-medium text-[#6B7280] uppercase tracking-wide">Actions</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-[#6B7280] uppercase tracking-wide">Name</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-[#6B7280] uppercase tracking-wide">Email</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-[#6B7280] uppercase tracking-wide">Gender</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-[#6B7280] uppercase tracking-wide">Age</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-[#6B7280] uppercase tracking-wide">Area</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-[#6B7280] uppercase tracking-wide">Language</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-[#6B7280] uppercase tracking-wide">Nationality</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-[#6B7280] uppercase tracking-wide">Meal Pref.</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-[#6B7280] uppercase tracking-wide">Budget</th>
+                <th className="px-6 py-3 text-right text-xs font-semibold text-[#6B7280] uppercase tracking-wide">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[#F3F4F6]">
               {dinnerRequests.length === 0 ? (
                 <tr>
-                  <td colSpan="11" className="px-4 py-8 text-center text-sm text-[#6B7280]">
-                    No dinner requests found
+                  <td colSpan="11" className="px-6 py-8 text-center text-sm text-[#6B7280]">
+                    No requests found
                   </td>
                 </tr>
               ) : (
-                dinnerRequests.map((item) => {
+                dinnerRequests.map((item, index) => {
                   const user = item.user;
                   const profile = user.profile || {};
                   const isSelected = selectedUsers.includes(user.id);
 
                   return (
                     <tr key={`${user.id}-${item.id || index}`} className="hover:bg-[#F9FAFB] transition-colors">
-                      <td className="px-4 py-3">
+                      <td className="px-6 py-4">
                         <input 
                           type="checkbox" 
-                          className="rounded border-gray-300 text-orange-500 focus:ring-orange-500"
+                          className="rounded border-gray-300 text-orange-500 focus:ring-orange-500 h-4 w-4"
                           checked={isSelected}
                           onChange={(e) => handleSelectUser(user.id, e.target.checked)}
                         />
                       </td>
-                      <td className="px-4 py-3.5 whitespace-nowrap text-sm text-[#111827]">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-[#111827]">
                         {formatDisplayValue(user.first_name || user.last_name ? `${user.first_name} ${user.last_name}`.trim() : '')}
                       </td>
-                      <td className="px-4 py-3.5 whitespace-nowrap text-sm text-[#6B7280]">{formatDisplayValue(user.email)}</td>
-                      <td className="px-4 py-3.5 whitespace-nowrap">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-[#6B7280]">{formatDisplayValue(user.email)}</td>
+                      <td className="px-6 py-4 whitespace-nowrap">
                         <GenderBadge gender={profile.gender} />
                       </td>
-                      <td className="px-4 py-3.5 whitespace-nowrap text-sm text-[#6B7280]">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-[#6B7280]">
                         {calculateAge(profile.date_of_birth)}
                       </td>
-                      <td className="px-4 py-3.5 whitespace-nowrap text-sm text-[#6B7280]">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-[#6B7280]">
                         {formatDisplayValue(profile.area)}
                       </td>
-                      <td className="px-4 py-3.5 whitespace-nowrap text-sm text-[#6B7280]">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-[#6B7280]">
                         {formatDisplayValue(profile.language)}
                       </td>
-                      <td className="px-4 py-3.5 whitespace-nowrap text-sm text-[#6B7280]">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-[#6B7280]">
+                        {formatDisplayValue(profile.nationality)}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-[#6B7280]">
                         {formatDisplayValue(profile.meal_preference)}
                       </td>
-                      <td className="px-4 py-3.5 whitespace-nowrap text-sm text-[#6B7280]">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-[#6B7280]">
                         {formatDisplayValue(profile.budget)}
                       </td>
-                      <td className="px-4 py-3.5 whitespace-nowrap">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium ${
-                          item.request_status === 'pending' 
-                            ? 'bg-yellow-100 text-yellow-800'
-                            : item.request_status === 'approved'
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-red-100 text-red-800'
-                        }`}>
-                          {capitalizeWords(item.request_status)}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3.5 whitespace-nowrap text-right">
-                        <div className="flex items-center justify-end gap-2">
-                          <button
-                            onClick={() => {
+                      <td className="px-6 py-4 whitespace-nowrap text-right">
+                        <button
+                          onClick={(e) => {
+                              e.stopPropagation();
+                              // Implement dropdown or actions
                               setSelectedProfile(user);
                               setShowViewProfile(true);
-                            }}
-                            className="px-3 py-1.5 text-blue-600 hover:bg-blue-50 rounded text-xs font-medium transition-colors"
-                          >
-                            View Profile
-                          </button>
-                          {item.request_status !== 'approved' && (
-                            <button
-                              onClick={() => handleUpdateRequestStatus(item.id, 'approved')}
-                              className="px-3 py-1.5 bg-green-600 text-white rounded text-xs font-medium hover:bg-green-700 transition-colors"
-                            >
-                              Approve
-                            </button>
-                          )}
-                          {item.request_status !== 'rejected' && (
-                            <button
-                              onClick={() => handleUpdateRequestStatus(item.id, 'rejected')}
-                              className="px-3 py-1.5 bg-red-600 text-white rounded text-xs font-medium hover:bg-red-700 transition-colors"
-                            >
-                              Reject
-                            </button>
-                          )}
-                        </div>
+                          }}
+                          className="text-[#9CA3AF] hover:text-[#111827] p-1 rounded-full hover:bg-gray-100 transition-colors"
+                        >
+                          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+                          </svg>
+                        </button>
                       </td>
                     </tr>
                   );
@@ -725,138 +710,174 @@ const GroupAttendeesPage = () => {
     <div className="flex flex-col h-full">
       {/* Header */}
       <div className="bg-white px-4 sm:px-6 lg:px-8 py-6 border-b border-[#E5E7EB] flex-shrink-0">
-        <div className="flex flex-col gap-4 mb-6">
+        <div className="flex flex-col gap-6 mb-6">
           <div>
-            <h1 className="text-xl font-bold text-[#111827]">Group & Attendees Management</h1>
-            <p className="text-sm text-[#6B7280] mt-1">Manage dinner requests and create groups</p>
+            <h1 className="text-xl font-bold text-[#111827]">User Data Management</h1>
+            <p className="text-sm text-[#6B7280] mt-1">Manage customers data and bookings</p>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-            {activeTab === 'users' ? (
-              <>
-                <CustomDropdown
-                  value={selectedDinner}
-                  onChange={(e) => setSelectedDinner(e.target.value)}
-                  options={[
-                    { value: '', label: 'Select Dinner' },
-                    ...dinners.map(dinner => ({
-                      value: dinner.id,
-                      label: `${dinner.title} - ${new Date(dinner.date).toLocaleDateString()}`,
-                    })),
-                  ]}
-                  placeholder="Select Dinner"
-                />
-                <input
-                  type="text"
-                  placeholder="Search by email (min 3 characters)"
-                  value={searchQuery}
-                  onChange={handleSearchChange}
-                  className="w-full px-4 py-2 border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-orange-500 bg-[#F9FAFB]"
-                />
-                <button 
-                  onClick={handleExportCSV}
-                  className="w-full px-4 py-2 bg-white border border-[#E5E7EB] text-[#374151] rounded-lg text-sm font-medium hover:bg-gray-50 flex items-center justify-center gap-2"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                  </svg>
-                  Export All CSV
-                </button>
-                <button 
-                  onClick={() => {
-                    setShowCreateGroupModal(true);
-                    // Initialize form with current selection if any
-                    setValueGroup('selectedUsers', selectedUsers); 
-                  }}
-                  disabled={selectedUsers.length === 0}
-                  className="w-full px-4 py-2 bg-[#F97316] text-white rounded-lg text-sm font-medium hover:bg-[#EA580C] disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Create Group ({selectedUsers.length})
-                </button>
-              </>
-            ) : (
-              <>
-                <input
-                  type="text"
-                  placeholder="Search groups (min 3 characters)"
-                  value={searchQuery}
-                  onChange={handleSearchChange}
-                  className="w-full px-4 py-2 border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-orange-500 bg-[#F9FAFB]"
-                />
-                <button 
-                  onClick={handleExportCSV}
-                  className="w-full px-4 py-2 bg-white border border-[#E5E7EB] text-[#374151] rounded-lg text-sm font-medium hover:bg-gray-50 flex items-center justify-center gap-2"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                  </svg>
-                  Export All CSV
-                </button>
-                <button 
-                  onClick={() => {
-                    setShowCreateGroupModal(true);
-                    setValueGroup('selectedUsers', selectedUsers);
-                  }}
-                  className="w-full px-4 py-2 bg-[#F97316] text-white rounded-lg text-sm font-medium hover:bg-[#EA580C]"
-                >
-                  Create Group
-                </button>
-              </>
-            )}
-          </div>
-        </div>
+          
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            {/* Tabs */}
+            <div className="flex items-center bg-[#F3F4F6] p-1 rounded-lg">
+              <button
+                onClick={() => setActiveTab('groups')}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                  activeTab === 'groups'
+                    ? 'bg-[#111827] text-white shadow-sm'
+                    : 'text-[#6B7280] hover:text-[#374151]'
+                }`}
+              >
+                Groups
+              </button>
+              <button
+                onClick={() => setActiveTab('users')}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                  activeTab === 'users'
+                    ? 'bg-[#111827] text-white shadow-sm'
+                    : 'text-[#6B7280] hover:text-[#374151]'
+                }`}
+              >
+                Users
+              </button>
+            </div>
 
-        {/* Tabs */}
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setActiveTab('groups')}
-            className={`flex-1 sm:flex-initial px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-              activeTab === 'groups'
-                ? 'bg-[#111827] text-white'
-                : 'bg-transparent text-[#6B7280] hover:bg-gray-100'
-            }`}
-          >
-            Groups ({groups.length})
-          </button>
-          <button
-            onClick={() => setActiveTab('users')}
-            className={`flex-1 sm:flex-initial px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-              activeTab === 'users'
-                ? 'bg-[#111827] text-white'
-                : 'bg-transparent text-[#6B7280] hover:bg-gray-100'
-            }`}
-          >
-            Dinner Requests ({requestsTotal})
-          </button>
+            {/* Actions */}
+            <div className="flex items-center gap-3 w-full sm:w-auto">
+              {activeTab === 'users' ? (
+                <>
+                  <div className="relative flex-1 sm:w-64">
+                    <input
+                      type="text"
+                      placeholder="Search"
+                      value={searchQuery}
+                      onChange={handleSearchChange}
+                      className="w-full pl-4 pr-10 py-2 border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-orange-500 bg-white"
+                    />
+                    <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                      <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                      </svg>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={handleExportCSV}
+                    className="px-4 py-2 bg-white border border-[#E5E7EB] text-[#374151] rounded-lg text-sm font-medium hover:bg-gray-50 flex items-center gap-2 whitespace-nowrap"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                    Export All CSV
+                  </button>
+                  <button 
+                    onClick={() => {
+                      setShowCreateGroupModal(true);
+                      setValueGroup('selectedUsers', selectedUsers); 
+                    }}
+                    className="px-4 py-2 bg-white border border-[#E5E7EB] text-[#374151] rounded-lg text-sm font-medium hover:bg-gray-50 whitespace-nowrap"
+                  >
+                    Create Manual Group
+                  </button>
+                  <button 
+                    className="px-4 py-2 bg-[#F97316] text-white rounded-lg text-sm font-medium hover:bg-[#EA580C] whitespace-nowrap"
+                  >
+                    AI Match
+                  </button>
+                </>
+              ) : (
+                <>
+                  <div className="relative flex-1 sm:w-64">
+                    <input
+                      type="text"
+                      placeholder="Search"
+                      value={searchQuery}
+                      onChange={handleSearchChange}
+                      className="w-full pl-4 pr-10 py-2 border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-orange-500 bg-white"
+                    />
+                    <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                      <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                      </svg>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={handleExportCSV}
+                    className="px-4 py-2 bg-white border border-[#E5E7EB] text-[#374151] rounded-lg text-sm font-medium hover:bg-gray-50 flex items-center gap-2 whitespace-nowrap"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                    Export All CSV
+                  </button>
+                  <button 
+                    className="px-4 py-2 bg-[#F97316] text-white rounded-lg text-sm font-medium hover:bg-[#EA580C] whitespace-nowrap"
+                  >
+                    Finalize Groups
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
         </div>
       </div>
 
       {/* Filters Section */}
       <div className="bg-white px-4 sm:px-6 lg:px-8 py-4 border-b border-[#E5E7EB] flex-shrink-0">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-          <CustomDropdown
-            value={activeTab === 'groups' ? filterCity : filterRequestCity}
-            onChange={(e) => activeTab === 'groups' ? setFilterCity(e.target.value) : setFilterRequestCity(e.target.value)}
-            options={[
-              { value: '', label: 'All Cities' },
-              { value: 'Cape Town', label: 'Cape Town' },
-              { value: 'Johannesburg', label: 'Johannesburg' },
-              { value: 'Durban', label: 'Durban' },
-            ]}
-            placeholder="All Cities"
-          />
+          {/* Dinner Context for Users Tab */}
+          {activeTab === 'users' ? (
+             <CustomDropdown
+               value={selectedDinner}
+               onChange={(e) => setSelectedDinner(e.target.value)}
+               options={[
+                 { value: '', label: 'Select Dinner Event' },
+                 ...dinners.map(dinner => ({
+                   value: dinner.id,
+                   label: `${dinner.title} - ${new Date(dinner.date).toLocaleDateString()}`,
+                 })),
+               ]}
+               placeholder="Select Dinner Event"
+             />
+          ) : (
+            <CustomDropdown
+              value={filterCity}
+              onChange={(e) => setFilterCity(e.target.value)}
+              options={[
+                { value: '', label: 'All Cities' },
+                { value: 'Cape Town', label: 'Cape Town' },
+                { value: 'Johannesburg', label: 'Johannesburg' },
+                { value: 'Durban', label: 'Durban' },
+              ]}
+              placeholder="All Cities"
+            />
+          )}
           
-          <CustomDropdown
-            value={activeTab === 'groups' ? filterDinner : filterRequestDinner}
-            onChange={(e) => activeTab === 'groups' ? setFilterDinner(e.target.value) : setFilterRequestDinner(e.target.value)}
-            options={[
-              { value: '', label: 'All Dinners' },
-              ...dinners.map(dinner => ({
-                value: dinner.id,
-                label: dinner.title,
-              })),
-            ]}
-            placeholder="All Dinners"
-          />
+          {/* Second Filter */}
+          {activeTab === 'users' ? (
+             <CustomDropdown
+               value={filterRequestCity}
+               onChange={(e) => setFilterRequestCity(e.target.value)}
+               options={[
+                 { value: '', label: 'All Cities' },
+                 { value: 'Cape Town', label: 'Cape Town' },
+                 { value: 'Johannesburg', label: 'Johannesburg' },
+                 { value: 'Durban', label: 'Durban' },
+               ]}
+               placeholder="All Cities"
+             />
+          ) : (
+            <CustomDropdown
+              value={filterDinner}
+              onChange={(e) => setFilterDinner(e.target.value)}
+              options={[
+                { value: '', label: 'All Dinners' },
+                ...dinners.map(dinner => ({
+                  value: dinner.id,
+                  label: dinner.title,
+                })),
+              ]}
+              placeholder="All Dinners"
+            />
+          )}
           
           <input
             type="date"
@@ -875,25 +896,28 @@ const GroupAttendeesPage = () => {
           />
           
           {((activeTab === 'groups' && (filterCity || filterDinner || filterDateFrom || filterDateTo)) ||
-            (activeTab === 'users' && (filterRequestCity || filterRequestDinner || filterRequestDateFrom || filterRequestDateTo))) && (
-            <button
-              onClick={() => {
-                if (activeTab === 'groups') {
-                  setFilterCity('');
-                  setFilterDinner('');
-                  setFilterDateFrom('');
-                  setFilterDateTo('');
-                } else {
-                  setFilterRequestCity('');
-                  setFilterRequestDinner('');
-                  setFilterRequestDateFrom('');
-                  setFilterRequestDateTo('');
-                }
-              }}
-              className="w-full px-4 py-2 text-sm text-[#6B7280] hover:text-[#374151] hover:bg-gray-50 rounded-lg transition-colors"
-            >
-              Clear Filters
-            </button>
+            (activeTab === 'users' && (selectedDinner || filterRequestCity || filterRequestDateFrom || filterRequestDateTo))) && (
+            <div className="sm:col-span-2 lg:col-span-4 flex justify-end">
+                <button
+                onClick={() => {
+                    if (activeTab === 'groups') {
+                    setFilterCity('');
+                    setFilterDinner('');
+                    setFilterDateFrom('');
+                    setFilterDateTo('');
+                    } else {
+                    setSelectedDinner(''); // Also clear selected dinner if user wants to reset all? Or maybe keep it.
+                    setFilterRequestCity('');
+                    setFilterRequestDinner('');
+                    setFilterRequestDateFrom('');
+                    setFilterRequestDateTo('');
+                    }
+                }}
+                className="text-sm text-[#F97316] hover:text-[#EA580C] font-medium transition-colors"
+                >
+                Clear Filters
+                </button>
+            </div>
           )}
         </div>
       </div>

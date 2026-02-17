@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { api, API_ENDPOINTS } from '../../utils/api';
 import { debounce, formatDisplayValue, isValidSearchQuery } from '../../utils/searchHelper';
 import { CustomDropdown } from '@/components/common';
+import EmailModal from './EmailModal';
 
 const AdminDashboardPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -16,6 +17,8 @@ const AdminDashboardPage = () => {
   const [totalUsers, setTotalUsers] = useState('0');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  
+  const [showEmailModal, setShowEmailModal] = useState(false);
   
   // Pagination
   const [currentPage, setCurrentPage] = useState(0);
@@ -204,7 +207,10 @@ const AdminDashboardPage = () => {
             <div>
               <h2 className="text-base font-semibold text-[#111827]">Users ({totalUsers})</h2>
             </div>
-            <button className="px-5 py-2.5 bg-[#10B981] text-white rounded-lg text-sm font-medium hover:bg-[#059669] transition-colors flex items-center gap-2 whitespace-nowrap">
+            <button 
+              onClick={() => setShowEmailModal(true)}
+              className="px-5 py-2.5 bg-[#10B981] text-white rounded-lg text-sm font-medium hover:bg-[#059669] transition-colors flex items-center gap-2 whitespace-nowrap"
+            >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
               </svg>
@@ -226,7 +232,7 @@ const AdminDashboardPage = () => {
                     Mobile
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-semibold text-[#374151] uppercase tracking-wide whitespace-nowrap">
-                    City
+                    City ID
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-semibold text-[#374151] uppercase tracking-wide whitespace-nowrap">
                     Tickets
@@ -360,6 +366,14 @@ const AdminDashboardPage = () => {
           )}
         </div>
       </div>
+
+      {showEmailModal && (
+        <EmailModal 
+          onClose={() => setShowEmailModal(false)}
+          contextText="All Users" 
+          recipientCount={parseInt(totalUsers)}
+        />
+      )}
     </div>
   );
 };

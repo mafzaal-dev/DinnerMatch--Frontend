@@ -163,6 +163,13 @@ export const API_ENDPOINTS = {
   DINNER_MAKE_REQUEST: '/dinner/make-request/',
   DINNER_REQUESTS_LIST: '/dinner/requests/list/',
   
+  // Email Management
+  EMAIL_TEMPLATES_LIST: '/email-templates/list/',
+  EMAIL_TEMPLATES_CREATE: '/email-templates/create/',
+  EMAIL_TEMPLATES_UPDATE: '/email-templates/update/',
+  EMAIL_TEMPLATES_DELETE: (id) => `/email-templates/delete/${id}/`,
+  EMAIL_SEND_TO_USERS: '/email-templates/send/',
+  
   // Others
   DINNERS: '/dinners/',
   BOOKINGS: '/bookings/',
