@@ -23,8 +23,7 @@ const Hero = () => {
                   window.dispatchEvent(new CustomEvent("openQuiz"));
                 }
               }}
-              className="bg-[#F97316] text-[#F5F5F5] px-4 py-3
-                             rounded-md font-semibold text-sm  md:w-fit uppercase hover:bg-[#FF9955] transition-colors cursor-pointer"
+              className="bg-[#F97316] text-[#F5F5F5] px-4 py-3 rounded-md font-semibold text-sm md:w-fit uppercase hover:bg-[#FF9955] transition-colors cursor-pointer"
             >
               Take the Quiz
             </button>

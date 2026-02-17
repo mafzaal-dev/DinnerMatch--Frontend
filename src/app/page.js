@@ -14,6 +14,7 @@ import {
   AreaSelectionModal, 
   QuizFlow,
   QuizResultsModal,
+  DemographicsFlow,
   SignupModal,
   WelcomeModal,
   BookDinnerModal
@@ -26,6 +27,7 @@ export default function Home() {
   const [selectedCity, setSelectedCity] = useState(null);
   const [selectedPlace, setSelectedPlace] = useState(null);
   const [quizAnswers, setQuizAnswers] = useState(null);
+  const [demographics, setDemographics] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -63,12 +65,14 @@ export default function Home() {
     setSelectedCity(null);
     setSelectedPlace(null);
     setQuizAnswers(null);
+    setDemographics(null);
     setError('');
     
     if (typeof window !== 'undefined') {
       localStorage.removeItem('quiz_answers');
       localStorage.removeItem('quiz_city');
       localStorage.removeItem('quiz_place');
+      localStorage.removeItem('quiz_demographics');
     }
   };
 
@@ -105,8 +109,16 @@ export default function Home() {
     if (accessToken) {
       setQuizStep('book-dinner');
     } else {
-      setQuizStep('signup');
+      setQuizStep('demographics');
     }
+  };
+
+  const handleDemographicsComplete = (data) => {
+    setDemographics(data);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('quiz_demographics', JSON.stringify(data));
+    }
+    setQuizStep('signup');
   };
 
   const handleSignup = async (formData) => {
@@ -114,14 +126,28 @@ export default function Home() {
       setLoading(true);
       setError('');
 
-      const answersArray = Array.isArray(quizAnswers) ? quizAnswers.filter(a => a && a.question_id) : [];
+      let answersArray = Array.isArray(quizAnswers) ? quizAnswers.filter(a => a && a.question_id) : [];
+      if (answersArray.length === 0 && typeof window !== 'undefined') {
+        const storedAnswers = JSON.parse(localStorage.getItem('quiz_answers') || '[]');
+        if (Array.isArray(storedAnswers)) {
+          answersArray = storedAnswers.filter(a => a && a.question_id);
+        }
+      }
+
+      let demographicsData = demographics;
+      if (!demographicsData && typeof window !== 'undefined') {
+        demographicsData = JSON.parse(localStorage.getItem('quiz_demographics') || '{}');
+      }
 
       const registrationData = {
         email: formData.email,
         password: formData.password,
         first_name: formData.firstName,
         last_name: formData.lastName || '',
-        answers: answersArray
+        answers: answersArray,
+        ...demographicsData,
+        city_id: selectedCity?.id,
+        area_id: selectedPlace?.id
       };
       
       if (formData.mobileNumber) {
@@ -173,6 +199,7 @@ export default function Home() {
         }
         
         localStorage.removeItem('quiz_answers');
+        localStorage.removeItem('quiz_demographics');
 
         setQuizStep('welcome');
       }
@@ -189,7 +216,7 @@ export default function Home() {
     if (typeof window !== 'undefined') {
       localStorage.setItem('show_book_dinner', 'true');
     }
-    router.push('/edit-profile');
+    router.push('/subscriptions');
   };
 
   const handleBookDinnerSuccess = (data) => {
@@ -197,6 +224,7 @@ export default function Home() {
       localStorage.removeItem('quiz_city');
       localStorage.removeItem('quiz_place');
       localStorage.removeItem('quiz_answers');
+      localStorage.removeItem('quiz_demographics');
     }
     resetQuizFlow();
     router.push('/your-dinner');
@@ -240,10 +268,16 @@ export default function Home() {
         compatibilityScore={90}
       />
       
+      <DemographicsFlow
+        isOpen={quizStep === 'demographics'}
+        onClose={resetQuizFlow}
+        onComplete={handleDemographicsComplete}
+      />
+
       <SignupModal
         isOpen={quizStep === 'signup'}
         onClose={resetQuizFlow}
-        onBack={() => setQuizStep('results')}
+        onBack={() => setQuizStep('demographics')}
         onSignup={handleSignup}
         loading={loading}
         error={error}

@@ -6,8 +6,7 @@ const Footer = () => {
         <div className="flex flex-col">
             <section className="bg-[#FFFBF7] py-20 px-6">
                 <div className="max-w-5xl mx-auto bg-white rounded-3xl p-12 md:p-16 shadow-[0_20px_50px_rgba(0,0,0,0.04)] text-center border border-[#F3F4F6]">
-                    <div className="inline-block bg-[#FFFAE6] text-[#FFAA55]
-                     text-sm font-semibold py-3 px-4 rounded-full mb-8 ">
+                    <div className="inline-block bg-[#FFFAE6] text-[#FFAA55] text-sm font-semibold py-3 px-4 rounded-full mb-8">
                         Limited Spots Available
                     </div>
 
@@ -38,9 +37,7 @@ const Footer = () => {
                         </div>
                     </div>
 
-                    <button className="bg-[#FFAA55] text-white
-                     px-3 py-3 rounded-xl text-sm 
-                      transition-all flex items-center gap-2 mx-auto mb-4 uppercase">
+                    <button className="bg-[#FFAA55] text-white px-3 py-3 rounded-xl text-sm transition-all flex items-center gap-2 mx-auto mb-4 uppercase">
                         Take the Quiz 
                     </button>
 
