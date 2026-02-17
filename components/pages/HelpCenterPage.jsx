@@ -19,6 +19,8 @@ const HelpCenterPage = ({ onSubmit, onBack }) => {
       onSubmit(data);
     }
   };
+
+  const faqData = [
     {
       question: "Is this a dating app?",
       answer: "No, DinnerMatch is not a dating app. It's a social platform designed to help people make new friends and have meaningful conversations over dinner. While people do sometimes form romantic connections, our primary focus is on platonic social matching."
@@ -74,21 +76,22 @@ const HelpCenterPage = ({ onSubmit, onBack }) => {
         {/* Contact Form */}
         <div className="bg-[#111121] border border-[#2F3A51] rounded-lg p-6 mb-8 shadow-lg">
           <h2 className="text-xl font-bold text-[#F5F5F5] mb-6">Contact Us</h2>
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-6">
            
             <div>
               <label className="block text-[#757575] font-semibold text-sm mb-2">
                 Your email address <span className="text-red-500">*</span>
               </label>
               <input
-                type="text"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                type="email"
+                {...register('email')}
                 placeholder="johnDoe@mail.com"
                 className="w-full px-4 py-3 bg-[#111121] border
                  border-[#2F3A51] placeholder-[#424242]  rounded-lg text-[#F5F5F5] focus:outline-none focus:border-[#FFAA55] transition-colors"
-                required
               />
+              {errors.email && (
+                <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>
+              )}
             </div>
 
 
@@ -98,13 +101,14 @@ const HelpCenterPage = ({ onSubmit, onBack }) => {
               </label>
               <input
                 type="text"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                {...register('name')}
                 placeholder="Enter your full name"
                 className="w-full px-4 py-3 bg-[#111121] border
                   border-[#2F3A51] placeholder-[#424242]  rounded-lg text-[#F5F5F5]   focus:outline-none focus:border-[#FFAA55] transition-colors"
-                required
               />
+              {errors.name && (
+                <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>
+              )}
             </div>
 
 
@@ -114,13 +118,14 @@ const HelpCenterPage = ({ onSubmit, onBack }) => {
               </label>
               <input
                 type="text"
-                value={formData.reason}
-                onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
+                {...register('reason')}
                 placeholder="Reason"
                 className="w-full px-4 py-3 bg-[#111121] border
                  border-[#2F3A51] placeholder-[#424242] rounded-lg text-[#F5F5F5]  focus:outline-none focus:border-[#FFAA55] transition-colors"
-                required
               />
+              {errors.reason && (
+                <p className="text-red-500 text-xs mt-1">{errors.reason.message}</p>
+              )}
             </div>
 
 
@@ -130,13 +135,14 @@ const HelpCenterPage = ({ onSubmit, onBack }) => {
               </label>
               <input
                 type="text"
-                value={formData.subject}
-                onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+                {...register('subject')}
                 placeholder="Brief summary of your message"
                 className="w-full px-4 py-3 bg-[#111121] border
                  border-[#2F3A51] placeholder-[#424242]  rounded-lg text-[#F5F5F5]   focus:outline-none focus:border-[#FFAA55] transition-colors"
-                required
               />
+              {errors.subject && (
+                <p className="text-red-500 text-xs mt-1">{errors.subject.message}</p>
+              )}
             </div>
 
             <div>
@@ -144,13 +150,14 @@ const HelpCenterPage = ({ onSubmit, onBack }) => {
                Description<span className="text-red-500">*</span>
               </label>
               <textarea
-                value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                {...register('description')}
                 placeholder="Please provide detail information about your inquiry or issue"
                 className="w-full px-4 py-3 bg-[#111121] border
                  border-[#2F3A51] placeholder-[#424242]  rounded-lg text-[#F5F5F5]  focus:outline-none focus:border-[#FFAA55] transition-colors min-h-[120px]"
-                required
               />
+              {errors.description && (
+                <p className="text-red-500 text-xs mt-1">{errors.description.message}</p>
+              )}
             </div>
 
             
