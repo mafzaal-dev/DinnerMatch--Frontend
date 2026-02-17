@@ -8,7 +8,7 @@ import { useEffect, useState } from 'react';
 export default function AdminLayout({ children }) {
   const router = useRouter();
   const pathname = usePathname();
-  const { isAdmin, isLoading, isAuthenticated } = useAuth();
+  const { isAdmin, isLoading, isAuthenticated, logout } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Protect admin routes
@@ -26,10 +26,7 @@ export default function AdminLayout({ children }) {
   }, [pathname]);
 
   const handleLogout = () => {
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('refresh_token');
-    localStorage.removeItem('user_data');
-    router.replace('/admin/login');
+    logout('/admin/login');
   };
 
   // Don't show sidebar on login page
