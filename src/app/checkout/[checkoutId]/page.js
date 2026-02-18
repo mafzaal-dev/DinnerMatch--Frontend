@@ -88,7 +88,14 @@ export default function CheckoutPage() {
                 } catch (_) {}
                 checkoutRef.current = null;
               }
-              router.push(`/checkout/result?checkoutId=${checkoutId}`);
+              const code = event?.result?.code || "000.000.000";
+              const desc = event?.result?.description || "";
+              const params = new URLSearchParams({
+                checkoutId,
+                "result.code": code,
+                ...(desc && { "result.description": desc }),
+              });
+              router.push(`/checkout/result?${params}`);
             },
             onCancelled: () => {
               if (checkoutRef.current) {

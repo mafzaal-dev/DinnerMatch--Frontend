@@ -1,10 +1,11 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 import Link from "next/link";
 import PricingSection from "@/components/pricing/PricingSection";
 
-export default function SubscriptionPage() {
+function SubscriptionContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const from = searchParams.get("from"); // "signup" | "dinner-details" | null
@@ -56,5 +57,19 @@ export default function SubscriptionPage() {
       </div>
       <PricingSection onSelectPlan={handleSelectPlan} />
     </main>
+  );
+}
+
+export default function SubscriptionPage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="min-h-screen bg-gray-950 flex items-center justify-center">
+          <div className="animate-spin rounded-full h-10 w-10 border-2 border-[#FFAA55] border-t-transparent" />
+        </main>
+      }
+    >
+      <SubscriptionContent />
+    </Suspense>
   );
 }
