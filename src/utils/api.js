@@ -174,6 +174,10 @@ export const API_ENDPOINTS = {
   // Others
   DINNERS: '/dinners/',
   BOOKINGS: '/bookings/',
+
+  // Plans & Payments
+  GET_ALL_PLANS: '/get-all-plans',
+  PAYMENTS_CHECKOUT: '/payments/checkout/one-time',
 };
 
 export default axiosInstance;

@@ -14,6 +14,7 @@ const PricingCard = ({
   badge,
   isHighlighted = false,
   onSelect,
+  plan,
 }) => {
   const cardClasses = isHighlighted
     ? "flex relative flex-col grow shrink gap-3 px-4 pt-8 pb-4 font-bold rounded-lg border border-yellow-900 border-solid min-w-60 w-[251px]"
@@ -73,7 +74,7 @@ const PricingCard = ({
 
       <button
         type="button"
-        onClick={() => onSelect && onSelect({ title, price, period })}
+        onClick={() => onSelect && onSelect({ title, price, period, plan })}
         className={`${buttonClasses} ${buttonBgClass}`}
         style={buttonStyle}
       >
