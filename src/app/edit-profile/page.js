@@ -1,71 +1,83 @@
 "use client";
 
-import EditProfilePage from '../../../components/pages/EditProfilePage';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '@/hooks/useAuth';
-import { useEffect, useState } from 'react';
-import { toast } from 'react-hot-toast';
+import EditProfilePage from "../../../components/pages/EditProfilePage";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/hooks/useAuth";
+import { useEffect, useState } from "react";
+import { toast } from "react-hot-toast";
+import { api, API_ENDPOINTS } from "@/utils/api";
 
 export default function EditProfile() {
   const router = useRouter();
   const { user, updateProfile, getProfile } = useAuth();
   const [initialData, setInitialData] = useState({});
+  const [profileApiResponse, setProfileApiResponse] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchProfile = async () => {
+      try {
+        const storedUser =
+          typeof window !== "undefined"
+            ? JSON.parse(localStorage.getItem("user_data") || "{}")
+            : {};
+
         try {
-            const storedUser = typeof window !== 'undefined' 
-              ? JSON.parse(localStorage.getItem('user_data') || '{}') 
-              : {};
-            
-            try {
-              const profileData = await getProfile();
-              if (profileData) {
-                  setInitialData({
-                      ...storedUser,
-                      ...user,
-                      ...profileData
-                  });
-              } else if (user || Object.keys(storedUser).length > 0) {
-                  setInitialData({ ...storedUser, ...user });
-              }
-            } catch (profileError) {
-              if (user || Object.keys(storedUser).length > 0) {
-                  setInitialData({ ...storedUser, ...user });
-              }
-            }
-        } catch (error) {
-            console.error('Failed to load profile', error);
-        } finally {
-            setLoading(false);
+          const fullResponse = await api.get(API_ENDPOINTS.USER_PROFILE);
+          if (fullResponse?.success && fullResponse?.data) {
+            setProfileApiResponse(fullResponse);
+            setInitialData({
+              ...storedUser,
+              ...user,
+              ...fullResponse.data,
+            });
+          } else if (user || Object.keys(storedUser).length > 0) {
+            setInitialData({ ...storedUser, ...user });
+          }
+
+          if (
+            !fullResponse?.success &&
+            (user || Object.keys(storedUser).length > 0)
+          ) {
+            setInitialData({ ...storedUser, ...user });
+          }
+        } catch (profileError) {
+          if (user || Object.keys(storedUser).length > 0) {
+            setInitialData({ ...storedUser, ...user });
+          }
         }
+      } catch (error) {
+        console.error("Failed to load profile", error);
+      } finally {
+        setLoading(false);
+      }
     };
 
     fetchProfile();
-  }, [user, getProfile]);
-
+  }, [user]);
 
   const handleSave = async (formData) => {
     try {
-        await updateProfile(formData);
-        toast.success('Profile updated successfully! You can now request for dinners.');
-        
-        if (typeof window !== 'undefined') {
-          const showBookDinner = localStorage.getItem('show_book_dinner');
-          localStorage.removeItem('show_book_dinner');
-          
-          if (showBookDinner === 'true') {
-            router.push('/');
-          } else {
-            router.push('/available-dinners');
-          }
+      await updateProfile(formData);
+      toast.success(
+        "Profile updated successfully! You can now request for dinners.",
+      );
+
+      if (typeof window !== "undefined") {
+        const showBookDinner = localStorage.getItem("show_book_dinner");
+        localStorage.removeItem("show_book_dinner");
+
+        if (showBookDinner === "true") {
+          router.push("/");
         } else {
-          router.push('/available-dinners');
+          router.push("/available-dinners");
         }
+      } else {
+        router.push("/available-dinners");
+      }
     } catch (error) {
-        console.error('Failed to update profile', error);
-        toast.error(error.message || 'Failed to update profile');
+      console.error("Failed to update profile", error);
+      toast.error(error.message || "Failed to update profile");
     }
   };
 
@@ -74,13 +86,19 @@ export default function EditProfile() {
   };
 
   if (loading) {
-      return (
-          <div className="min-h-screen bg-[#080814] flex items-center justify-center">
-             <div className="text-white">Loading...</div>
-          </div>
-      );
+    return (
+      <div className="min-h-screen bg-[#080814] flex items-center justify-center">
+        <div className="text-white">Loading...</div>
+      </div>
+    );
   }
 
-  return <EditProfilePage onSave={handleSave} onBack={handleBack} initialData={initialData} />;
+  return (
+    <EditProfilePage
+      onSave={handleSave}
+      onBack={handleBack}
+      initialData={initialData}
+      profileApiResponse={profileApiResponse}
+    />
+  );
 }
-

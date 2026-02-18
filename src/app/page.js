@@ -22,6 +22,36 @@ import {
 } from "../../components/modals";
 import { api, API_ENDPOINTS } from '../utils/api';
 
+// Format demographic value for profile API (snake_case -> Title Case)
+const formatProfileValue = (value) => {
+  if (value == null || value === '') return value;
+  const str = String(value).trim();
+  return str.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+};
+
+const GENDER_MAP = { woman: 'Female', man: 'Male', non_binary: 'Non-Binary' };
+
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const isValidUUID = (value) => value && UUID_REGEX.test(String(value).trim());
+
+function buildProfileUpdatePayload(formData, demographicsData, selectedCity, selectedPlace) {
+  const d = demographicsData || {};
+  const payload = {
+    first_name: formData.firstName?.trim() || '',
+    last_name: (formData.lastName || '').trim(),
+    date_of_birth: d.date_of_birth || '',
+    gender: GENDER_MAP[d.gender] || formatProfileValue(d.gender),
+    relationship_status: formatProfileValue(d.relationship_status),
+    industry: formatProfileValue(d.industry),
+    nationality: formatProfileValue(d.nationality),
+    language: formatProfileValue(d.language),
+  };
+  // API expects city and area as UUIDs; only include when valid (modals may use slugs until backend provides UUIDs)
+  if (isValidUUID(selectedCity?.id)) payload.city = selectedCity.id;
+  if (isValidUUID(selectedPlace?.id)) payload.area = selectedPlace.id;
+  return payload;
+}
+
 export default function Home() {
   const router = useRouter();
   const [quizStep, setQuizStep] = useState(null);
@@ -198,7 +228,21 @@ export default function Home() {
             localStorage.setItem('user_data', JSON.stringify(userData));
           }
         }
-        
+
+        // Update user profile with selected preferences (demographics + city/area)
+        try {
+          const profilePayload = buildProfileUpdatePayload(
+            formData,
+            demographicsData,
+            selectedCity,
+            selectedPlace
+          );
+          await api.put(API_ENDPOINTS.PROFILE_UPDATE, profilePayload);
+        } catch (profileErr) {
+          console.error('Profile update after signup failed:', profileErr);
+          // Continue to welcome; don't block the user
+        }
+
         localStorage.removeItem('quiz_answers');
         localStorage.removeItem('quiz_demographics');
 
