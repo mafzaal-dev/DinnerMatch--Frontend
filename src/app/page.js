@@ -202,7 +202,7 @@ export default function Home() {
         localStorage.removeItem('quiz_answers');
         localStorage.removeItem('quiz_demographics');
 
-        setQuizStep('subscription');
+        setQuizStep('welcome');
       }
     } catch (err) {
       console.error('Registration error:', err);
@@ -214,14 +214,14 @@ export default function Home() {
   };
 
   const handleSubscriptionContinue = (plan) => {
-    setQuizStep('welcome');
-  };
-
-  const handleWelcomeNext = () => {
     if (typeof window !== 'undefined') {
       localStorage.setItem('show_book_dinner', 'true');
     }
     router.push('/subscriptions');
+  };
+
+  const handleWelcomeNext = () => {
+    setQuizStep('subscription');
   };
 
   const handleBookDinnerSuccess = (data) => {
@@ -291,7 +291,7 @@ export default function Home() {
       <SubscriptionModal
         isOpen={quizStep === 'subscription'}
         onClose={resetQuizFlow}
-        onBack={() => setQuizStep('signup')}
+        onBack={() => setQuizStep('welcome')}
         onContinue={handleSubscriptionContinue}
       />
       
