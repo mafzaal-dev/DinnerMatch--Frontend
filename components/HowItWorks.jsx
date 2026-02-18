@@ -77,8 +77,7 @@ const HowItWorks = () => {
                     {steps.map((step, index) => (
                         <div
                             key={index}
-                            className={`${step.bgColor} py-6 px-5  rounded-2xl flex flex-col 
-                            items-center text-center transition-all hover:shadow-lg duration-300`}
+                            className={`${step.bgColor} py-6 px-5 rounded-2xl flex flex-col items-center text-center transition-all hover:shadow-lg duration-300`}
                         >
                             <div className={`mb-6 ${step.iconColor}`}>{step.icon}</div>
                             <h3 className={`font-bold text-xl mb-4 ${step.textColor}`}>{step.title}</h3>
@@ -89,8 +88,7 @@ const HowItWorks = () => {
                     ))}
                 </div>
 
-                <button className="bg-[#FFAA55] text-[#F5F5F5] px-2 py-4 
-                rounded-md  text-sm  hover:bg-[#FF9955] transition-all flex items-center gap-2 mx-auto uppercase">
+                <button className="bg-[#FFAA55] text-[#F5F5F5] px-2 py-4 rounded-md text-sm hover:bg-[#FF9955] transition-all flex items-center gap-2 mx-auto uppercase">
                     Take the Quiz
                 </button>
             </div>

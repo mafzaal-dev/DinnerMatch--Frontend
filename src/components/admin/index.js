@@ -9,3 +9,5 @@ export { default as DinnerManagementPage } from './DinnerManagementPage';
 export { default as CreateEditDinnerPage } from './CreateEditDinnerPage';
 export { default as RestaurantManagementPage } from './RestaurantManagementPage';
 export { default as CreateEditRestaurantPage } from './CreateEditRestaurantPage';
+export { default as EmailModal } from './EmailModal';
+export { default as EmailManagerPage } from './EmailManagerPage';
