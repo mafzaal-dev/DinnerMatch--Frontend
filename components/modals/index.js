@@ -8,6 +8,7 @@ export { default as QuizFlow } from './QuizFlow';
 export { default as QuizResultsModal } from './QuizResultsModal';
 export { default as DemographicsFlow } from './DemographicsFlow';
 export { default as SignupModal } from './SignupModal';
+export { default as SubscriptionModal } from './SubscriptionModal';
 export { default as WelcomeModal } from './WelcomeModal';
 export { default as HowItWorksModal } from './HowItWorksModal';
 export { default as BookDinnerModal } from './BookDinnerModal';

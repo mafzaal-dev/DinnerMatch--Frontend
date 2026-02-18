@@ -1,13 +1,16 @@
 "use client";
 
+import { useState } from 'react';
 import DinnerDetailsPage from '../../../components/pages/DinnerDetailsPage';
+import { SubscriptionModal } from '../../../components/modals';
 import { useRouter } from 'next/navigation';
 
 export default function DinnerDetails() {
   const router = useRouter();
+  const [subscriptionModalOpen, setSubscriptionModalOpen] = useState(false);
 
   const handleManageSubscription = () => {
-    router.push('/account');
+    setSubscriptionModalOpen(true);
   };
 
   const handleContactSupport = () => {
@@ -28,13 +31,20 @@ export default function DinnerDetails() {
   };
 
   return (
-    <DinnerDetailsPage
-      onManageSubscription={handleManageSubscription}
-      onContactSupport={handleContactSupport}
-      onMyAccount={handleMyAccount}
-      onRSVP={handleRSVP}
-      onCopyAddress={handleCopyAddress}
-    />
+    <>
+      <DinnerDetailsPage
+        onManageSubscription={handleManageSubscription}
+        onContactSupport={handleContactSupport}
+        onMyAccount={handleMyAccount}
+        onRSVP={handleRSVP}
+        onCopyAddress={handleCopyAddress}
+      />
+      <SubscriptionModal
+        isOpen={subscriptionModalOpen}
+        onClose={() => setSubscriptionModalOpen(false)}
+        onContinue={(plan) => setSubscriptionModalOpen(false)}
+      />
+    </>
   );
 }
 

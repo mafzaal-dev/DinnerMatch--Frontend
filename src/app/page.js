@@ -16,6 +16,7 @@ import {
   QuizResultsModal,
   DemographicsFlow,
   SignupModal,
+  SubscriptionModal,
   WelcomeModal,
   BookDinnerModal
 } from "../../components/modals";
@@ -201,7 +202,7 @@ export default function Home() {
         localStorage.removeItem('quiz_answers');
         localStorage.removeItem('quiz_demographics');
 
-        setQuizStep('welcome');
+        setQuizStep('subscription');
       }
     } catch (err) {
       console.error('Registration error:', err);
@@ -210,6 +211,10 @@ export default function Home() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSubscriptionContinue = (plan) => {
+    setQuizStep('welcome');
   };
 
   const handleWelcomeNext = () => {
@@ -281,6 +286,13 @@ export default function Home() {
         onSignup={handleSignup}
         loading={loading}
         error={error}
+      />
+
+      <SubscriptionModal
+        isOpen={quizStep === 'subscription'}
+        onClose={resetQuizFlow}
+        onBack={() => setQuizStep('signup')}
+        onContinue={handleSubscriptionContinue}
       />
       
       <WelcomeModal

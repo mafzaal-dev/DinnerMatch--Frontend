@@ -1,59 +1,59 @@
 "use client";
 
-import React from 'react';
+import React from "react";
 
 const PricingModal = ({ isOpen, onClose, onSelectPlan }) => {
   if (!isOpen) return null;
 
   const plans = [
     {
-      id: 'annual',
-      title: 'Annual Pass',
-      badge: 'BEST VALUE',
-      badgeColor: 'bg-[#FFAA55]',
-      originalPrice: 'R3000',
-      price: 'R2000',
-      priceColor: 'text-[#FFAA55]',
-      savings: 'Save R1000',
-      billing: 'Billed Annually',
+      id: "annual",
+      title: "Annual Pass",
+      badge: "BEST VALUE",
+      badgeColor: "bg-[#FFAA55]",
+      originalPrice: "R3000",
+      price: "R2000",
+      priceColor: "text-[#FFAA55]",
+      savings: "Save R1000",
+      billing: "Billed Annually",
       features: [
-        'Unlimited DinnersMatch Dinner for 12 months.',
-        'First access to every dinner',
-        'Discount + First access to exclusive DinnersMatch parties',
-        'Community member perks',
+        "Unlimited DinnersMatch Dinner for 12 months.",
+        "First access to every dinner",
+        "Discount + First access to exclusive DinnersMatch parties",
+        "Community member perks",
       ],
-      buttonText: 'Get Annual Pass',
-      buttonColor: 'bg-[#FFAA55] hover:bg-[#FF9955]',
+      buttonText: "Get Annual Pass",
+      buttonColor: "bg-[#FFAA55] hover:bg-[#FF9955]",
     },
     {
-      id: 'monthly',
-      title: 'Monthly Pass',
+      id: "monthly",
+      title: "Monthly Pass",
       badge: null,
-      badgeColor: '',
-      price: 'R250',
-      priceColor: 'text-[#F5F5F5]',
+      badgeColor: "",
+      price: "R250",
+      priceColor: "text-[#F5F5F5]",
       savings: null,
-      billing: 'Billed Monthly',
+      billing: "Billed Monthly",
       features: [
-        'Access to all Dinners - build your social rhythm.',
-        'Early access to exclusive DinnersMatch parties',
-        'Cancel anytime - no question asked.',
+        "Access to all Dinners - build your social rhythm.",
+        "Early access to exclusive DinnersMatch parties",
+        "Cancel anytime - no question asked.",
       ],
-      buttonText: 'Start Monthly Pass',
-      buttonColor: 'bg-[#FFAA55] hover:bg-[#FF9955]',
+      buttonText: "Start Monthly Pass",
+      buttonColor: "bg-[#FFAA55] hover:bg-[#FF9955]",
     },
     {
-      id: 'single',
-      title: 'Single Dinner',
+      id: "single",
+      title: "Single Dinner",
       badge: null,
-      badgeColor: '',
-      price: 'R200',
-      priceColor: 'text-[#F5F5F5]',
+      badgeColor: "",
+      price: "R200",
+      priceColor: "text-[#F5F5F5]",
       savings: null,
-      billing: 'One Time Payment',
-      features: ['Limited to 1 dinner'],
-      buttonText: 'Get Single Ticket',
-      buttonColor: 'bg-[#FFAA55] hover:bg-[#FF9955]',
+      billing: "One Time Payment",
+      features: ["Limited to 1 dinner"],
+      buttonText: "Get Single Ticket",
+      buttonColor: "bg-[#FFAA55]  hover:bg-[#FF9955]",
     },
   ];
 
@@ -66,16 +66,29 @@ const PricingModal = ({ isOpen, onClose, onSelectPlan }) => {
           className="absolute top-6 right-6 text-white/70 hover:text-white transition-colors z-10"
           aria-label="Close modal"
         >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          <svg
+            className="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M6 18L18 6M6 6l12 12"
+            />
           </svg>
         </button>
 
         {/* Header */}
         <div className="text-center mb-8">
-          <h2 className="text-4xl font-bold text-[#F5F5F5] mb-2">Choose Your DinnersMatch Pass</h2>
+          <h2 className="text-4xl font-bold text-[#F5F5F5] mb-2">
+            Choose Your DinnersMatch Pass
+          </h2>
           <p className="text-[#E0E0E0]">
-            No more waiting for plans. Join Cape Town most exciting social community.
+            No more waiting for plans. Join Cape Town most exciting social
+            community.
           </p>
         </div>
 
@@ -93,24 +106,33 @@ const PricingModal = ({ isOpen, onClose, onSelectPlan }) => {
                   {plan.badge}
                 </div>
               )}
-              <h3 className="text-xl font-bold text-[#F5F5F5] mb-4">{plan.title}</h3>
+              <h3 className="text-xl font-bold text-[#F5F5F5] mb-4">
+                {plan.title}
+              </h3>
               <div className="mb-4">
                 {plan.originalPrice && (
                   <span className="text-[#A0A0A0] line-through text-lg mr-2">
                     {plan.originalPrice}
                   </span>
                 )}
-                <span className={`text-3xl font-bold ${plan.priceColor}`}>{plan.price}</span>
+                <span className={`text-3xl font-bold ${plan.priceColor}`}>
+                  {plan.price}
+                </span>
               </div>
               {plan.savings && (
-                <p className="text-[#FFAA55] text-sm mb-2 font-medium">{plan.savings}</p>
+                <p className="text-[#FFAA55] text-sm mb-2 font-medium">
+                  {plan.savings}
+                </p>
               )}
               {plan.billing && (
                 <p className="text-[#E0E0E0] text-sm mb-4">{plan.billing}</p>
               )}
               <ul className="space-y-3 mb-6 flex-grow">
                 {plan.features.map((feature, index) => (
-                  <li key={index} className="flex items-start text-[#E0E0E0] text-sm">
+                  <li
+                    key={index}
+                    className="flex items-start text-[#E0E0E0] text-sm"
+                  >
                     <svg
                       className="w-5 h-5 text-[#FFAA55] mr-2 flex-shrink-0 mt-0.5"
                       fill="currentColor"
@@ -128,7 +150,7 @@ const PricingModal = ({ isOpen, onClose, onSelectPlan }) => {
               </ul>
               <button
                 onClick={() => onSelectPlan(plan.id)}
-                className={`w-full ${plan.buttonColor} text-[#F5F5F5] py-3 rounded-lg font-bold text-sm uppercase tracking-wide transition-colors`}
+                className={`w-full cursor-pointer ${plan.buttonColor} text-[#F5F5F5] py-3 rounded-lg font-bold text-sm uppercase tracking-wide transition-colors`}
               >
                 {plan.buttonText}
               </button>
@@ -138,22 +160,28 @@ const PricingModal = ({ isOpen, onClose, onSelectPlan }) => {
 
         {/* Why Subscription Section */}
         <div className="bg-[#111121] border border-white rounded-xl p-6 mb-6">
-          <h3 className="text-xl font-bold text-[#F5F5F5] mb-3">Why a subscription?</h3>
+          <h3 className="text-xl font-bold text-[#F5F5F5] mb-3">
+            Why a subscription?
+          </h3>
           <p className="text-[#E0E0E0] leading-relaxed">
-            Building a social life isn't a once-off event - it's a rhythm. DinnersMatch happens
-            every 2 weeks, and the magic only works when people show up consistently. A
-            subscription lets us guarantee great groups, exciting restaurants, and a reliable
-            social rhythm you can count on.
+            Building a social life isn't a once-off event - it's a rhythm.
+            DinnersMatch happens every 2 weeks, and the magic only works when
+            people show up consistently. A subscription lets us guarantee great
+            groups, exciting restaurants, and a reliable social rhythm you can
+            count on.
           </p>
         </div>
 
         {/* Legal Text */}
         <p className="text-xs text-[#A0A0A0] text-center">
-          By continuing you agree to our{' '}
-          <a href="/terms-conditions" className="text-[#FFAA55] hover:underline">
+          By continuing you agree to our{" "}
+          <a
+            href="/terms-conditions"
+            className="text-[#FFAA55] hover:underline"
+          >
             Terms & Conditions
-          </a>{' '}
-          and{' '}
+          </a>{" "}
+          and{" "}
           <a href="/privacy-policy" className="text-[#FFAA55] hover:underline">
             Privacy Policy
           </a>
@@ -165,4 +193,3 @@ const PricingModal = ({ isOpen, onClose, onSelectPlan }) => {
 };
 
 export default PricingModal;
-
