@@ -290,7 +290,7 @@ export default function Home() {
 
       <SubscriptionModal
         isOpen={quizStep === 'subscription'}
-        onClose={resetQuizFlow}
+        onClose={() => setQuizStep('book-dinner')}
         onBack={() => setQuizStep('welcome')}
         onContinue={handleSubscriptionContinue}
       />

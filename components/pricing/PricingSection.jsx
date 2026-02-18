@@ -136,14 +136,6 @@ const PricingSection = ({ onSelectPlan }) => {
       </main>
 
       <Disclaimer />
-
-      <div className="flex absolute top-4 right-4 z-0 justify-center items-center p-0 w-5 h-5 aspect-[1/1] min-h-5">
-        <img
-          src="/cross-icon.svg"
-          className="object-contain self-stretch my-auto w-5 aspect-square"
-          alt=""
-        />
-      </div>
     </section>
   );
 };
