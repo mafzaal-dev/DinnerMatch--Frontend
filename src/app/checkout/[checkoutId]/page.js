@@ -58,12 +58,29 @@ export default function CheckoutPage() {
         checkout = CheckoutLib.initiate({
           key: entityId,
           checkoutId,
-          options: {
+          customisations: {
+            showCancelButton: true,
+            showAmountField: true,
             theme: {
-              brand: { primary: "#FFAA55" },
+              fontFamily: "Roboto, sans-serif",
+              brand: {
+                primary: "#92400E",
+                secondary: "#D97706",
+              },
+              cards: {
+                background: "#ffffff",
+                backgroundHover: "#f8fafc",
+              },
+            },
+            card: {
+              submitButtonText: "Pay now",
+              headingText: {
+                default: "Enter your card details to complete payment",
+                savedCards: "Select a saved card or enter new details",
+              },
             },
           },
-          events: {
+          eventHandlers: {
             onCompleted: (event) => {
               if (checkoutRef.current) {
                 try {
@@ -148,8 +165,8 @@ export default function CheckoutPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gray-950">
-      <div className="sticky top-0 z-10 flex justify-between items-center px-4 py-4 bg-gray-950/95 backdrop-blur border-b border-gray-800">
+    <main className="min-h-screen bg-gray-950 bg-gradient-to-b from-gray-950 via-gray-950 to-gray-900">
+      <div className="sticky top-0 z-10 flex justify-between items-center px-4 sm:px-6 py-4 bg-gray-950/95 backdrop-blur-sm border-b border-gray-800/80">
         <Link
           href="/subscription"
           className="flex items-center gap-2 text-[#E0E0E0] hover:text-[#F5F5F5] transition-colors"
@@ -171,37 +188,60 @@ export default function CheckoutPage() {
         </Link>
       </div>
 
-      <div className="max-w-lg mx-auto px-4 py-12">
-        <h1 className="text-2xl font-semibold text-[#F5F5F5] mb-2">
-          Complete payment
-        </h1>
-        <p className="text-[#A0A0A0] mb-8">
-          Enter your card details to subscribe.
-        </p>
+      <div className="max-w-xl mx-auto px-4 py-8 sm:py-12">
+        <div className="rounded-2xl bg-white shadow-xl border border-gray-200 overflow-hidden">
+          <div className="px-6 sm:px-8 pt-8 pb-6">
+            <div className="text-center mb-6">
+              <h1 className="text-2xl sm:text-3xl font-semibold text-gray-900 mb-2">
+                Complete payment
+              </h1>
+              <p className="text-gray-600 text-base">
+                Choose a payment method and enter your details to subscribe.
+              </p>
+            </div>
 
-        {status === "error" && (
-          <div className="mb-6 p-4 bg-red-900/30 border border-red-700 rounded-lg text-red-400 text-sm">
-            <p className="font-medium mb-1">Payment error</p>
-            <p>{errorMsg}</p>
-            <Link
-              href="/subscription"
-              className="mt-3 inline-block text-[#FFAA55] hover:text-[#FFBB66]"
+            {status === "error" && (
+              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm">
+                <p className="font-medium mb-1">Payment error</p>
+                <p>{errorMsg}</p>
+                <Link
+                  href="/subscription"
+                  className="mt-3 inline-block text-amber-600 hover:text-amber-700 font-medium"
+                >
+                  ← Go back and try again
+                </Link>
+              </div>
+            )}
+
+            {status === "loading" && (
+              <div className="flex justify-center py-20">
+                <div className="animate-spin rounded-full h-10 w-10 border-2 border-amber-500 border-t-transparent" />
+              </div>
+            )}
+
+            <div
+              className="rounded-xl overflow-hidden bg-gray-50 border border-gray-200 p-4 sm:p-5"
+              style={{ minHeight: status === "loading" ? 0 : 420 }}
             >
-              ← Go back and try again
-            </Link>
-          </div>
-        )}
+              <div id="peach-payment-form" />
+            </div>
 
-        {status === "loading" && (
-          <div className="flex justify-center py-16">
-            <div className="animate-spin rounded-full h-10 w-10 border-2 border-[#FFAA55] border-t-transparent" />
+            <p className="text-center mt-6 text-gray-500 text-sm flex items-center justify-center gap-1.5">
+              <svg
+                className="w-4 h-4 text-emerald-500"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              Secured by Peach Payments
+            </p>
           </div>
-        )}
-
-        <div
-          id="peach-payment-form"
-          style={{ minHeight: status === "loading" ? 0 : 400 }}
-        />
+        </div>
       </div>
     </main>
   );
