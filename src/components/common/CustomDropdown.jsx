@@ -22,7 +22,7 @@ const GAP = 4;
  * @param {string} props.name - Name attribute for form handling
  * @param {boolean} props.required - Whether the field is required
  * @param {string} props.error - Error message to display
- * @param {'top'|'bottom'} props.placement - Open menu above ('top') or below ('bottom') the trigger. Use 'top' in modals to avoid clipping.
+ * @param {'top'|'bottom'|'auto'} props.placement - Open menu above ('top'), below ('bottom'), or choose automatically ('auto') based on viewport space.
  */
 const CustomDropdown = ({
   options = [],
@@ -39,10 +39,13 @@ const CustomDropdown = ({
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [menuPosition, setMenuPosition] = useState(null);
+  const [autoOpenUpward, setAutoOpenUpward] = useState(false);
   const dropdownRef = useRef(null);
   const menuRef = useRef(null);
   const inputRef = useRef(null);
-  const openUpward = placement === 'top';
+
+  const openUpward =
+    placement === 'auto' ? autoOpenUpward : placement === 'top';
 
   // Find the selected option label
   const selectedOption = options.find(opt => opt.value === value);
@@ -53,7 +56,7 @@ const CustomDropdown = ({
     option.label.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // When opening, measure trigger and set position for portaled menu (so menu is never clipped by modal overflow)
+  // When opening, measure trigger and set position for portaled menu; with placement="auto", choose up/down by viewport space
   useEffect(() => {
     if (!isOpen || disabled || !dropdownRef.current) {
       setMenuPosition(null);
@@ -61,13 +64,26 @@ const CustomDropdown = ({
     }
     const el = dropdownRef.current;
     const rect = el.getBoundingClientRect();
+    const spaceBelow = window.innerHeight - rect.bottom;
+    const spaceAbove = rect.top;
+    const minSpaceForMenu = 260;
+
+    const shouldOpenUpward =
+      placement === 'auto'
+        ? spaceBelow < minSpaceForMenu || spaceAbove > spaceBelow
+        : placement === 'top';
+
+    if (placement === 'auto') {
+      setAutoOpenUpward(shouldOpenUpward);
+    }
+
     setMenuPosition({
       left: rect.left,
-      top: openUpward ? undefined : rect.bottom + GAP,
-      bottom: openUpward ? window.innerHeight - rect.top + GAP : undefined,
+      top: shouldOpenUpward ? undefined : rect.bottom + GAP,
+      bottom: shouldOpenUpward ? window.innerHeight - rect.top + GAP : undefined,
       width: rect.width,
     });
-  }, [isOpen, disabled, openUpward]);
+  }, [isOpen, disabled, placement]);
 
   // Close dropdown when clicking outside (trigger or portaled menu)
   useEffect(() => {
@@ -140,7 +156,7 @@ const CustomDropdown = ({
         onKeyDown={handleKeyDown}
         disabled={disabled}
         className={`
-          w-full px-4 py-2.5 text-left border rounded-lg text-sm 
+          w-full px-4 py-2.5 text-left border rounded-lg text-sm whitespace-nowrap
           focus:outline-none focus:ring-1 transition-colors
           flex items-center justify-between gap-2
           ${disabled 
@@ -158,8 +174,8 @@ const CustomDropdown = ({
           {required && !value && <span className="text-red-500 ml-1">*</span>}
         </span>
         <ChevronDown
-          className={`w-4 h-4 transition-transform ${disabled ? 'text-gray-400' : 'text-gray-500'} ${
-            openUpward ? (isOpen ? 'rotate-0' : 'rotate-180') : isOpen ? 'rotate-180' : ''
+          className={`w-4 h-4 shrink-0 transition-transform ${disabled ? 'text-gray-400' : 'text-gray-500'} ${
+            isOpen ? 'rotate-180' : ''
           }`}
         />
       </button>

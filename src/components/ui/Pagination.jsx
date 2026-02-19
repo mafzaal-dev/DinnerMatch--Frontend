@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { ChevronLeft, ChevronRight, MoreHorizontal } from "lucide-react";
+import { CustomDropdown } from "@/components/common";
 
 const cn = (...classes) => classes.filter(Boolean).join(" ");
 
@@ -182,59 +183,59 @@ function TablePagination({
 
   return (
     <div className="px-4 sm:px-6 py-4 border-t border-[#E5E7EB] flex flex-col sm:flex-row items-center justify-between gap-3">
-      <div className="flex flex-col sm:flex-row items-center gap-3">
-        <span className="text-sm text-[#6B7280]">
-          Showing {from} to {to} of {total} results
-        </span>
+      <span className="text-sm text-[#6B7280]">
+        Showing {from} to {to} of {total} results
+      </span>
+      <div className="flex flex-row items-center gap-2">
+        <Pagination className="w-auto">
+          <PaginationContent className="gap-1">
+            <PaginationItem>
+              <PaginationPrevious
+                onClick={() => onPageChange(Math.max(0, currentPage - 1))}
+                disabled={currentPage === 0}
+              />
+            </PaginationItem>
+            {pageNumbers.map((page, idx) =>
+              page === "ellipsis" ? (
+                <PaginationItem key={`ellipsis-${idx}`}>
+                  <PaginationEllipsis />
+                </PaginationItem>
+              ) : (
+                <PaginationItem key={page}>
+                  <PaginationLink
+                    isActive={currentPage === page - 1}
+                    onClick={() => onPageChange(page - 1)}
+                  >
+                    {page}
+                  </PaginationLink>
+                </PaginationItem>
+              ),
+            )}
+            <PaginationItem>
+              <PaginationNext
+                onClick={() => onPageChange(currentPage + 1)}
+                disabled={(currentPage + 1) * pageSize >= total}
+              />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
         {pageSizeOptions?.length && onPageSizeChange && (
-          <select
-            value={pageSize}
+          <CustomDropdown
+            value={String(pageSize)}
             onChange={(e) => {
               onPageSizeChange(Number(e.target.value));
               onPageChange(0);
             }}
-            className="min-w-[130px] px-3 py-2 border border-[#D1D5DB] rounded-lg text-sm text-[#374151] bg-white focus:outline-none focus:ring-1 focus:ring-[#F97316] focus:border-[#F97316]"
-          >
-            {pageSizeOptions.map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {opt.label}
-              </option>
-            ))}
-          </select>
+            options={pageSizeOptions.map((opt) => ({
+              value: String(opt.value),
+              label: opt.label,
+            }))}
+            placeholder="Per page"
+            className="min-w-[130px]"
+            placement="auto"
+          />
         )}
       </div>
-      <Pagination className="justify-end w-full sm:w-auto">
-        <PaginationContent className="gap-1">
-          <PaginationItem>
-            <PaginationPrevious
-              onClick={() => onPageChange(Math.max(0, currentPage - 1))}
-              disabled={currentPage === 0}
-            />
-          </PaginationItem>
-          {pageNumbers.map((page, idx) =>
-            page === "ellipsis" ? (
-              <PaginationItem key={`ellipsis-${idx}`}>
-                <PaginationEllipsis />
-              </PaginationItem>
-            ) : (
-              <PaginationItem key={page}>
-                <PaginationLink
-                  isActive={currentPage === page - 1}
-                  onClick={() => onPageChange(page - 1)}
-                >
-                  {page}
-                </PaginationLink>
-              </PaginationItem>
-            ),
-          )}
-          <PaginationItem>
-            <PaginationNext
-              onClick={() => onPageChange(currentPage + 1)}
-              disabled={(currentPage + 1) * pageSize >= total}
-            />
-          </PaginationItem>
-        </PaginationContent>
-      </Pagination>
     </div>
   );
 }
