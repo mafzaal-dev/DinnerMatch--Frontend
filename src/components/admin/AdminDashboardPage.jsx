@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback, useRef } from "react";
+import { X } from "lucide-react";
 import { api, API_ENDPOINTS } from "../../utils/api";
 import {
   debounce,
@@ -163,6 +164,27 @@ const AdminDashboardPage = () => {
     }
   };
 
+  const hasActiveFilters =
+    selectedUserType !== "All Users" ||
+    selectedCity !== "All Cities" ||
+    selectedUpcomingDinner !== "Any Upcoming Dinner" ||
+    selectedStatus !== "All Users" ||
+    startDate !== "" ||
+    endDate !== "" ||
+    searchQuery !== "";
+
+  const handleResetFilters = () => {
+    setSelectedUserType("All Users");
+    setSelectedCity("All Cities");
+    setSelectedUpcomingDinner("Any Upcoming Dinner");
+    setSelectedStatus("All Users");
+    setStartDate("");
+    setEndDate("");
+    setSearchQuery("");
+    setCurrentPage(0);
+    toast.success("Filters reset");
+  };
+
   const handleExportCSV = async () => {
     try {
       // Use axiosInstance directly from api to handle responseType: 'blob'
@@ -216,6 +238,17 @@ const AdminDashboardPage = () => {
               onChange={handleSearchChange}
               className="flex-1 px-4 py-2.5 border border-[#D1D5DB] rounded-lg text-sm text-[#111827] placeholder-[#9CA3AF] focus:outline-none focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316] transition-colors"
             />
+            {hasActiveFilters && (
+              <button
+                type="button"
+                onClick={handleResetFilters}
+                className="w-full sm:w-auto px-4 py-2.5 bg-white border border-[#E5E7EB] text-[#6B7280] rounded-lg text-sm font-medium hover:bg-[#FEF2F2] hover:border-[#FCA5A5] hover:text-[#B91C1C] transition-colors flex items-center gap-2 justify-center whitespace-nowrap"
+                title="Reset all filters"
+              >
+                <X className="w-4 h-4" />
+                Reset filters
+              </button>
+            )}
             <button
               onClick={handleExportCSV}
               className="w-full sm:w-auto px-5 py-2.5 bg-white border border-[#D1D5DB] text-[#374151] rounded-lg text-sm font-medium hover:bg-[#F9FAFB] transition-colors flex items-center gap-2 justify-center whitespace-nowrap"
@@ -237,8 +270,8 @@ const AdminDashboardPage = () => {
             </button>
           </div>
 
-          {/* Filter Dropdowns */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-2">
+          {/* Filter Dropdowns - 3 per row */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
             <div className="flex flex-col gap-1">
               <label className="text-xs font-medium text-[#6B7280]">
                 Membership

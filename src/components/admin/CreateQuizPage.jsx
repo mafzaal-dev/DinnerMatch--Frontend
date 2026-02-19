@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { ChevronLeft } from "lucide-react";
 import { useQuiz } from "@/hooks/useQuiz";
 import { toast } from "react-hot-toast";
 import { CustomDropdown } from "@/components/common";
@@ -362,7 +363,17 @@ const CreateQuizPage = ({ quizId = null, isEdit = false }) => {
     <div className="flex flex-col h-full">
       {/* Header */}
       <div className="bg-white px-4 sm:px-6 lg:px-8 py-5 border-b border-[#E5E7EB] flex-shrink-0">
-        <h1 className="text-xl font-semibold text-[#111827]">Quiz</h1>
+        <div className="flex items-center gap-3 mb-1">
+          <button
+            type="button"
+            onClick={() => router.push("/admin/quiz")}
+            className="p-1.5 -ml-1.5 rounded-lg text-[#6B7280] bg-[#F3F4F6] hover:text-[#111827] transition-colors"
+            aria-label="Back to quiz list"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+          <h1 className="text-xl font-semibold text-[#111827]">Quiz</h1>
+        </div>
         <p className="text-sm text-[#6B7280] mt-0.5">
           Please provide all of the information below to add a question.
         </p>

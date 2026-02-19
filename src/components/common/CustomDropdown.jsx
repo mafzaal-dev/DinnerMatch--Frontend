@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from 'react';
-import { createPortal } from 'react-dom';
-import { ChevronDown } from 'lucide-react';
+import React, { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
+import { ChevronDown } from "lucide-react";
 
 const DROPDOWN_Z_INDEX = 9999;
 const GAP = 4;
@@ -26,18 +26,18 @@ const GAP = 4;
  */
 const CustomDropdown = ({
   options = [],
-  value = '',
+  value = "",
   onChange,
-  placeholder = 'Select an option',
+  placeholder = "Select an option",
   disabled = false,
-  className = '',
-  name = '',
+  className = "",
+  name = "",
   required = false,
-  error = '',
-  placement = 'bottom',
+  error = "",
+  placement = "bottom",
 }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [menuPosition, setMenuPosition] = useState(null);
   const [autoOpenUpward, setAutoOpenUpward] = useState(false);
   const dropdownRef = useRef(null);
@@ -45,15 +45,15 @@ const CustomDropdown = ({
   const inputRef = useRef(null);
 
   const openUpward =
-    placement === 'auto' ? autoOpenUpward : placement === 'top';
+    placement === "auto" ? autoOpenUpward : placement === "top";
 
   // Find the selected option label
-  const selectedOption = options.find(opt => opt.value === value);
-  const displayText = selectedOption ? selectedOption.label : '';
+  const selectedOption = options.find((opt) => opt.value === value);
+  const displayText = selectedOption ? selectedOption.label : "";
 
   // Filter options based on search term
-  const filteredOptions = options.filter(option =>
-    option.label.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredOptions = options.filter((option) =>
+    option.label.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   // When opening, measure trigger and set position for portaled menu; with placement="auto", choose up/down by viewport space
@@ -69,18 +69,20 @@ const CustomDropdown = ({
     const minSpaceForMenu = 260;
 
     const shouldOpenUpward =
-      placement === 'auto'
+      placement === "auto"
         ? spaceBelow < minSpaceForMenu || spaceAbove > spaceBelow
-        : placement === 'top';
+        : placement === "top";
 
-    if (placement === 'auto') {
+    if (placement === "auto") {
       setAutoOpenUpward(shouldOpenUpward);
     }
 
     setMenuPosition({
       left: rect.left,
       top: shouldOpenUpward ? undefined : rect.bottom + GAP,
-      bottom: shouldOpenUpward ? window.innerHeight - rect.top + GAP : undefined,
+      bottom: shouldOpenUpward
+        ? window.innerHeight - rect.top + GAP
+        : undefined,
       width: rect.width,
     });
   }, [isOpen, disabled, placement]);
@@ -92,25 +94,25 @@ const CustomDropdown = ({
       const inMenu = menuRef.current?.contains(event.target);
       if (!inTrigger && !inMenu) {
         setIsOpen(false);
-        setSearchTerm('');
+        setSearchTerm("");
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   // Handle keyboard navigation
   const handleKeyDown = (e) => {
     if (disabled) return;
 
-    if (e.key === 'Enter' || e.key === ' ') {
+    if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
       setIsOpen(!isOpen);
-    } else if (e.key === 'Escape') {
+    } else if (e.key === "Escape") {
       setIsOpen(false);
-      setSearchTerm('');
-    } else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      setSearchTerm("");
+    } else if (e.key === "ArrowDown" || e.key === "ArrowUp") {
       e.preventDefault();
       if (!isOpen) {
         setIsOpen(true);
@@ -134,7 +136,7 @@ const CustomDropdown = ({
         target: {
           name: name,
           value: option.value,
-          type: 'select-one',
+          type: "select-one",
         },
         currentTarget: {
           name: name,
@@ -144,7 +146,7 @@ const CustomDropdown = ({
       onChange(syntheticEvent);
     }
     setIsOpen(false);
-    setSearchTerm('');
+    setSearchTerm("");
   };
 
   return (
@@ -159,34 +161,36 @@ const CustomDropdown = ({
           w-full px-4 py-2.5 text-left border rounded-lg text-sm whitespace-nowrap
           focus:outline-none focus:ring-1 transition-colors
           flex items-center justify-between gap-2
-          ${disabled 
-            ? 'bg-gray-100 text-gray-400 cursor-not-allowed border-gray-200' 
-            : 'bg-white text-gray-900 border-[#D1D5DB] hover:border-[#F97316] focus:border-[#F97316] focus:ring-[#F97316] cursor-pointer'
+          ${
+            disabled
+              ? "bg-gray-100 text-gray-400 cursor-not-allowed border-gray-200"
+              : "bg-white text-gray-900 border-[#D1D5DB] hover:border-[#F97316] focus:border-[#F97316] focus:ring-[#F97316] cursor-pointer"
           }
-          ${error ? 'border-red-500' : ''}
+          ${error ? "border-red-500" : ""}
         `}
         aria-haspopup="listbox"
         aria-expanded={isOpen}
         aria-label={name}
       >
-        <span className={displayText ? 'text-gray-900' : 'text-gray-400'}>
+        <span className={displayText ? "text-gray-900" : "text-gray-400"}>
           {displayText || placeholder}
           {required && !value && <span className="text-red-500 ml-1">*</span>}
         </span>
         <ChevronDown
-          className={`w-4 h-4 shrink-0 transition-transform ${disabled ? 'text-gray-400' : 'text-gray-500'} ${
-            isOpen ? 'rotate-180' : ''
+          className={`w-4 h-4 shrink-0 transition-transform ${disabled ? "text-gray-400" : "text-gray-500"} ${
+            isOpen ? "rotate-180" : ""
           }`}
         />
       </button>
 
       {/* Error Message */}
-      {error && (
-        <p className="mt-1 text-xs text-red-500">{error}</p>
-      )}
+      {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
 
       {/* Dropdown Menu - rendered in portal with fixed position so it is never clipped by modal overflow */}
-      {isOpen && !disabled && menuPosition && typeof document !== 'undefined' &&
+      {isOpen &&
+        !disabled &&
+        menuPosition &&
+        typeof document !== "undefined" &&
         createPortal(
           <div
             ref={menuRef}
@@ -216,7 +220,7 @@ const CustomDropdown = ({
             )}
 
             {/* Options List */}
-            <div className="overflow-y-auto max-h-48" role="listbox">
+            <div className="overflow-y-auto max-h-60" role="listbox">
               {filteredOptions.length > 0 ? (
                 filteredOptions.map((option, index) => {
                   const isSelected = option.value === value;
@@ -228,9 +232,10 @@ const CustomDropdown = ({
                       className={`
                         w-full px-4 py-2.5 text-left text-sm transition-colors
                         hover:bg-[#FFF7ED] focus:bg-[#FFF7ED] focus:outline-none
-                        ${isSelected
-                          ? 'bg-[#FFF7ED] text-[#F97316] font-medium'
-                          : 'text-gray-900'
+                        ${
+                          isSelected
+                            ? "bg-[#FFF7ED] text-[#F97316] font-medium"
+                            : "text-gray-900"
                         }
                       `}
                       role="option"
@@ -264,7 +269,7 @@ const CustomDropdown = ({
               )}
             </div>
           </div>,
-          document.body
+          document.body,
         )}
     </div>
   );
