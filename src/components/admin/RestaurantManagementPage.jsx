@@ -267,7 +267,9 @@ const RestaurantManagementPage = () => {
                         )}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-[#374151]">
-                        {restaurant.budget || '-'}
+                        {restaurant.price != null && restaurant.price !== ''
+                          ? formatPrice(restaurant.price)
+                          : formatDisplayValue(restaurant.budget) || '-'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-[#374151]">
                         <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">

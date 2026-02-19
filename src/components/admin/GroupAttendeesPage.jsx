@@ -197,8 +197,8 @@ const GroupAttendeesPage = () => {
       }
       if (filterRequestCity) params.append('city', filterRequestCity);
       if (filterRequestDinner) params.append('dinner', filterRequestDinner);
-      if (filterRequestDateFrom) params.append('date_from', filterRequestDateFrom);
-      if (filterRequestDateTo) params.append('date_to', filterRequestDateTo);
+      if (filterRequestDateFrom) params.append('start_date', filterRequestDateFrom);
+      if (filterRequestDateTo) params.append('end_date', filterRequestDateTo);
       
       const response = await api.get(`${API_ENDPOINTS.DINNER_REQUESTS_LIST}?${params}`);
       
@@ -235,8 +235,8 @@ const GroupAttendeesPage = () => {
       }
       if (filterCity) params.append('city', filterCity);
       if (filterDinner) params.append('dinner', filterDinner);
-      if (filterDateFrom) params.append('date_from', filterDateFrom);
-      if (filterDateTo) params.append('date_to', filterDateTo);
+      if (filterDateFrom) params.append('start_date', filterDateFrom);
+      if (filterDateTo) params.append('end_date', filterDateTo);
       
       const response = await api.get(`${API_ENDPOINTS.GROUP_LIST}?${params}`);
       
