@@ -32,9 +32,8 @@ PaginationItem.displayName = "PaginationItem";
 const paginationLinkStyles = {
   default:
     "inline-flex items-center justify-center rounded-lg border border-[#E5E7EB] bg-white px-3 py-2 text-sm font-medium text-[#374151] hover:bg-[#F9FAFB] transition-colors disabled:pointer-events-none disabled:opacity-50",
-  active:
-    "border-[#F97316] bg-white text-[#111827] hover:bg-white hover:text-[#111827]",
-  ghost: "border-transparent bg-transparent hover:bg-[#F3F4F6]",
+  active: "!bg-[#F97316] text-white hover:bg-white cus",
+  ghost: "border-transparent bg-transparent hover:bg-[#F3F4F6] cursor-pointer",
 };
 
 const PaginationLink = ({
@@ -226,7 +225,7 @@ function TablePagination({
                   {page}
                 </PaginationLink>
               </PaginationItem>
-            )
+            ),
           )}
           <PaginationItem>
             <PaginationNext
