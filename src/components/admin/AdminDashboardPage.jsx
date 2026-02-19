@@ -14,14 +14,14 @@ import toast from "react-hot-toast";
 
 const AdminDashboardPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedSignupTime, setSelectedSignupTime] =
-    useState("All Signup Times");
   const [selectedUserType, setSelectedUserType] = useState("All Users");
   const [selectedCity, setSelectedCity] = useState("All Cities");
   const [selectedUpcomingDinner, setSelectedUpcomingDinner] = useState(
     "Any Upcoming Dinner",
   );
   const [selectedStatus, setSelectedStatus] = useState("All Users");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const [users, setUsers] = useState([]);
   const [totalUsers, setTotalUsers] = useState("0");
   const [loading, setLoading] = useState(false);
@@ -44,23 +44,16 @@ const AdminDashboardPage = () => {
       setError(null);
       try {
         const params = new URLSearchParams();
-        // Only add search if it's valid (3+ characters)
-        if (isValidSearchQuery(query)) {
-          params.append("search", query);
-        }
+        // Pagination
         params.append("index", currentPage);
         params.append("offset", pageSize);
 
-        // Add filter params when not "All" / default
-        if (selectedSignupTime !== "All Signup Times") {
-          const signupMap = {
-            "Last 7 Days": "7",
-            "Last 30 Days": "30",
-            "Last 90 Days": "90",
-          };
-          if (signupMap[selectedSignupTime])
-            params.append("signup_days", signupMap[selectedSignupTime]);
+        // Search (min 3 characters)
+        if (isValidSearchQuery(query)) {
+          params.append("search", query);
         }
+
+        // Filters – match API: membership, city, has_upcoming_booking, status, start_date, end_date
         if (selectedUserType !== "All Users") {
           params.append("membership", selectedUserType.toLowerCase());
         }
@@ -76,6 +69,8 @@ const AdminDashboardPage = () => {
         if (selectedStatus !== "All Users") {
           params.append("status", selectedStatus.toLowerCase());
         }
+        params.append("start_date", startDate || "null");
+        params.append("end_date", endDate || "null");
 
         const endpoint = `${API_ENDPOINTS.USER_LIST}?${params.toString()}`;
         const response = await api.get(endpoint);
@@ -96,11 +91,12 @@ const AdminDashboardPage = () => {
     [
       currentPage,
       pageSize,
-      selectedSignupTime,
       selectedUserType,
       selectedCity,
       selectedUpcomingDinner,
       selectedStatus,
+      startDate,
+      endDate,
     ],
   );
 
@@ -207,11 +203,11 @@ const AdminDashboardPage = () => {
       </div>
 
       {/* Main Content */}
-      <div className="p-6">
+      <div className="p-3">
         {/* Stats Cards - Removed as per requirements */}
 
         {/* Search and Filters */}
-        <div className="bg-white rounded-xl shadow-sm border border-[#E5E7EB] p-5 mb-5">
+        <div className="bg-white rounded-xl shadow-sm border border-[#E5E7EB] p-3 mb-5">
           <div className="flex flex-col sm:flex-row gap-3 mb-4">
             <input
               type="text"
@@ -242,77 +238,107 @@ const AdminDashboardPage = () => {
           </div>
 
           {/* Filter Dropdowns */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
-            <CustomDropdown
-              value={selectedSignupTime}
-              onChange={(e) => {
-                setSelectedSignupTime(e.target.value);
-                setCurrentPage(0);
-              }}
-              options={[
-                { value: "All Signup Times", label: "All Signup Times" },
-                { value: "Last 7 Days", label: "Last 7 Days" },
-                { value: "Last 30 Days", label: "Last 30 Days" },
-                { value: "Last 90 Days", label: "Last 90 Days" },
-              ]}
-              placeholder="All Signup Times"
-            />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-2">
+            <div className="flex flex-col gap-1">
+              <label className="text-xs font-medium text-[#6B7280]">
+                Membership
+              </label>
+              <CustomDropdown
+                value={selectedUserType}
+                onChange={(e) => {
+                  setSelectedUserType(e.target.value);
+                  setCurrentPage(0);
+                }}
+                options={[
+                  { value: "All Users", label: "All Users" },
+                  { value: "Subscribed", label: "Subscribed" },
+                  { value: "Free", label: "Free" },
+                ]}
+                placeholder="All Users"
+              />
+            </div>
 
-            <CustomDropdown
-              value={selectedUserType}
-              onChange={(e) => {
-                setSelectedUserType(e.target.value);
-                setCurrentPage(0);
-              }}
-              options={[
-                { value: "All Users", label: "All Users" },
-                { value: "Subscribed", label: "Subscribed" },
-                { value: "Free", label: "Free" },
-              ]}
-              placeholder="All Users"
-            />
+            <div className="flex flex-col gap-1">
+              <label className="text-xs font-medium text-[#6B7280]">City</label>
+              <CustomDropdown
+                value={selectedCity}
+                onChange={(e) => {
+                  setSelectedCity(e.target.value);
+                  setCurrentPage(0);
+                }}
+                options={[
+                  { value: "All Cities", label: "All Cities" },
+                  { value: "Cape Town", label: "Cape Town" },
+                  { value: "Johannesburg", label: "Johannesburg" },
+                ]}
+                placeholder="All Cities"
+              />
+            </div>
 
-            <CustomDropdown
-              value={selectedCity}
-              onChange={(e) => {
-                setSelectedCity(e.target.value);
-                setCurrentPage(0);
-              }}
-              options={[
-                { value: "All Cities", label: "All Cities" },
-                { value: "Cape Town", label: "Cape Town" },
-                { value: "Johannesburg", label: "Johannesburg" },
-              ]}
-              placeholder="All Cities"
-            />
+            <div className="flex flex-col gap-1">
+              <label className="text-xs font-medium text-[#6B7280]">
+                Upcoming dinner
+              </label>
+              <CustomDropdown
+                value={selectedUpcomingDinner}
+                onChange={(e) => {
+                  setSelectedUpcomingDinner(e.target.value);
+                  setCurrentPage(0);
+                }}
+                options={[
+                  { value: "Any Upcoming Dinner", label: "Any Upcoming Dinner" },
+                  { value: "Has Booking", label: "Has Booking" },
+                  { value: "No Booking", label: "No Booking" },
+                ]}
+                placeholder="Any Upcoming Dinner"
+              />
+            </div>
 
-            <CustomDropdown
-              value={selectedUpcomingDinner}
-              onChange={(e) => {
-                setSelectedUpcomingDinner(e.target.value);
-                setCurrentPage(0);
-              }}
-              options={[
-                { value: "Any Upcoming Dinner", label: "Any Upcoming Dinner" },
-                { value: "Has Booking", label: "Has Booking" },
-                { value: "No Booking", label: "No Booking" },
-              ]}
-              placeholder="Any Upcoming Dinner"
-            />
+            <div className="flex flex-col gap-1">
+              <label className="text-xs font-medium text-[#6B7280]">Status</label>
+              <CustomDropdown
+                value={selectedStatus}
+                onChange={(e) => {
+                  setSelectedStatus(e.target.value);
+                  setCurrentPage(0);
+                }}
+                options={[
+                  { value: "All Users", label: "All Users" },
+                  { value: "Active", label: "Active" },
+                  { value: "Inactive", label: "Inactive" },
+                ]}
+                placeholder="All Users"
+              />
+            </div>
 
-            <CustomDropdown
-              value={selectedStatus}
-              onChange={(e) => {
-                setSelectedStatus(e.target.value);
-                setCurrentPage(0);
-              }}
-              options={[
-                { value: "All Users", label: "All Users" },
-                { value: "Active", label: "Active" },
-                { value: "Inactive", label: "Inactive" },
-              ]}
-              placeholder="All Users"
-            />
+            <div className="flex flex-col gap-1">
+              <label className="text-xs font-medium text-[#6B7280]">
+                Start date
+              </label>
+              <input
+                type="date"
+                value={startDate}
+                onChange={(e) => {
+                  setStartDate(e.target.value);
+                  setCurrentPage(0);
+                }}
+                className="px-3 py-2 border border-[#D1D5DB] rounded-lg text-sm text-[#111827] focus:outline-none focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316]"
+              />
+            </div>
+            <div className="flex flex-col gap-1">
+              <label className="text-xs font-medium text-[#6B7280]">
+                End date
+              </label>
+              <input
+                type="date"
+                value={endDate}
+                onChange={(e) => {
+                  setEndDate(e.target.value);
+                  setCurrentPage(0);
+                }}
+                className="px-3 py-2 border border-[#D1D5DB] rounded-lg text-sm text-[#111827] focus:outline-none focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316]"
+              />
+            </div>
           </div>
         </div>
 
@@ -486,15 +512,26 @@ const AdminDashboardPage = () => {
                         )}
                       </td>
                       <td className="px-4 py-3.5 whitespace-nowrap text-sm text-[#6B7280] relative">
-                        <div className="relative inline-block" ref={openMenuUserId === (user.id || user.email) ? menuRef : null}>
+                        <div
+                          className="relative inline-block"
+                          ref={
+                            openMenuUserId === (user.id || user.email)
+                              ? menuRef
+                              : null
+                          }
+                        >
                           <button
                             type="button"
                             onClick={() =>
                               setOpenMenuUserId((prev) =>
-                                prev === (user.id || user.email) ? null : user.id || user.email,
+                                prev === (user.id || user.email)
+                                  ? null
+                                  : user.id || user.email,
                               )
                             }
-                            disabled={updatingUserId === (user.id || user.email)}
+                            disabled={
+                              updatingUserId === (user.id || user.email)
+                            }
                             className="p-1 hover:bg-[#F3F4F6] rounded transition-colors disabled:opacity-60"
                             aria-label="User actions"
                           >
@@ -511,7 +548,10 @@ const AdminDashboardPage = () => {
                               <button
                                 type="button"
                                 onClick={() =>
-                                  handleUpdateUserStatus(user.id || user.email, true)
+                                  handleUpdateUserStatus(
+                                    user.id || user.email,
+                                    true,
+                                  )
                                 }
                                 disabled={
                                   updatingUserId === (user.id || user.email) ||
@@ -527,7 +567,10 @@ const AdminDashboardPage = () => {
                               <button
                                 type="button"
                                 onClick={() =>
-                                  handleUpdateUserStatus(user.id || user.email, false)
+                                  handleUpdateUserStatus(
+                                    user.id || user.email,
+                                    false,
+                                  )
                                 }
                                 disabled={
                                   updatingUserId === (user.id || user.email) ||
