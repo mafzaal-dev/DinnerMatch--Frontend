@@ -5,6 +5,7 @@ import { api, API_ENDPOINTS } from '../../utils/api';
 import { toast } from 'react-hot-toast';
 import { debounce, formatDisplayValue, isValidSearchQuery, capitalizeWords } from '../../utils/searchHelper';
 import { CustomDropdown } from '@/components/common';
+import { TablePagination } from '@/components/ui/Pagination';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { createGroupSchema } from '@/constants/validationSchemas';
@@ -679,29 +680,12 @@ const GroupAttendeesPage = () => {
         </div>
         
         {/* Pagination */}
-        {requestsTotal > 0 && (
-          <div className="px-6 py-4 border-t border-[#E5E7EB] flex items-center justify-between">
-            <div className="text-sm text-[#6B7280]">
-              Showing {requestsPage * requestsPageSize + 1} to {Math.min((requestsPage + 1) * requestsPageSize, requestsTotal)} of {requestsTotal} results
-            </div>
-            <div className="flex gap-2">
-              <button
-                onClick={() => setRequestsPage(Math.max(0, requestsPage - 1))}
-                disabled={requestsPage === 0}
-                className="px-4 py-2 border border-[#E5E7EB] rounded-lg text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
-              >
-                Previous
-              </button>
-              <button
-                onClick={() => setRequestsPage(requestsPage + 1)}
-                disabled={(requestsPage + 1) * requestsPageSize >= requestsTotal}
-                className="px-4 py-2 border border-[#E5E7EB] rounded-lg text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
-              >
-                Next
-              </button>
-            </div>
-          </div>
-        )}
+        <TablePagination
+          currentPage={requestsPage}
+          total={requestsTotal}
+          pageSize={requestsPageSize}
+          onPageChange={setRequestsPage}
+        />
       </div>
     );
   };

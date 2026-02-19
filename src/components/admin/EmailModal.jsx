@@ -105,6 +105,7 @@ const EmailModal = ({ onClose, contextText, totalUsers, recipientCount }) => {
                   ]}
                   placeholder="Select a template"
                   disabled={loading}
+                  placement="top"
                 />
               </div>
               {loading && <p className="text-xs text-gray-500 mt-1">Loading templates...</p>}

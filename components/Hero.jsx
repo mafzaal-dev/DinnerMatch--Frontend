@@ -68,13 +68,25 @@ const Hero = () => {
 
           <div className="flex gap-5 mt-3">
             <div className="flex items-center gap-3">
-              <div className="w-7 h-7 rounded-full bg-gray-200 flex items-center justify-center text-[1rem]"></div>
+              <Image
+                src="/vibe-matched.svg"
+                alt=""
+                width={34}
+                height={34}
+                className=" object-contain shrink-0"
+              />
               <span className="font-semibold text-sm text-[#212121]">
                 Vibe-Matched Groups
               </span>
             </div>
             <div className="flex items-center gap-3">
-              <div className="w-7 h-7 rounded-full bg-gray-200 flex items-center justify-center text-xl"></div>
+              <Image
+                src="/budget-friendly.svg"
+                alt=""
+                width={34}
+                height={34}
+                className=" object-contain shrink-0"
+              />
               <span className="font-semibold text-sm text-[#212121]">
                 Budget-Friendly
               </span>
@@ -101,5 +113,3 @@ const Hero = () => {
 };
 
 export default Hero;
-
-

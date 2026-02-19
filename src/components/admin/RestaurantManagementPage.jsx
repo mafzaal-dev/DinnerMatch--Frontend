@@ -6,6 +6,7 @@ import { useRestaurant } from '@/hooks/useRestaurant';
 import toast from 'react-hot-toast';
 import { debounce, formatDisplayValue, isValidSearchQuery } from '@/utils/searchHelper';
 import { CustomDropdown } from '@/components/common';
+import { TablePagination } from '@/components/ui/Pagination';
 
 const RestaurantManagementPage = () => {
   const router = useRouter();
@@ -303,28 +304,13 @@ const RestaurantManagementPage = () => {
           </div>
 
           {/* Pagination */}
-          {!loading && total > 0 && (
-            <div className="px-6 py-4 border-t border-[#E5E7EB] flex flex-col sm:flex-row items-center justify-between gap-3">
-              <div className="text-sm text-[#6B7280]">
-                Showing {currentPage * pageSize + 1} to {Math.min((currentPage + 1) * pageSize, total)} of {total} results
-              </div>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setCurrentPage(Math.max(0, currentPage - 1))}
-                  disabled={currentPage === 0}
-                  className="px-3 py-1 border border-[#E5E7EB] rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
-                >
-                  Previous
-                </button>
-                <button
-                  onClick={() => setCurrentPage(currentPage + 1)}
-                  disabled={(currentPage + 1) * pageSize >= total}
-                  className="px-3 py-1 border border-[#E5E7EB] rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
-                >
-                  Next
-                </button>
-              </div>
-            </div>
+          {!loading && (
+            <TablePagination
+              currentPage={currentPage}
+              total={total}
+              pageSize={pageSize}
+              onPageChange={setCurrentPage}
+            />
           )}
         </div>
       </div>

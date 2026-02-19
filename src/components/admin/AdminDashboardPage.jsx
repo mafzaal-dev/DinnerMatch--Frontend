@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { api, API_ENDPOINTS } from '../../utils/api';
 import { debounce, formatDisplayValue, isValidSearchQuery } from '../../utils/searchHelper';
 import { CustomDropdown } from '@/components/common';
+import { TablePagination } from '@/components/ui/Pagination';
 import EmailModal from './EmailModal';
 
 const AdminDashboardPage = () => {
@@ -24,7 +25,7 @@ const AdminDashboardPage = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [pageSize, setPageSize] = useState(10);
 
-  const fetchUsers = async (query = '') => {
+  const fetchUsers = useCallback(async (query = '') => {
     setLoading(true);
     setError(null);
     try {
@@ -35,13 +36,31 @@ const AdminDashboardPage = () => {
       }
       params.append('index', currentPage);
       params.append('offset', pageSize);
-      
+
+      // Add filter params when not "All" / default
+      if (selectedSignupTime !== 'All Signup Times') {
+        const signupMap = { 'Last 7 Days': '7', 'Last 30 Days': '30', 'Last 90 Days': '90' };
+        if (signupMap[selectedSignupTime]) params.append('signup_days', signupMap[selectedSignupTime]);
+      }
+      if (selectedUserType !== 'All Users') {
+        params.append('membership', selectedUserType.toLowerCase());
+      }
+      if (selectedCity !== 'All Cities') {
+        params.append('city', selectedCity);
+      }
+      if (selectedUpcomingDinner !== 'Any Upcoming Dinner') {
+        params.append('has_upcoming_booking', selectedUpcomingDinner === 'Has Booking' ? 'true' : 'false');
+      }
+      if (selectedStatus !== 'All Users') {
+        params.append('status', selectedStatus.toLowerCase());
+      }
+
       const endpoint = `${API_ENDPOINTS.USER_LIST}?${params.toString()}`;
       const response = await api.get(endpoint);
-      
-      const userData = response.data?.users || [];
-      const total = response.data?.total || 0;
-      
+
+      const userData = response?.users ?? response?.data?.users ?? [];
+      const total = response?.total ?? response?.data?.total ?? 0;
+
       setUsers(userData);
       setTotalUsers(total.toString());
     } catch (err) {
@@ -50,7 +69,15 @@ const AdminDashboardPage = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [
+    currentPage,
+    pageSize,
+    selectedSignupTime,
+    selectedUserType,
+    selectedCity,
+    selectedUpcomingDinner,
+    selectedStatus,
+  ]);
 
   // Debounced search function
   const debouncedFetchUsers = useCallback(
@@ -63,9 +90,10 @@ const AdminDashboardPage = () => {
     [] // eslint-disable-line react-hooks/exhaustive-deps
   );
 
+  // Refetch when pagination or any filter changes (fetchUsers updates when those deps change)
   useEffect(() => {
     fetchUsers(searchQuery);
-  }, [currentPage, pageSize]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [fetchUsers]);
 
   const handleSearchChange = (e) => {
     const value = e.target.value;
@@ -145,7 +173,10 @@ const AdminDashboardPage = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
             <CustomDropdown
               value={selectedSignupTime}
-              onChange={(e) => setSelectedSignupTime(e.target.value)}
+              onChange={(e) => {
+                setSelectedSignupTime(e.target.value);
+                setCurrentPage(0);
+              }}
               options={[
                 { value: 'All Signup Times', label: 'All Signup Times' },
                 { value: 'Last 7 Days', label: 'Last 7 Days' },
@@ -157,7 +188,10 @@ const AdminDashboardPage = () => {
 
             <CustomDropdown
               value={selectedUserType}
-              onChange={(e) => setSelectedUserType(e.target.value)}
+              onChange={(e) => {
+                setSelectedUserType(e.target.value);
+                setCurrentPage(0);
+              }}
               options={[
                 { value: 'All Users', label: 'All Users' },
                 { value: 'Subscribed', label: 'Subscribed' },
@@ -168,7 +202,10 @@ const AdminDashboardPage = () => {
 
             <CustomDropdown
               value={selectedCity}
-              onChange={(e) => setSelectedCity(e.target.value)}
+              onChange={(e) => {
+                setSelectedCity(e.target.value);
+                setCurrentPage(0);
+              }}
               options={[
                 { value: 'All Cities', label: 'All Cities' },
                 { value: 'Cape Town', label: 'Cape Town' },
@@ -179,7 +216,10 @@ const AdminDashboardPage = () => {
 
             <CustomDropdown
               value={selectedUpcomingDinner}
-              onChange={(e) => setSelectedUpcomingDinner(e.target.value)}
+              onChange={(e) => {
+                setSelectedUpcomingDinner(e.target.value);
+                setCurrentPage(0);
+              }}
               options={[
                 { value: 'Any Upcoming Dinner', label: 'Any Upcoming Dinner' },
                 { value: 'Has Booking', label: 'Has Booking' },
@@ -190,7 +230,10 @@ const AdminDashboardPage = () => {
 
             <CustomDropdown
               value={selectedStatus}
-              onChange={(e) => setSelectedStatus(e.target.value)}
+              onChange={(e) => {
+                setSelectedStatus(e.target.value);
+                setCurrentPage(0);
+              }}
               options={[
                 { value: 'All Users', label: 'All Users' },
                 { value: 'Active', label: 'Active' },
@@ -324,45 +367,23 @@ const AdminDashboardPage = () => {
           </div>
 
           {/* Pagination */}
-          {!loading && parseInt(totalUsers) > 0 && (
-            <div className="px-4 sm:px-6 py-4 border-t border-[#E5E7EB] flex flex-col sm:flex-row items-center justify-between gap-3">
-              <div className="flex flex-col sm:flex-row items-center gap-3">
-                <span className="text-sm text-[#6B7280]">
-                  Showing {currentPage * pageSize + 1} to {Math.min((currentPage + 1) * pageSize, parseInt(totalUsers))} of {totalUsers} results
-                </span>
-                <CustomDropdown
-                  value={pageSize.toString()}
-                  onChange={(e) => {
-                    setPageSize(parseInt(e.target.value));
-                    setCurrentPage(0);
-                  }}
-                  options={[
-                    { value: '10', label: '10 per page' },
-                    { value: '25', label: '25 per page' },
-                    { value: '50', label: '50 per page' },
-                    { value: '100', label: '100 per page' },
-                  ]}
-                  placeholder="10 per page"
-                  className="w-full sm:w-auto min-w-[130px]"
-                />
-              </div>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setCurrentPage(Math.max(0, currentPage - 1))}
-                  disabled={currentPage === 0}
-                  className="px-4 py-2 border border-[#E5E7EB] rounded-lg text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
-                >
-                  Previous
-                </button>
-                <button
-                  onClick={() => setCurrentPage(currentPage + 1)}
-                  disabled={(currentPage + 1) * pageSize >= parseInt(totalUsers)}
-                  className="px-4 py-2 border border-[#E5E7EB] rounded-lg text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
-                >
-                  Next
-                </button>
-              </div>
-            </div>
+          {!loading && (
+            <TablePagination
+              currentPage={currentPage}
+              total={parseInt(totalUsers) || 0}
+              pageSize={pageSize}
+              onPageChange={setCurrentPage}
+              pageSizeOptions={[
+                { value: 10, label: '10 per page' },
+                { value: 25, label: '25 per page' },
+                { value: 50, label: '50 per page' },
+                { value: 100, label: '100 per page' },
+              ]}
+              onPageSizeChange={(size) => {
+                setPageSize(size);
+                setCurrentPage(0);
+              }}
+            />
           )}
         </div>
       </div>

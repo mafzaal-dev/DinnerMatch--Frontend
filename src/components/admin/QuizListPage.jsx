@@ -4,6 +4,7 @@ import { useQuiz } from '@/hooks/useQuiz';
 import { toast } from 'react-hot-toast';
 import { debounce, isValidSearchQuery } from '@/utils/searchHelper';
 import { CustomDropdown } from '@/components/common';
+import { TablePagination } from '@/components/ui/Pagination';
 import {
   DndContext, 
   closestCenter,
@@ -273,7 +274,6 @@ const QuizListPage = () => {
     (currentPage + 1) * pageSize
   );
   
-  const totalPages = Math.ceil(filteredQuestions.length / pageSize);
 
   const handleCreateQuestion = () => {
     router.push('/admin/quiz/create');
@@ -465,31 +465,13 @@ const QuizListPage = () => {
           </div>
 
           {/* Pagination */}
-          {!loading && filteredQuestions.length > 0 && (
-            <div className="px-6 py-4 border-t border-[#E5E7EB] flex flex-col sm:flex-row items-center justify-between gap-3">
-              <div className="text-sm text-[#6B7280]">
-                Showing {currentPage * pageSize + 1} to {Math.min((currentPage + 1) * pageSize, filteredQuestions.length)} of {filteredQuestions.length} results
-              </div>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setCurrentPage(Math.max(0, currentPage - 1))}
-                  disabled={currentPage === 0}
-                  className="px-4 py-2 border border-[#E5E7EB] rounded-lg text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
-                >
-                  Previous
-                </button>
-                <span className="px-4 py-2 text-sm text-[#6B7280]">
-                  Page {currentPage + 1} of {totalPages}
-                </span>
-                <button
-                  onClick={() => setCurrentPage(currentPage + 1)}
-                  disabled={currentPage >= totalPages - 1}
-                  className="px-4 py-2 border border-[#E5E7EB] rounded-lg text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
-                >
-                  Next
-                </button>
-              </div>
-            </div>
+          {!loading && (
+            <TablePagination
+              currentPage={currentPage}
+              total={filteredQuestions.length}
+              pageSize={pageSize}
+              onPageChange={setCurrentPage}
+            />
           )}
         </div>
       </div>

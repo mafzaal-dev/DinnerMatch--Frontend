@@ -1,12 +1,17 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { ChevronDown } from 'lucide-react';
+
+const DROPDOWN_Z_INDEX = 9999;
+const GAP = 4;
 
 /**
  * CustomDropdown Component
- * A custom dropdown that replaces native <select> elements with a styled UI
- * 
+ * A custom dropdown that replaces native <select> elements with a styled UI.
+ * When placement="top" or inside constrained containers, the menu is rendered in a portal so it is not clipped.
+ *
  * @param {Object} props
  * @param {Array} props.options - Array of options: [{ value: string, label: string }]
  * @param {string} props.value - Currently selected value
@@ -17,6 +22,7 @@ import { ChevronDown } from 'lucide-react';
  * @param {string} props.name - Name attribute for form handling
  * @param {boolean} props.required - Whether the field is required
  * @param {string} props.error - Error message to display
+ * @param {'top'|'bottom'} props.placement - Open menu above ('top') or below ('bottom') the trigger. Use 'top' in modals to avoid clipping.
  */
 const CustomDropdown = ({
   options = [],
@@ -28,11 +34,15 @@ const CustomDropdown = ({
   name = '',
   required = false,
   error = '',
+  placement = 'bottom',
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [menuPosition, setMenuPosition] = useState(null);
   const dropdownRef = useRef(null);
+  const menuRef = useRef(null);
   const inputRef = useRef(null);
+  const openUpward = placement === 'top';
 
   // Find the selected option label
   const selectedOption = options.find(opt => opt.value === value);
@@ -43,10 +53,28 @@ const CustomDropdown = ({
     option.label.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Close dropdown when clicking outside
+  // When opening, measure trigger and set position for portaled menu (so menu is never clipped by modal overflow)
+  useEffect(() => {
+    if (!isOpen || disabled || !dropdownRef.current) {
+      setMenuPosition(null);
+      return;
+    }
+    const el = dropdownRef.current;
+    const rect = el.getBoundingClientRect();
+    setMenuPosition({
+      left: rect.left,
+      top: openUpward ? undefined : rect.bottom + GAP,
+      bottom: openUpward ? window.innerHeight - rect.top + GAP : undefined,
+      width: rect.width,
+    });
+  }, [isOpen, disabled, openUpward]);
+
+  // Close dropdown when clicking outside (trigger or portaled menu)
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+      const inTrigger = dropdownRef.current?.contains(event.target);
+      const inMenu = menuRef.current?.contains(event.target);
+      if (!inTrigger && !inMenu) {
         setIsOpen(false);
         setSearchTerm('');
       }
@@ -129,8 +157,10 @@ const CustomDropdown = ({
           {displayText || placeholder}
           {required && !value && <span className="text-red-500 ml-1">*</span>}
         </span>
-        <ChevronDown 
-          className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''} ${disabled ? 'text-gray-400' : 'text-gray-500'}`}
+        <ChevronDown
+          className={`w-4 h-4 transition-transform ${disabled ? 'text-gray-400' : 'text-gray-500'} ${
+            openUpward ? (isOpen ? 'rotate-0' : 'rotate-180') : isOpen ? 'rotate-180' : ''
+          }`}
         />
       </button>
 
@@ -139,74 +169,87 @@ const CustomDropdown = ({
         <p className="mt-1 text-xs text-red-500">{error}</p>
       )}
 
-      {/* Dropdown Menu */}
-      {isOpen && !disabled && (
-        <div className="absolute z-50 w-full mt-1 bg-white border border-[#D1D5DB] rounded-lg shadow-lg max-h-60 overflow-hidden">
-          {/* Search Input (if there are many options) */}
-          {options.length > 5 && (
-            <div className="p-2 border-b border-[#E5E7EB]">
-              <input
-                ref={inputRef}
-                type="text"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Search..."
-                className="w-full px-3 py-2 text-sm border border-[#D1D5DB] rounded-md focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316] outline-none"
-                onClick={(e) => e.stopPropagation()}
-              />
-            </div>
-          )}
-
-          {/* Options List */}
-          <div className="overflow-y-auto max-h-48" role="listbox">
-            {filteredOptions.length > 0 ? (
-              filteredOptions.map((option, index) => {
-                const isSelected = option.value === value;
-                return (
-                  <button
-                    key={`${option.value}-${index}`}
-                    type="button"
-                    onClick={() => handleSelectOption(option)}
-                    className={`
-                      w-full px-4 py-2.5 text-left text-sm transition-colors
-                      hover:bg-[#FFF7ED] focus:bg-[#FFF7ED] focus:outline-none
-                      ${isSelected 
-                        ? 'bg-[#FFF7ED] text-[#F97316] font-medium' 
-                        : 'text-gray-900'
-                      }
-                    `}
-                    role="option"
-                    aria-selected={isSelected}
-                  >
-                    <div className="flex items-center justify-between">
-                      <span>{option.label}</span>
-                      {isSelected && (
-                        <svg 
-                          className="w-4 h-4 text-[#F97316]" 
-                          fill="none" 
-                          stroke="currentColor" 
-                          viewBox="0 0 24 24"
-                        >
-                          <path 
-                            strokeLinecap="round" 
-                            strokeLinejoin="round" 
-                            strokeWidth={2} 
-                            d="M5 13l4 4L19 7" 
-                          />
-                        </svg>
-                      )}
-                    </div>
-                  </button>
-                );
-              })
-            ) : (
-              <div className="px-4 py-3 text-sm text-gray-500 text-center">
-                No options found
+      {/* Dropdown Menu - rendered in portal with fixed position so it is never clipped by modal overflow */}
+      {isOpen && !disabled && menuPosition && typeof document !== 'undefined' &&
+        createPortal(
+          <div
+            ref={menuRef}
+            className="fixed bg-white border border-[#D1D5DB] rounded-lg shadow-lg max-h-60 overflow-hidden"
+            style={{
+              zIndex: DROPDOWN_Z_INDEX,
+              left: menuPosition.left,
+              width: menuPosition.width,
+              ...(menuPosition.top != null
+                ? { top: menuPosition.top }
+                : { bottom: menuPosition.bottom }),
+            }}
+          >
+            {/* Search Input (if there are many options) */}
+            {options.length > 5 && (
+              <div className="p-2 border-b border-[#E5E7EB]">
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder="Search..."
+                  className="w-full px-3 py-2 text-sm border border-[#D1D5DB] rounded-md focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316] outline-none"
+                  onClick={(e) => e.stopPropagation()}
+                />
               </div>
             )}
-          </div>
-        </div>
-      )}
+
+            {/* Options List */}
+            <div className="overflow-y-auto max-h-48" role="listbox">
+              {filteredOptions.length > 0 ? (
+                filteredOptions.map((option, index) => {
+                  const isSelected = option.value === value;
+                  return (
+                    <button
+                      key={`${option.value}-${index}`}
+                      type="button"
+                      onClick={() => handleSelectOption(option)}
+                      className={`
+                        w-full px-4 py-2.5 text-left text-sm transition-colors
+                        hover:bg-[#FFF7ED] focus:bg-[#FFF7ED] focus:outline-none
+                        ${isSelected
+                          ? 'bg-[#FFF7ED] text-[#F97316] font-medium'
+                          : 'text-gray-900'
+                        }
+                      `}
+                      role="option"
+                      aria-selected={isSelected}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span>{option.label}</span>
+                        {isSelected && (
+                          <svg
+                            className="w-4 h-4 text-[#F97316]"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M5 13l4 4L19 7"
+                            />
+                          </svg>
+                        )}
+                      </div>
+                    </button>
+                  );
+                })
+              ) : (
+                <div className="px-4 py-3 text-sm text-gray-500 text-center">
+                  No options found
+                </div>
+              )}
+            </div>
+          </div>,
+          document.body
+        )}
     </div>
   );
 };
