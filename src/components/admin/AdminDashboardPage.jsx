@@ -410,7 +410,7 @@ const AdminDashboardPage = () => {
             </button>
           </div>
 
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto min-h-[400px]">
             <table className="w-full">
               <thead className="bg-[#F9FAFB] border-b border-[#E5E7EB]">
                 <tr>
