@@ -35,7 +35,7 @@ const QuizFlow = ({ isOpen, onClose, onComplete, onBack }) => {
             answer_type: q.answer_type,
             min_value: q.min_value,
             max_value: q.max_value,
-            options: (q.option || []).sort((a, b) => a.sort_order - b.sort_order)
+            options: (q.options || []).sort((a, b) => a.sort_order - b.sort_order)
           }));
         
         setQuestions(sortedQuestions);
