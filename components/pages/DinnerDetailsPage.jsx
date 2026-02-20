@@ -6,6 +6,7 @@ import Link from 'next/link';
 const DinnerDetailsPage = ({
   dinner = {
     city: "",
+    isoDate: "",
     date: "",
     time: "",
     restaurant: "",
@@ -84,6 +85,57 @@ const DinnerDetailsPage = ({
   const hasDetails =
     dinner.status === "Published" ||
     (dinner.status !== "Draft" && dinner.status !== "Pending");
+
+  const getDynamicDates = () => {
+    if (!dinner?.isoDate && !dinner?.date) {
+      return {
+        groupReveal: "Monday, December 8, 7:00 PM",
+        restaurantReveal: "Tuesday, December 9, 10:00 AM",
+        dinnerExperience: "Tuesday, December 9, 7:00 PM"
+      };
+    }
+
+    let dinnerDate;
+    if (dinner.isoDate) {
+      dinnerDate = new Date(dinner.isoDate);
+    } else {
+      const dateStr = `${dinner.date} ${dinner.time}`;
+      dinnerDate = new Date(dateStr);
+    }
+
+    if (isNaN(dinnerDate.getTime())) {
+      return {
+        groupReveal: "Monday, December 8, 7:00 PM",
+        restaurantReveal: "Tuesday, December 9, 10:00 AM",
+        dinnerExperience: "Tuesday, December 9, 7:00 PM"
+      };
+    }
+    
+    const groupDate = new Date(dinnerDate);
+    groupDate.setDate(dinnerDate.getDate() - 1);
+    groupDate.setHours(19, 0, 0, 0);
+
+    const restaurantDate = new Date(dinnerDate);
+    restaurantDate.setHours(10, 0, 0, 0);
+
+    const experienceDate = dinnerDate;
+
+    const options = { 
+      weekday: 'long', 
+      month: 'long', 
+      day: 'numeric', 
+      hour: 'numeric', 
+      minute: '2-digit' 
+    };
+    
+    return {
+      groupReveal: groupDate.toLocaleString('en-US', options),
+      restaurantReveal: restaurantDate.toLocaleString('en-US', options),
+      dinnerExperience: experienceDate.toLocaleString('en-US', options)
+    };
+  };
+
+  const { groupReveal, restaurantReveal, dinnerExperience } = getDynamicDates();
 
   return (
     <div className="min-h-screen bg-black p-4 md:p-8">
@@ -295,12 +347,9 @@ const DinnerDetailsPage = ({
               <div className="flex flex-col gap-3">
                 <p className="text-[#E0E0E0] text-sm">Location</p>
                 <p className="text-[#F5F5F5] text-lg font-semibold">
-                  {dinner.city} - Southern Suburbs
+                  {dinner.city}
                 </p>
               </div>
-              <button className="text-[#FFAA55] text-sm font-medium hover:text-[#FF9955]">
-                Change Location
-              </button>
             </div>
 
             {/* Date Section */}
@@ -764,7 +813,7 @@ const DinnerDetailsPage = ({
                   Find out more about your group on
                 </p>
                 <p className="text-[#F5F5F5] font-bold text-lg">
-                  Monday, December 8, 7:00 PM
+                  {groupReveal}
                 </p>
               </div>
             </div>
@@ -801,7 +850,7 @@ const DinnerDetailsPage = ({
                   Get your dinner location on
                 </p>
                 <p className="text-[#F5F5F5] font-bold text-lg">
-                  Tuesday, December 9, 10:00 AM
+                  {restaurantReveal}
                 </p>
               </div>
             </div>
@@ -832,7 +881,7 @@ const DinnerDetailsPage = ({
                   Unlock the experience of your dinner
                 </p>
                 <p className="text-[#F5F5F5] font-bold text-lg">
-                  Tuesday, December 9, 7:00 PM
+                  {dinnerExperience}
                 </p>
               </div>
             </div>

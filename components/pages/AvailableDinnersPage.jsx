@@ -246,14 +246,6 @@ const AvailableDinnersPage = ({ onMyAccount, onViewDetails }) => {
 
                     {/* Action Button */}
                     <div className="flex flex-col gap-2">
-                      {onViewDetails && (
-                        <button
-                          onClick={() => onViewDetails(dinner.id)}
-                          className="bg-transparent border-2 border-[#FFAA55] text-[#FFAA55] px-6 py-3 rounded-lg font-bold text-sm uppercase tracking-wide hover:bg-[#FFAA55] hover:text-[#F5F5F5] transition-all whitespace-nowrap"
-                        >
-                          View Details
-                        </button>
-                      )}
                       <button
                         onClick={() => handleRequestDinner(dinner.id)}
                         disabled={

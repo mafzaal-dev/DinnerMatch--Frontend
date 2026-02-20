@@ -191,14 +191,14 @@ export const API_ENDPOINTS = {
   BOOKINGS: "/bookings/",
 
   // Plans & Payments
-  GET_ALL_PLANS: '/get-all-plans',
-  PAYMENTS_CHECKOUT: '/payments/checkout/one-time',
-  USER_SUBSCRIPTIONS: '/user/subscriptions',
-  DINNER_REQUESTS_ME: '/dinner/requests/me/',
-  DINNER_DETAIL: '/dinner/detail/',
-  
+  GET_ALL_PLANS: "/get-all-plans",
+  PAYMENTS_CHECKOUT: "/payments/checkout/one-time",
+  USER_SUBSCRIPTIONS: "/user/subscriptions",
+  DINNER_REQUESTS_ME: "/dinner/all-requested-dinners/",
+  DINNER_DETAIL: "/dinner/detail/",
+
   // Attendance
-  ATTENDANCE_UPDATE: '/attendance/update/',
+  ATTENDANCE_UPDATE: "/attendance/update/",
 };
 
 export default axiosInstance;

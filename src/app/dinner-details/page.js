@@ -91,6 +91,7 @@ function DinnerDetailsContent() {
 
     return {
       city: d.location,
+      isoDate: d.date,
       date: dateObj.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
       time: dateObj.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
       restaurant: d.group?.restaurant?.name || "To be announced", // Use restaurant name if available, else placeholder
