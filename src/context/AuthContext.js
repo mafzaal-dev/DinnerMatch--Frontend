@@ -124,7 +124,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('refresh_token');
     localStorage.removeItem('user_data');
     setUser(null);
-    router.push(redirectPath);
+    router.push('/');
   }, [router]);
 
   const getProfile = useCallback(async () => {
