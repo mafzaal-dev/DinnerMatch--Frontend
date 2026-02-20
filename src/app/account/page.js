@@ -1,12 +1,15 @@
 "use client";
 
+import { useState } from 'react';
 import AccountPage from '../../../components/pages/AccountPage';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
+import { SubscriptionModal } from '../../../components/modals';
 
 export default function Account() {
   const router = useRouter();
   const { logout, user } = useAuth();
+  const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
 
   const handleEditProfile = () => {
     router.push('/edit-profile');
@@ -17,7 +20,7 @@ export default function Account() {
   };
 
   const handleManageSubscription = () => {
-    router.push('/subscription');
+    setShowSubscriptionModal(true);
   };
 
   const handleHelpCenter = () => {
@@ -41,17 +44,25 @@ export default function Account() {
   };
 
   return (
-    <AccountPage
-      onEditProfile={handleEditProfile}
-      onMyTickets={handleMyTickets}
-      onManageSubscription={handleManageSubscription}
-      onHelpCenter={handleHelpCenter}
-      onPrivacyPolicy={handlePrivacyPolicy}
-      onTermsConditions={handleTermsConditions}
-      onLogOut={handleLogOut}
-      onBack={handleBack}
-      user={user}
-    />
+    <>
+      <AccountPage
+        onEditProfile={handleEditProfile}
+        onMyTickets={handleMyTickets}
+        onManageSubscription={handleManageSubscription}
+        onHelpCenter={handleHelpCenter}
+        onPrivacyPolicy={handlePrivacyPolicy}
+        onTermsConditions={handleTermsConditions}
+        onLogOut={handleLogOut}
+        onBack={handleBack}
+        user={user}
+      />
+      <SubscriptionModal
+        isOpen={showSubscriptionModal}
+        onClose={() => setShowSubscriptionModal(false)}
+        onBack={() => setShowSubscriptionModal(false)}
+        onContinue={() => setShowSubscriptionModal(false)}
+      />
+    </>
   );
 }
 

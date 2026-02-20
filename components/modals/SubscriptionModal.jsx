@@ -27,9 +27,10 @@
         api
           .get(API_ENDPOINTS.GET_ALL_PLANS)
           .then((res) => {
-            if (res?.success && Array.isArray(res?.plans)) {
-              setPlans(res.plans);
-            } else if (res?.plans) {
+            const list = res?.data?.plans ?? res?.plans;
+            if (Array.isArray(list) && list.length > 0) {
+              setPlans(list);
+            } else if (Array.isArray(res?.plans)) {
               setPlans(res.plans);
             }
           })
@@ -43,8 +44,24 @@
     }, [isOpen]);
 
     const handleSelectPlan = async (selection) => {
-      const plan = selection?.plan;
+      let plan = selection?.plan;
+      if (!plan?.id && selection?.title && plans?.length) {
+        const match = plans.find(
+          (p) =>
+            p.name &&
+            selection.title &&
+            (p.name.toLowerCase().includes(selection.title.toLowerCase()) ||
+              selection.title.toLowerCase().includes(p.name.toLowerCase()))
+        );
+        if (match) plan = match;
+      }
       if (!plan?.id) {
+        if (selection?.title) {
+          setError(
+            "Unable to start checkout for this plan. Please refresh the page and try again."
+          );
+          return;
+        }
         onContinue?.(selection);
         return;
       }

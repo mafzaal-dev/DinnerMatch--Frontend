@@ -114,7 +114,7 @@ export default function CheckoutPage() {
                 checkoutRef.current = null;
               }
               setErrorMsg(
-                "This payment session has expired. Please go back and try again."
+                "This payment session has expired. Please go back and try again.",
               );
               setStatus("error");
             },
@@ -136,9 +136,7 @@ export default function CheckoutPage() {
     };
 
     script.onerror = () => {
-      setErrorMsg(
-        "Could not load payment SDK. Check your network connection."
-      );
+      setErrorMsg("Could not load payment SDK. Check your network connection.");
       setStatus("error");
     };
 
