@@ -10,6 +10,7 @@ import {
 } from "../../utils/searchHelper";
 import { CustomDropdown } from "@/components/common";
 import { TablePagination } from "@/components/ui/Pagination";
+import { Tooltip } from "@/components/ui/Tooltip";
 import EmailModal from "./EmailModal";
 import toast from "react-hot-toast";
 import { useAuth } from "@/hooks/useAuth";
@@ -584,48 +585,89 @@ const AdminDashboardPage = () => {
                           </button>
                           {openMenuUserId === (user.id || user.email) && (
                             <div className="absolute right-0 top-full mt-1 z-50 min-w-[140px] py-1 bg-white border border-[#E5E7EB] rounded-lg shadow-lg">
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  handleUpdateUserStatus(
-                                    user.id || user.email,
-                                    true,
-                                  )
-                                }
-                                disabled={
-                                  updatingUserId === (user.id || user.email) ||
-                                  user.is_active === true ||
-                                  isCurrentUser(user)
-                                }
-                                title={isCurrentUser(user) ? "You cannot change your own status" : undefined}
-                                className="w-full px-3 py-2 text-left text-sm text-[#111827] hover:bg-[#F9FAFB] disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-                              >
-                                {user.is_active === true && (
-                                  <span className="text-[#10B981]">✓</span>
-                                )}
-                                Set Active
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  handleUpdateUserStatus(
-                                    user.id || user.email,
-                                    false,
-                                  )
-                                }
-                                disabled={
-                                  updatingUserId === (user.id || user.email) ||
-                                  user.is_active === false ||
-                                  isCurrentUser(user)
-                                }
-                                title={isCurrentUser(user) ? "You cannot change your own status" : undefined}
-                                className="w-full px-3 py-2 text-left text-sm text-[#111827] hover:bg-[#F9FAFB] disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-                              >
-                                {user.is_active === false && (
-                                  <span className="text-[#10B981]">✓</span>
-                                )}
-                                Set Inactive
-                              </button>
+                              {isCurrentUser(user) ? (
+                                <>
+                                  <Tooltip
+                                    asChild
+                                    content="You cannot change your own status. This prevents locking yourself out of the admin panel."
+                                    side="left"
+                                  >
+                                    <span className="block w-full">
+                                      <button
+                                        type="button"
+                                        disabled
+                                        aria-label="Set Active (disabled for your account)"
+                                        className="w-full px-3 py-2 text-left text-sm text-[#111827] opacity-50 cursor-not-allowed flex items-center gap-2"
+                                      >
+                                        {user.is_active === true && (
+                                          <span className="text-[#10B981]">✓</span>
+                                        )}
+                                        Set Active
+                                      </button>
+                                    </span>
+                                  </Tooltip>
+                                  <Tooltip
+                                    asChild
+                                    content="You cannot change your own status. This prevents locking yourself out of the admin panel."
+                                    side="left"
+                                  >
+                                    <span className="block w-full">
+                                      <button
+                                        type="button"
+                                        disabled
+                                        aria-label="Set Inactive (disabled for your account)"
+                                        className="w-full px-3 py-2 text-left text-sm text-[#111827] opacity-50 cursor-not-allowed flex items-center gap-2"
+                                      >
+                                        {user.is_active === false && (
+                                          <span className="text-[#10B981]">✓</span>
+                                        )}
+                                        Set Inactive
+                                      </button>
+                                    </span>
+                                  </Tooltip>
+                                </>
+                              ) : (
+                                <>
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      handleUpdateUserStatus(
+                                        user.id || user.email,
+                                        true,
+                                      )
+                                    }
+                                    disabled={
+                                      updatingUserId === (user.id || user.email) ||
+                                      user.is_active === true
+                                    }
+                                    className="w-full px-3 py-2 text-left text-sm text-[#111827] hover:bg-[#F9FAFB] disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                                  >
+                                    {user.is_active === true && (
+                                      <span className="text-[#10B981]">✓</span>
+                                    )}
+                                    Set Active
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      handleUpdateUserStatus(
+                                        user.id || user.email,
+                                        false,
+                                      )
+                                    }
+                                    disabled={
+                                      updatingUserId === (user.id || user.email) ||
+                                      user.is_active === false
+                                    }
+                                    className="w-full px-3 py-2 text-left text-sm text-[#111827] hover:bg-[#F9FAFB] disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                                  >
+                                    {user.is_active === false && (
+                                      <span className="text-[#10B981]">✓</span>
+                                    )}
+                                    Set Inactive
+                                  </button>
+                                </>
+                              )}
                             </div>
                           )}
                         </div>
