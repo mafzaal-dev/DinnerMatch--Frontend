@@ -525,7 +525,9 @@ const DinnerDetailsPage = ({
                 {/* Group Details */}
                 {dinner.group.languages?.length > 0 && (
                   <div style={{ display: "flex", flexDirection: "column" }}>
-                    <p className="text-[#77777B] text-sm uppercase">LANGUAGES</p>
+                    <p className="text-[#77777B] text-sm uppercase">
+                      LANGUAGES
+                    </p>
                     <p className="text-[#F5F5F5] text-base">
                       {dinner.group.languages.join(", ")}
                     </p>
@@ -619,11 +621,9 @@ const DinnerDetailsPage = ({
                     </span>
                   </p>
                   <p className="text-[#757575] text-sm">
-                    {dinner.group?.attendance_stats ? (
-                      `${(dinner.group.attendance_stats.there || 0) + (dinner.group.attendance_stats.attended || 0)} attending, ${dinner.group.attendance_stats.late || 0} late, ${dinner.group.attendance_stats.no_response || 0} not responded`
-                    ) : (
-                      "Loading stats..."
-                    )}
+                    {dinner.group?.attendance_stats
+                      ? `${(dinner.group.attendance_stats.there || 0) + (dinner.group.attendance_stats.attended || 0)} attending, ${dinner.group.attendance_stats.late || 0} late, ${dinner.group.attendance_stats.no_response || 0} not responded`
+                      : "Loading stats..."}
                   </p>
                 </div>
 
@@ -841,32 +841,6 @@ const DinnerDetailsPage = ({
 
         {/* Action Buttons */}
         <div className="space-y-3">
-          {onManageSubscription && (
-            <button
-              onClick={onManageSubscription}
-              className="w-full bg-[#121212] border border-[#242428]
-               rounded-lg p-6 flex items-center justify-center gap-2 
-               hover:bg-[#1A1A1E] transition-colors"
-              style={{ boxShadow: "0 0 16px rgba(0, 0, 0, 0.12)" }}
-            >
-              <svg
-                className="w-6 h-6 text-[#F5F5F5]"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
-                />
-              </svg>
-              <span className="text-white text-sm font-semibold">
-                Manage Subscription
-              </span>
-            </button>
-          )}
           {onContactSupport && (
             <button
               onClick={onContactSupport}

@@ -20,7 +20,7 @@ export default function Account() {
   };
 
   const handleManageSubscription = () => {
-    router.push('/subscription');
+    setShowSubscriptionModal(true);
   };
 
   const handleHelpCenter = () => {
