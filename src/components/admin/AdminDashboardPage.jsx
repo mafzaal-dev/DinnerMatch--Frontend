@@ -215,7 +215,7 @@ const AdminDashboardPage = () => {
       window.URL.revokeObjectURL(url);
     } catch (err) {
       console.error("Error exporting CSV:", err);
-      alert("Failed to export CSV. Please try again.");
+      toast.error("Failed to export CSV. Please try again.");
     }
   };
 

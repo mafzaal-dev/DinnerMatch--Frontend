@@ -2,6 +2,7 @@
 
 import ForgotPasswordPage from '../../../components/pages/ForgotPasswordPage';
 import { useRouter } from 'next/navigation';
+import { toast } from 'react-hot-toast';
 
 export default function ForgotPassword() {
   const router = useRouter();
@@ -9,8 +10,7 @@ export default function ForgotPassword() {
   const handleSubmit = (data) => {
     // Handle forgot password logic here
     console.log('Reset password requested for:', data.email);
-    // Show success message
-    alert('Password reset link has been sent to your email!');
+    toast.success('Password reset link has been sent to your email!');
     router.push('/login');
   };
 

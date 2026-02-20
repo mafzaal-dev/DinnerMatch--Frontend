@@ -123,6 +123,7 @@ const CreateQuizPage = ({ quizId = null, isEdit = false }) => {
         sort_order: i + 1,
       })),
   );
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -299,24 +300,18 @@ const CreateQuizPage = ({ quizId = null, isEdit = false }) => {
     router.push("/admin/quiz");
   };
 
-  const handleRemoveQuestion = async () => {
-    if (
-      !confirm(
-        "Are you sure you want to delete this question? This action cannot be undone.",
-      )
-    ) {
-      return;
-    }
+  const handleRemoveQuestionClick = () => {
+    setShowDeleteConfirm(true);
+  };
 
+  const confirmDeleteQuestion = async () => {
     try {
       if (quizId) {
         await deleteQuestion(quizId);
         toast.success("Question deleted successfully");
-        router.push("/admin/quiz");
-      } else {
-        // If it's a new question that hasn't been saved, just go back
-        router.push("/admin/quiz");
       }
+      setShowDeleteConfirm(false);
+      router.push("/admin/quiz");
     } catch (error) {
       console.error("Delete failed:", error);
       toast.error("Failed to delete question");
@@ -622,7 +617,23 @@ const CreateQuizPage = ({ quizId = null, isEdit = false }) => {
           </div>
 
           {/* Action Buttons */}
-          <div className="flex items-center justify-end gap-3 pt-6 border-t border-[#E5E7EB] mt-8">
+          <div className="flex items-center justify-between pt-6 border-t border-[#E5E7EB] mt-8">
+            <div>
+              {isEdit && (
+                <button
+                  type="button"
+                  onClick={handleRemoveQuestionClick}
+                  className="px-5 py-2.5 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 flex items-center gap-2"
+                  disabled={loading}
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                  Delete Question
+                </button>
+              )}
+            </div>
+            <div className="flex items-center gap-3">
             <button
               onClick={handleCancel}
               className="px-5 py-2.5 border border-[#D1D5DB] text-[#374151] rounded-lg text-sm font-medium hover:bg-[#F9FAFB] transition-colors"
@@ -659,9 +670,42 @@ const CreateQuizPage = ({ quizId = null, isEdit = false }) => {
               )}
               {isEdit ? "Update Question" : "Create Question"}
             </button>
+            </div>
           </div>
         </div>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
+            <div className="flex items-center justify-center w-12 h-12 mx-auto mb-4 bg-red-100 rounded-full">
+              <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-semibold text-[#111827] text-center mb-2">Delete Question</h3>
+            <p className="text-sm text-[#6B7280] text-center mb-6">
+              Are you sure you want to delete &quot;{formData.code || "this question"}&quot;? This action cannot be undone.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowDeleteConfirm(false)}
+                className="flex-1 px-4 py-2.5 border border-[#D1D5DB] text-[#374151] rounded-lg text-sm font-medium hover:bg-[#F9FAFB] transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDeleteQuestion}
+                disabled={loading}
+                className="flex-1 px-4 py-2.5 bg-[#DC2626] text-white rounded-lg text-sm font-medium hover:bg-[#B91C1C] transition-colors disabled:opacity-50"
+              >
+                {loading ? "Deleting..." : "Delete"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

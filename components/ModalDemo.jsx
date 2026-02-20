@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from 'react';
+import { toast } from 'react-hot-toast';
 import {
   LoginModal,
   PreferencesForm,
@@ -158,7 +159,7 @@ const ModalDemo = () => {
             }}
             onConfirm={() => {
               setConfirmationOpen(false);
-              alert('Preferences confirmed!');
+              toast.success('Preferences confirmed!');
             }}
           />
         </div>
@@ -170,7 +171,7 @@ const ModalDemo = () => {
         onSelectPlan={(planId) => {
           console.log('Selected plan:', planId);
           setPricingOpen(false);
-          alert(`Selected plan: ${planId}`);
+          toast.success(`Selected plan: ${planId}`);
         }}
       />
 

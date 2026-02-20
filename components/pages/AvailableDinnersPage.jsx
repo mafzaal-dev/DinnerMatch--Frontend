@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { api, API_ENDPOINTS } from '../../src/utils/api';
+import { toast } from 'react-hot-toast';
 
 const AvailableDinnersPage = ({ onMyAccount, onViewDetails }) => {
   const [dinners, setDinners] = useState([]);
@@ -48,7 +49,7 @@ const AvailableDinnersPage = ({ onMyAccount, onViewDetails }) => {
       });
 
       if (response.success) {
-        alert('Request sent successfully! We will notify you once confirmed.');
+        toast.success('Request sent successfully! We will notify you once confirmed.');
         // Refresh dinners to update any status
         fetchDinners();
       }
@@ -56,7 +57,7 @@ const AvailableDinnersPage = ({ onMyAccount, onViewDetails }) => {
       console.error('Error requesting dinner:', err);
       const errorMessage = err.response?.data?.message || err.message || 'Failed to request dinner';
       setError(errorMessage);
-      alert(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setRequestingDinner(null);
     }

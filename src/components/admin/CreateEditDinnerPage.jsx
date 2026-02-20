@@ -22,6 +22,7 @@ const CreateEditDinnerPage = ({ dinnerId = null, isEdit = false }) => {
     dinner_type: "Open",
     is_published: false,
   });
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   useEffect(() => {
     fetchLocations();
@@ -147,18 +148,15 @@ const CreateEditDinnerPage = ({ dinnerId = null, isEdit = false }) => {
     router.push("/admin/dinner-management");
   };
 
-  const handleDelete = async () => {
-    if (
-      !confirm(
-        "Are you sure you want to delete this dinner? This action cannot be undone.",
-      )
-    ) {
-      return;
-    }
+  const handleDeleteClick = () => {
+    setShowDeleteConfirm(true);
+  };
 
+  const confirmDelete = async () => {
     try {
       await deleteDinner(dinnerId);
       toast.success("Dinner deleted successfully");
+      setShowDeleteConfirm(false);
       router.push("/admin/dinner-management");
     } catch (error) {
       console.error("Delete failed:", error);
@@ -329,7 +327,7 @@ const CreateEditDinnerPage = ({ dinnerId = null, isEdit = false }) => {
             <div>
               {isEdit && (
                 <button
-                  onClick={handleDelete}
+                  onClick={handleDeleteClick}
                   className="px-5 py-2.5 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 flex items-center gap-2"
                   disabled={loading}
                 >
@@ -393,6 +391,50 @@ const CreateEditDinnerPage = ({ dinnerId = null, isEdit = false }) => {
           </div>
         </div>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
+            <div className="flex items-center justify-center w-12 h-12 mx-auto mb-4 bg-red-100 rounded-full">
+              <svg
+                className="w-6 h-6 text-red-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                />
+              </svg>
+            </div>
+            <h3 className="text-lg font-semibold text-[#111827] text-center mb-2">
+              Delete Dinner
+            </h3>
+            <p className="text-sm text-[#6B7280] text-center mb-6">
+              Are you sure you want to delete &quot;{formData.title || "this dinner"}&quot;? This action cannot be undone.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowDeleteConfirm(false)}
+                className="flex-1 px-4 py-2.5 border border-[#D1D5DB] text-[#374151] rounded-lg text-sm font-medium hover:bg-[#F9FAFB] transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDelete}
+                disabled={loading}
+                className="flex-1 px-4 py-2.5 bg-[#DC2626] text-white rounded-lg text-sm font-medium hover:bg-[#B91C1C] transition-colors disabled:opacity-50"
+              >
+                {loading ? "Deleting..." : "Delete"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
