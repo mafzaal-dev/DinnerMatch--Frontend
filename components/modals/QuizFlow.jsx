@@ -203,18 +203,43 @@ const QuizFlow = ({ isOpen, onClose, onComplete, onBack }) => {
             </div>
           )}
 
-          {currentQ.answer_type === 'scale_1_10' && (
+          {currentQ.answer_type === 'boolean' && (
+            <div className="flex gap-4">
+              <button
+                onClick={() => handleAnswer('true')}
+                className={`flex-1 py-4 rounded-lg border transition-all font-semibold text-xl ${
+                  currentAnswer?.value === 'true'
+                    ? 'bg-[#FFAA55] border-[#FFAA55] text-white'
+                    : 'bg-[#111121] border-[#2F3A51] text-[#E0E0E0] hover:border-[#FFAA55] hover:text-[#F5F5F5]'
+                }`}
+              >
+                Yes
+              </button>
+              <button
+                onClick={() => handleAnswer('false')}
+                className={`flex-1 py-4 rounded-lg border transition-all font-semibold text-xl ${
+                  currentAnswer?.value === 'false'
+                    ? 'bg-[#FFAA55] border-[#FFAA55] text-white'
+                    : 'bg-[#111121] border-[#2F3A51] text-[#E0E0E0] hover:border-[#FFAA55] hover:text-[#F5F5F5]'
+                }`}
+              >
+                No
+              </button>
+            </div>
+          )}
+
+          {(currentQ.answer_type === 'scale' || currentQ.answer_type === 'scale_1_10') && (
             <div>
               <div className="flex justify-between mb-6 text-sm text-[#E0E0E0]">
                 <span className='text-[#FFAA55]'>
-                  {currentQ.options.find(o => o.value === '1')?.label || 'Very Low'}
+                  {currentQ.options.find(o => o.value === String(currentQ.min_value || 1))?.label || 'Very Low'}
                 </span>
                 <span className='text-[#FFAA55]'>
                   {currentQ.options.find(o => o.value === String(currentQ.max_value || 10))?.label || 'Very High'}
                 </span>
               </div>
               <div className="grid grid-cols-5 gap-3">
-                {Array.from({ length: currentQ.max_value || 10 }, (_, i) => i + 1).map((value) => {
+                {Array.from({ length: (currentQ.max_value || 10) - (currentQ.min_value || 1) + 1 }, (_, i) => i + (currentQ.min_value || 1)).map((value) => {
                   const isSelected = currentAnswer?.value === String(value);
                   return (
                     <button

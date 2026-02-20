@@ -1,4 +1,8 @@
+"use client";
+
 import React from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuthContext } from '@/context/AuthContext';
 
 const steps = [
     {
@@ -65,6 +69,9 @@ const steps = [
 ];
 
 const HowItWorks = () => {
+    const { isAuthenticated } = useAuthContext();
+    const router = useRouter();
+
     return (
         <section id="how-it-works" className="bg-white pt-22 pb-8 px-6">
             <div className="max-w-7xl mx-auto text-center">
@@ -88,8 +95,19 @@ const HowItWorks = () => {
                     ))}
                 </div>
 
-                <button className="bg-[#FFAA55] text-[#F5F5F5] px-2 py-4 rounded-md text-sm hover:bg-[#FF9955] transition-all flex items-center gap-2 mx-auto uppercase">
-                    Take the Quiz
+                <button 
+                    onClick={() => {
+                        if (isAuthenticated) {
+                            router.push("/available-dinners");
+                        } else {
+                            if (typeof window !== "undefined") {
+                                window.dispatchEvent(new CustomEvent("openQuiz"));
+                            }
+                        }
+                    }}
+                    className="bg-[#FFAA55] text-[#F5F5F5] px-2 py-4 rounded-md text-sm hover:bg-[#FF9955] transition-all flex items-center gap-2 mx-auto uppercase"
+                >
+                    {isAuthenticated ? "Available Dinners" : "Take the Quiz"}
                 </button>
             </div>
         </section>

@@ -98,7 +98,7 @@ const STEPS = [
     title: 'Identity',
     question: 'When is your birthday?',
     type: 'date',
-    placeholder: 'DD/MM/YYYY'
+    placeholder: 'Select your birthday'
   }
 ];
 

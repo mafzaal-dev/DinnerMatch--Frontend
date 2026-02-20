@@ -1,7 +1,14 @@
+"use client";
+
 import React from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { useAuthContext } from '@/context/AuthContext';
 
 const Footer = () => {
+    const { isAuthenticated } = useAuthContext();
+    const router = useRouter();
+
     return (
         <div className="flex flex-col">
             <section className="bg-[#FFFBF7] py-20 px-6">
@@ -37,8 +44,19 @@ const Footer = () => {
                         </div>
                     </div>
 
-                    <button className="bg-[#FFAA55] text-white px-3 py-3 rounded-xl text-sm transition-all flex items-center gap-2 mx-auto mb-4 uppercase">
-                        Take the Quiz 
+                    <button 
+                        onClick={() => {
+                            if (isAuthenticated) {
+                                router.push("/available-dinners");
+                            } else {
+                                if (typeof window !== "undefined") {
+                                    window.dispatchEvent(new CustomEvent("openQuiz"));
+                                }
+                            }
+                        }}
+                        className="bg-[#FFAA55] text-white px-3 py-3 rounded-xl text-sm transition-all flex items-center gap-2 mx-auto mb-4 uppercase"
+                    >
+                        {isAuthenticated ? "Available Dinners" : "Take the Quiz"} 
                     </button>
 
                     <p className="text-xs text-[#757575]">

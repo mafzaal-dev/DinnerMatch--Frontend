@@ -2,8 +2,13 @@
 
 import React from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useAuthContext } from "@/context/AuthContext";
 
 const Hero = () => {
+  const { isAuthenticated } = useAuthContext();
+  const router = useRouter();
+
   return (
     <section className="bg-[#F3F4F6] py-16 md:py-20 min-h-[45vh] flex items-center">
       <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-1 items-center">
@@ -19,13 +24,17 @@ const Hero = () => {
           <div className="flex flex-col gap-4 mt-4">
             <button
               onClick={() => {
-                if (typeof window !== "undefined") {
-                  window.dispatchEvent(new CustomEvent("openQuiz"));
+                if (isAuthenticated) {
+                  router.push("/available-dinners");
+                } else {
+                  if (typeof window !== "undefined") {
+                    window.dispatchEvent(new CustomEvent("openQuiz"));
+                  }
                 }
               }}
               className="bg-[#F97316] text-[#F5F5F5] px-4 py-3 rounded-md font-semibold text-sm md:w-fit uppercase hover:bg-[#FF9955] transition-colors cursor-pointer"
             >
-              Take the Quiz
+              {isAuthenticated ? "Available Dinners" : "Take the Quiz"}
             </button>
             <p className="text-sm text-[#757575] font-normal mb-2">
               14000+ people have taken the quiz. It only takes 2 minutes.
