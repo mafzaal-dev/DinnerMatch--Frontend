@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, Suspense } from 'react';
 import DinnerDetailsPage from '../../../components/pages/DinnerDetailsPage';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useSubscription, useRequestedDinners, useDinnerDetail, useUpdateAttendance } from '../../hooks/useDinners';
 
-export default function DinnerDetails() {
+function DinnerDetailsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const urlDinnerId = searchParams.get('id');
@@ -181,5 +181,17 @@ export default function DinnerDetails() {
       onRSVP={handleRSVP}
       onCopyAddress={handleCopyAddress}
     />
+  );
+}
+
+export default function DinnerDetails() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#FFAA55]"></div>
+      </div>
+    }>
+      <DinnerDetailsContent />
+    </Suspense>
   );
 }
