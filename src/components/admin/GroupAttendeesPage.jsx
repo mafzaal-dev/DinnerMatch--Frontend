@@ -71,7 +71,7 @@ const GroupAttendeesPage = () => {
     if (node) groupsObserverRef.current.observe(node);
   }, [loading, isLoadingMore, hasMoreGroups]);
   
-  // Pagination - Requests
+  // Pagination - Requests (Users tab) – same pattern as other admin tables
   const [requestsPage, setRequestsPage] = useState(0);
   const [requestsPageSize, setRequestsPageSize] = useState(10);
   const [requestsTotal, setRequestsTotal] = useState(0);
@@ -98,7 +98,7 @@ const GroupAttendeesPage = () => {
     if (selectedDinner) {
       fetchDinnerRequests();
     }
-  }, [selectedDinner, requestsPage, filterRequestCity, filterRequestDinner, filterRequestDateFrom, filterRequestDateTo]); // eslint-disable-line
+  }, [selectedDinner, requestsPage, requestsPageSize, filterRequestCity, filterRequestDinner, filterRequestDateFrom, filterRequestDateTo]); // eslint-disable-line
 
   useEffect(() => {
     if (activeTab === 'groups') {
@@ -187,7 +187,9 @@ const GroupAttendeesPage = () => {
       setError('');
       
       const params = new URLSearchParams();
-      params.append('index', requestsPage);
+      // Same as other admin pages: index = start record index (skip), offset = page size (limit)
+      const startIndex = requestsPage * requestsPageSize;
+      params.append('index', startIndex);
       params.append('offset', requestsPageSize);
       if (selectedDinner) params.append('dinner_id', selectedDinner);
       
@@ -694,12 +696,22 @@ const GroupAttendeesPage = () => {
           </table>
         </div>
         
-        {/* Pagination */}
+        {/* Pagination – same as other admin pages (e.g. Admin Dashboard) */}
         <TablePagination
           currentPage={requestsPage}
           total={requestsTotal}
           pageSize={requestsPageSize}
           onPageChange={setRequestsPage}
+          pageSizeOptions={[
+            { value: 10, label: '10 per page' },
+            { value: 25, label: '25 per page' },
+            { value: 50, label: '50 per page' },
+            { value: 100, label: '100 per page' },
+          ]}
+          onPageSizeChange={(size) => {
+            setRequestsPageSize(size);
+            setRequestsPage(0);
+          }}
         />
       </div>
     );
