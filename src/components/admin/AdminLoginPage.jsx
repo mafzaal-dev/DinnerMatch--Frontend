@@ -1,13 +1,15 @@
 "use client";
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
+import { Eye, EyeOff } from 'lucide-react';
 import { adminLoginSchema } from '@/constants/validationSchemas';
 
 const AdminLoginPage = ({ onLogin, isLoading, error }) => {
   const router = useRouter();
+  const [showPassword, setShowPassword] = useState(false);
   const {
     register,
     handleSubmit,
@@ -61,7 +63,7 @@ const AdminLoginPage = ({ onLogin, isLoading, error }) => {
             <label 
               htmlFor="email" 
               className="text-[#424242]" 
-              style={{ fontSize: '10px', lineHeight: '10px' }}
+              style={{ fontSize: '14px', lineHeight: '20px' }}
             >
               Email
             </label>
@@ -69,19 +71,19 @@ const AdminLoginPage = ({ onLogin, isLoading, error }) => {
               type="email"
               id="email"
               {...register('email')}
-              placeholder="Write here"
+              placeholder="Enter your email"
               className={`w-full bg-white border rounded-lg focus:outline-none focus:border-[#F97316] transition-colors ${errors.email ? 'border-red-500' : ''}`}
               style={{
                 borderColor: errors.email ? '#EF4444' : '#EEEEEE',
                 height: '48px',
                 padding: '0 16px',
-                fontSize: '11px',
+                fontSize: '14px',
                 color: '#212121',
               }}
               disabled={isLoading}
             />
             {errors.email && (
-              <span className="text-red-500" style={{ fontSize: '10px' }}>{errors.email.message}</span>
+              <span className="text-red-500" style={{ fontSize: '12px' }}>{errors.email.message}</span>
             )}
           </div>
 
@@ -90,27 +92,55 @@ const AdminLoginPage = ({ onLogin, isLoading, error }) => {
             <label 
               htmlFor="password" 
               className="text-[#424242]" 
-              style={{ fontSize: '10px', lineHeight: '10px' }}
+              style={{ fontSize: '14px', lineHeight: '20px' }}
             >
               Password
             </label>
-            <input
-              type="password"
-              id="password"
-              {...register('password')}
-              placeholder="Write here"
-              className={`w-full bg-white border rounded-lg focus:outline-none focus:border-[#F97316] transition-colors ${errors.password ? 'border-red-500' : ''}`}
-              style={{
-                borderColor: errors.password ? '#EF4444' : '#EEEEEE',
-                height: '48px',
-                padding: '0 16px',
-                fontSize: '11px',
-                color: '#212121',
-              }}
-              disabled={isLoading}
-            />
+            <div style={{ position: 'relative', width: '100%' }}>
+              <input
+                type={showPassword ? 'text' : 'password'}
+                id="password"
+                {...register('password')}
+                placeholder="Enter your password"
+                className={`w-full bg-white border rounded-lg focus:outline-none focus:border-[#F97316] transition-colors ${errors.password ? 'border-red-500' : ''}`}
+                style={{
+                  borderColor: errors.password ? '#EF4444' : '#EEEEEE',
+                  height: '48px',
+                  padding: '0 44px 0 16px',
+                  fontSize: '14px',
+                  color: '#212121',
+                }}
+                disabled={isLoading}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((prev) => !prev)}
+                disabled={isLoading}
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+                style={{
+                  position: 'absolute',
+                  right: '12px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'none',
+                  border: 'none',
+                  padding: '4px',
+                  cursor: isLoading ? 'not-allowed' : 'pointer',
+                  color: '#757575',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                {showPassword ? (
+                  <EyeOff size={20} strokeWidth={1.5} />
+                ) : (
+                  <Eye size={20} strokeWidth={1.5} />
+                )}
+              </button>
+            </div>
             {errors.password && (
-              <span className="text-red-500" style={{ fontSize: '10px' }}>{errors.password.message}</span>
+              <span className="text-red-500" style={{ fontSize: '12px' }}>{errors.password.message}</span>
             )}
           </div>
 
@@ -122,7 +152,7 @@ const AdminLoginPage = ({ onLogin, isLoading, error }) => {
             style={{
               backgroundColor: '#F97316',
               height: '48px',
-              fontSize: '12px',
+              fontSize: '14px',
               opacity: isLoading ? 0.7 : 1,
               cursor: isLoading ? 'not-allowed' : 'pointer'
             }}
@@ -141,6 +171,7 @@ const AdminLoginPage = ({ onLogin, isLoading, error }) => {
       <style jsx>{`
         input::placeholder {
           color: #BDBDBD;
+          font-size: 14px;
         }
       `}</style>
     </div>
