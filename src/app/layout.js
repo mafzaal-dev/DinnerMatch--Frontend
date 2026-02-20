@@ -5,6 +5,7 @@ import UTMTracker from "../../components/UTMTracker";
 import NoSSR from "@/components/common/NoSSR";
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from '@/context/AuthContext';
+import QueryProvider from '@/providers/QueryProvider';
 
 const roboto = Roboto({
   weight: ['300', '400', '500', '700'],
@@ -21,19 +22,21 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${roboto.className} antialiased`} suppressHydrationWarning>
-        <AuthProvider>
-          <NoSSR>
-            <MetaPixel />
-            <UTMTracker />
-          </NoSSR>
-          <Toaster position="top-center" toastOptions={{
-            style: {
-              background: '#333',
-              color: '#fff',
-            },
-          }} />
-          {children}
-        </AuthProvider>
+        <QueryProvider>
+          <AuthProvider>
+            <NoSSR>
+              <MetaPixel />
+              <UTMTracker />
+            </NoSSR>
+            <Toaster position="top-center" toastOptions={{
+              style: {
+                background: '#333',
+                color: '#fff',
+              },
+            }} />
+            {children}
+          </AuthProvider>
+        </QueryProvider>
       </body>
     </html>
   );
