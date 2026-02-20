@@ -16,6 +16,10 @@ export default function Account() {
     router.push('/your-dinner');
   };
 
+  const handleManageSubscription = () => {
+    router.push('/subscription');
+  };
+
   const handleHelpCenter = () => {
     router.push('/help-center');
   };
@@ -40,6 +44,7 @@ export default function Account() {
     <AccountPage
       onEditProfile={handleEditProfile}
       onMyTickets={handleMyTickets}
+      onManageSubscription={handleManageSubscription}
       onHelpCenter={handleHelpCenter}
       onPrivacyPolicy={handlePrivacyPolicy}
       onTermsConditions={handleTermsConditions}
