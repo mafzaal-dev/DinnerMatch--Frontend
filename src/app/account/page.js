@@ -1,15 +1,23 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import AccountPage from '../../../components/pages/AccountPage';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { SubscriptionModal } from '../../../components/modals';
 
 export default function Account() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { logout, user } = useAuth();
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
+
+  useEffect(() => {
+    if (searchParams.get('openSubscription') === '1') {
+      setShowSubscriptionModal(true);
+      router.replace('/account', { scroll: false });
+    }
+  }, [searchParams, router]);
 
   const handleEditProfile = () => {
     router.push('/edit-profile');

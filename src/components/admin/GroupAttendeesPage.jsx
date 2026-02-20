@@ -11,6 +11,15 @@ import { TablePagination } from '@/components/ui/Pagination';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { createGroupSchema } from '@/constants/validationSchemas';
+import {
+  DndContext,
+  DragOverlay,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  useDraggable,
+  useDroppable,
+} from '@dnd-kit/core';
 
 const GroupAttendeesPage = () => {
   const [activeTab, setActiveTab] = useState('groups'); // 'groups' or 'users'
@@ -33,7 +42,8 @@ const GroupAttendeesPage = () => {
   const [selectedProfile, setSelectedProfile] = useState(null);
   
   const [selectedRestaurant, setSelectedRestaurant] = useState('');
-  
+  const [activeDragId, setActiveDragId] = useState(null);
+
   // React Hook Form for Create Group
   const {
     register: registerGroup,
@@ -336,9 +346,13 @@ const GroupAttendeesPage = () => {
 
     try {
       setLoading(true);
-      const response = await api.put(API_ENDPOINTS.GROUP_MARK_BOOKED, {
+      const memberIds = (selectedGroup.members || []).map((m) => m.id);
+      const response = await api.put(API_ENDPOINTS.GROUP_UPDATE, {
         group_id: selectedGroup.id,
-        restaurant_id: selectedRestaurant || null
+        is_booked: true,
+        members: memberIds,
+        restaurant_id: selectedRestaurant || null,
+        dinner_id: selectedGroup.dinner_id || null,
       });
 
       if (response.success) {
@@ -350,7 +364,7 @@ const GroupAttendeesPage = () => {
       }
     } catch (err) {
       console.error('Error making booking:', err);
-      toast.error('Failed to confirm booking');
+      toast.error(err?.message || 'Failed to confirm booking');
     } finally {
       setLoading(false);
     }
@@ -361,9 +375,8 @@ const GroupAttendeesPage = () => {
 
     try {
       setLoading(true);
-      // Assuming there's a delete endpoint
-      const response = await api.delete(`${API_ENDPOINTS.GROUP_LIST}/${selectedGroup.id}`);
-      
+      const response = await api.delete(API_ENDPOINTS.GROUP_DELETE(selectedGroup.id));
+
       if (response.success) {
         toast.success('Group deleted successfully');
         setShowDeleteConfirm(false);
@@ -372,11 +385,78 @@ const GroupAttendeesPage = () => {
       }
     } catch (err) {
       console.error('Error deleting group:', err);
-      toast.error('Failed to delete group');
+      toast.error(err?.message || 'Failed to delete group');
     } finally {
       setLoading(false);
     }
   };
+
+  /** Move a user from source group to target group; updates both groups via API. */
+  const handleMoveUserToGroup = async (sourceGroup, targetGroup, userId) => {
+    const sourceMembers = (sourceGroup.members || []).filter((m) => m.id !== userId).map((m) => m.id);
+    const targetMemberIds = (targetGroup.members || []).map((m) => m.id);
+    if (targetMemberIds.includes(userId)) return; // already in target
+    const newTargetMembers = [...targetMemberIds, userId];
+
+    try {
+      setLoading(true);
+      const [updateSource, updateTarget] = await Promise.all([
+        api.put(API_ENDPOINTS.GROUP_UPDATE, {
+          group_id: sourceGroup.id,
+          is_booked: sourceGroup.is_booked ?? false,
+          members: sourceMembers,
+          restaurant_id: sourceGroup.restaurant_id ?? null,
+          dinner_id: sourceGroup.dinner_id ?? null,
+        }),
+        api.put(API_ENDPOINTS.GROUP_UPDATE, {
+          group_id: targetGroup.id,
+          is_booked: targetGroup.is_booked ?? false,
+          members: newTargetMembers,
+          restaurant_id: targetGroup.restaurant_id ?? null,
+          dinner_id: targetGroup.dinner_id ?? null,
+        }),
+      ]);
+      if (updateSource?.success && updateTarget?.success) {
+        toast.success('User moved to group');
+        fetchGroups(false);
+      } else {
+        toast.error(updateSource?.message || updateTarget?.message || 'Failed to move user');
+      }
+    } catch (err) {
+      console.error('Error moving user between groups:', err);
+      toast.error(err?.message || 'Failed to move user');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDragStart = useCallback((event) => {
+    setActiveDragId(event.active.id);
+  }, []);
+
+  const handleDragEnd = useCallback(
+    (event) => {
+      setActiveDragId(null);
+      const { active, over } = event;
+      if (!over?.id) return;
+      const dragId = String(active.id);
+      const overId = String(over.id);
+      if (!dragId.startsWith('user-') || !overId.startsWith('group-')) return;
+      const match = dragId.match(/^user-(.+)-group-(.+)$/);
+      if (!match) return;
+      const [, userId, sourceGroupId] = match;
+      const targetGroupId = overId.replace(/^group-/, '');
+      if (sourceGroupId === targetGroupId) return;
+
+      const sourceGroup = groups.find((g) => String(g.id) === sourceGroupId);
+      const targetGroup = groups.find((g) => String(g.id) === targetGroupId);
+      if (!sourceGroup || !targetGroup) return;
+
+      const userIdActual = isNaN(Number(userId)) ? userId : Number(userId);
+      handleMoveUserToGroup(sourceGroup, targetGroup, userIdActual);
+    },
+    [groups]
+  );
 
   const handleUpdateRequestStatus = async (requestId, status) => {
     try {
@@ -451,9 +531,80 @@ const GroupAttendeesPage = () => {
     );
   };
 
+  const DroppableGroupCard = ({ groupId, children, innerRef }) => {
+    const { setNodeRef, isOver } = useDroppable({ id: `group-${groupId}` });
+    const mergeRef = (el) => {
+      setNodeRef(el);
+      if (innerRef) innerRef.current = el;
+    };
+    return (
+      <div
+        ref={mergeRef}
+        className={`bg-white rounded-xl shadow-sm border-2 overflow-hidden transition-colors min-h-[120px] ${
+          isOver ? 'border-[#F97316] bg-orange-50/30 ring-2 ring-[#F97316]/30' : 'border-[#E5E7EB]'
+        }`}
+      >
+        {children}
+      </div>
+    );
+  };
+
+  const DraggableMemberRow = ({ group, member, GenderBadge: GenderBadgeComp }) => {
+    const dragId = `user-${member.id}-group-${group.id}`;
+    const { attributes, listeners, setNodeRef, isDragging } = useDraggable({ id: dragId });
+    return (
+      <tr
+        ref={setNodeRef}
+        className={`transition-colors ${isDragging ? 'bg-[#F3F4F6] opacity-40' : 'hover:bg-[#F9FAFB]'}`}
+      >
+        <td className="px-6 py-4 text-[#9CA3AF]">
+          <div
+            {...attributes}
+            {...listeners}
+            className="cursor-grab active:cursor-grabbing touch-none w-fit p-1 -m-1 rounded hover:bg-[#E5E7EB]"
+            title="Drag to move to another group"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8h16M4 16h16" />
+            </svg>
+          </div>
+        </td>
+        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-[#111827]">
+          {formatDisplayValue(`${member.first_name || ''} ${member.last_name || ''}`.trim())}
+        </td>
+        <td className="px-6 py-4 whitespace-nowrap text-sm text-[#6B7280]">
+          {formatDisplayValue(member.email)}
+        </td>
+        <td className="px-6 py-4 whitespace-nowrap">
+          <GenderBadgeComp gender={member.profile?.gender} />
+        </td>
+      </tr>
+    );
+  };
+
+  const dndSensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: { distance: 8 },
+    })
+  );
+
+  const getDraggedMemberAndGroup = useCallback((dragId) => {
+    if (!dragId) return null;
+    const match = String(dragId).match(/^user-(.+)-group-(.+)$/);
+    if (!match) return null;
+    const [, userId, groupId] = match;
+    const group = groups.find((g) => String(g.id) === groupId);
+    if (!group?.members) return null;
+    const member = group.members.find((m) => String(m.id) === userId);
+    return member && group ? { member, group } : null;
+  }, [groups]);
+
   // Groups List Component (Cards)
   const GroupsTable = () => {
+    const dragged = activeDragId ? getDraggedMemberAndGroup(activeDragId) : null;
+
     return (
+      <DndContext sensors={dndSensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
       <div className="space-y-6">
         {groups.length === 0 && !loading ? (
           <div className="text-center py-12 bg-white rounded-xl border border-[#E5E7EB]">
@@ -470,10 +621,10 @@ const GroupAttendeesPage = () => {
               const maleCount = members.filter(m => m.profile?.gender === 'Male' || m.profile?.gender === 'M').length;
               
               return (
-                <div 
-                  key={group.id} 
-                  ref={isLastElement ? lastGroupElementRef : null}
-                  className="bg-white rounded-xl shadow-sm border border-[#E5E7EB] overflow-hidden"
+                <DroppableGroupCard
+                  key={group.id}
+                  groupId={group.id}
+                  innerRef={isLastElement ? lastGroupElementRef : undefined}
                 >
                   {/* Group Header */}
                   <div className="px-6 py-5 border-b border-[#E5E7EB] flex items-center justify-between">
@@ -524,53 +675,43 @@ const GroupAttendeesPage = () => {
                   {/* Members Table */}
                   <div className="overflow-x-auto">
                     <table className="w-full">
-                      <thead className="bg-[#F9FAFB] border-b border-[#E5E7EB]">
-                        <tr>
-                          <th className="px-6 py-3 text-left text-xs font-semibold text-[#6B7280] uppercase tracking-wide w-10">
-                            {/* Icon/Handle */}
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-semibold text-[#6B7280] uppercase tracking-wide">
-                            Name
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-semibold text-[#6B7280] uppercase tracking-wide">
-                            Email
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-semibold text-[#6B7280] uppercase tracking-wide">
-                            Gender
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-[#F3F4F6]">
-                        {members.length === 0 ? (
+                        <thead className="bg-[#F9FAFB] border-b border-[#E5E7EB]">
                           <tr>
-                            <td colSpan="4" className="px-6 py-4 text-center text-sm text-[#6B7280]">
-                              No members in this group
-                            </td>
+                            <th className="px-6 py-3 text-left text-xs font-semibold text-[#6B7280] uppercase tracking-wide w-10">
+                              {/* Drag handle */}
+                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-semibold text-[#6B7280] uppercase tracking-wide">
+                              Name
+                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-semibold text-[#6B7280] uppercase tracking-wide">
+                              Email
+                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-semibold text-[#6B7280] uppercase tracking-wide">
+                              Gender
+                            </th>
                           </tr>
-                        ) : (
-                          members.map((member) => (
-                            <tr key={member.id} className="hover:bg-[#F9FAFB] transition-colors">
-                              <td className="px-6 py-4 text-[#9CA3AF]">
-                                <svg className="w-4 h-4 cursor-move" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8h16M4 16h16" />
-                                </svg>
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-[#111827]">
-                                {formatDisplayValue(`${member.first_name || ''} ${member.last_name || ''}`.trim())}
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm text-[#6B7280]">
-                                {formatDisplayValue(member.email)}
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap">
-                                <GenderBadge gender={member.profile?.gender} />
+                        </thead>
+                        <tbody className="divide-y divide-[#F3F4F6]">
+                          {members.length === 0 ? (
+                            <tr>
+                              <td colSpan="4" className="px-6 py-4 text-center text-sm text-[#6B7280]">
+                                No members in this group — drag users from another group to add
                               </td>
                             </tr>
-                          ))
-                        )}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
+                          ) : (
+                            members.map((member) => (
+                              <DraggableMemberRow
+                                key={member.id}
+                                group={group}
+                                member={member}
+                                GenderBadge={GenderBadge}
+                              />
+                            ))
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                </DroppableGroupCard>
               );
             })}
             {isLoadingMore && (
@@ -592,6 +733,36 @@ const GroupAttendeesPage = () => {
           </div>
         )}
       </div>
+
+      <DragOverlay dropAnimation={null}>
+        {dragged ? (
+          <div
+            className="flex items-center gap-0 bg-white rounded-xl border-2 border-[#F97316] shadow-2xl shadow-black/20 py-3 px-4 cursor-grabbing min-w-[320px]"
+            style={{ boxShadow: '0 20px 40px -12px rgba(0,0,0,0.25), 0 0 0 1px rgba(249,115,22,0.2)' }}
+          >
+            <div className="flex items-center justify-center w-10 shrink-0 text-[#9CA3AF]">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8h16M4 16h16" />
+              </svg>
+            </div>
+            <div className="flex-1 min-w-0 flex items-center gap-4 pl-2">
+              <span className="text-sm font-medium text-[#111827] truncate">
+                {formatDisplayValue(`${dragged.member.first_name || ''} ${dragged.member.last_name || ''}`.trim()) || '—'}
+              </span>
+              <span className="text-sm text-[#6B7280] truncate hidden sm:inline">
+                {formatDisplayValue(dragged.member.email)}
+              </span>
+              <span className="shrink-0">
+                <GenderBadge gender={dragged.member.profile?.gender} />
+              </span>
+            </div>
+            <span className="text-xs font-medium text-[#F97316] bg-[#FFF7ED] px-2 py-1 rounded-lg shrink-0">
+              Moving to another group
+            </span>
+          </div>
+        ) : null}
+      </DragOverlay>
+      </DndContext>
     );
   };
 
@@ -819,11 +990,11 @@ const GroupAttendeesPage = () => {
                     </svg>
                     Export All CSV
                   </button>
-                  <button 
+                  {/* <button 
                     className="px-4 py-2 bg-[#F97316] text-white rounded-lg text-sm font-medium hover:bg-[#EA580C] whitespace-nowrap"
                   >
                     Finalize Groups
-                  </button>
+                  </button> */}
                 </>
               )}
             </div>

@@ -171,6 +171,8 @@ export const API_ENDPOINTS = {
   // Group Management
   GROUP_CREATE: "/groups/create/",
   GROUP_LIST: "/groups/list/",
+  GROUP_UPDATE: "/group/update/",
+  GROUP_DELETE: (id) => `/group/delete/${id}/`,
   GROUP_MARK_BOOKED: "/group/mark-as-booked/",
 
   // Dinner Requests

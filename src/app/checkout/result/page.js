@@ -3,11 +3,13 @@
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
+import SubscriptionModal from "@/components/modals/SubscriptionModal";
 
 function CheckoutResultContent() {
   const searchParams = useSearchParams();
   const [status, setStatus] = useState("loading");
   const [description, setDescription] = useState("");
+  const [subscriptionModalOpen, setSubscriptionModalOpen] = useState(false);
 
   useEffect(() => {
     // Peach Payments V2: params can come from redirectPostData (query string) or top-level response
@@ -186,12 +188,17 @@ function CheckoutResultContent() {
             {description ||
               "We couldn't process your payment. Please try again or use a different card."}
           </p>
-          <Link
-            href="/subscription"
+          <button
+            type="button"
+            onClick={() => setSubscriptionModalOpen(true)}
             className="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-[#FFAA55] text-gray-900 font-medium hover:bg-[#FFBB66] transition-colors"
           >
             Try again
-          </Link>
+          </button>
+          <SubscriptionModal
+            isOpen={subscriptionModalOpen}
+            onClose={() => setSubscriptionModalOpen(false)}
+          />
         </div>
       </main>
     );

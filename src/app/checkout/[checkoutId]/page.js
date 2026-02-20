@@ -3,6 +3,7 @@
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import SubscriptionModal from "@/components/modals/SubscriptionModal";
 
 // V2 Embedded Checkout SDK - Sandbox | Production: https://checkout.peachpayments.com/js/checkout.js
 const CHECKOUT_SCRIPT_URL =
@@ -15,6 +16,7 @@ export default function CheckoutPage() {
   const [entityId, setEntityId] = useState("");
   const [status, setStatus] = useState("loading");
   const [errorMsg, setErrorMsg] = useState("");
+  const [subscriptionModalOpen, setSubscriptionModalOpen] = useState(false);
   const checkoutRef = useRef(null);
 
   // Read entityId from query string (passed from SubscriptionModal)
@@ -104,7 +106,7 @@ export default function CheckoutPage() {
                 } catch (_) {}
                 checkoutRef.current = null;
               }
-              router.push("/subscription");
+              router.push("/account?openSubscription=1");
             },
             onExpired: () => {
               if (checkoutRef.current) {
@@ -159,12 +161,17 @@ export default function CheckoutPage() {
     return (
       <main className="min-h-screen bg-gray-950 flex flex-col items-center justify-center p-6">
         <p className="text-red-400 mb-4">Invalid checkout session.</p>
-        <Link
-          href="/subscription"
+        <button
+          type="button"
+          onClick={() => setSubscriptionModalOpen(true)}
           className="text-[#FFAA55] hover:text-[#FFBB66] transition-colors"
         >
           ← Back to plans
-        </Link>
+        </button>
+        <SubscriptionModal
+          isOpen={subscriptionModalOpen}
+          onClose={() => setSubscriptionModalOpen(false)}
+        />
       </main>
     );
   }
@@ -172,8 +179,9 @@ export default function CheckoutPage() {
   return (
     <main className="min-h-screen bg-gray-950 bg-gradient-to-b from-gray-950 via-gray-950 to-gray-900">
       <div className="sticky top-0 z-10 flex justify-between items-center px-4 sm:px-6 py-4 bg-gray-950/95 backdrop-blur-sm border-b border-gray-800/80">
-        <Link
-          href="/subscription"
+        <button
+          type="button"
+          onClick={() => setSubscriptionModalOpen(true)}
           className="flex items-center gap-2 text-[#E0E0E0] hover:text-[#F5F5F5] transition-colors"
         >
           <svg
@@ -190,7 +198,11 @@ export default function CheckoutPage() {
             />
           </svg>
           <span>Back to plans</span>
-        </Link>
+        </button>
+        <SubscriptionModal
+          isOpen={subscriptionModalOpen}
+          onClose={() => setSubscriptionModalOpen(false)}
+        />
       </div>
 
       <div className="max-w-xl mx-auto px-4 py-8 sm:py-12">
@@ -209,12 +221,13 @@ export default function CheckoutPage() {
               <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm">
                 <p className="font-medium mb-1">Payment error</p>
                 <p>{errorMsg}</p>
-                <Link
-                  href="/subscription"
+                <button
+                  type="button"
+                  onClick={() => setSubscriptionModalOpen(true)}
                   className="mt-3 inline-block text-amber-600 hover:text-amber-700 font-medium"
                 >
                   ← Go back and try again
-                </Link>
+                </button>
               </div>
             )}
 
