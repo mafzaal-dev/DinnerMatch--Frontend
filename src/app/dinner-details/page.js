@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, Suspense } from 'react';
+import { useEffect, useMemo, Suspense, useState } from 'react';
 import DinnerDetailsPage from '../../../components/pages/DinnerDetailsPage';
+import SubscriptionModal from '../../../components/modals/SubscriptionModal';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useSubscription, useRequestedDinners, useDinnerDetail, useUpdateAttendance } from '../../hooks/useDinners';
 
@@ -9,6 +10,7 @@ function DinnerDetailsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const urlDinnerId = searchParams.get('id');
+  const [subscriptionModalOpen, setSubscriptionModalOpen] = useState(false);
 
   // Fetch all necessary data using React Query
   const { 
@@ -111,7 +113,7 @@ function DinnerDetailsContent() {
   }, [dinnerDetailData]);
 
   const handleManageSubscription = () => {
-    router.push('/subscription');
+    setSubscriptionModalOpen(true);
   };
 
   const handleContactSupport = () => {
@@ -171,16 +173,22 @@ function DinnerDetailsContent() {
   }
 
   return (
-    <DinnerDetailsPage
-      dinner={dinnerData || undefined}
-      upcomingDates={upcomingDates}
-      subscriptionData={subscriptionData}
-      onManageSubscription={handleManageSubscription}
-      onContactSupport={handleContactSupport}
-      onMyAccount={handleMyAccount}
-      onRSVP={handleRSVP}
-      onCopyAddress={handleCopyAddress}
-    />
+    <>
+      <DinnerDetailsPage
+        dinner={dinnerData || undefined}
+        upcomingDates={upcomingDates}
+        subscriptionData={subscriptionData}
+        onManageSubscription={handleManageSubscription}
+        onContactSupport={handleContactSupport}
+        onMyAccount={handleMyAccount}
+        onRSVP={handleRSVP}
+        onCopyAddress={handleCopyAddress}
+      />
+      <SubscriptionModal
+        isOpen={subscriptionModalOpen}
+        onClose={() => setSubscriptionModalOpen(false)}
+      />
+    </>
   );
 }
 
