@@ -58,7 +58,7 @@ const SortableOption = ({
         <div className="flex items-center gap-3">
           <input
             type="text"
-            placeholder="Select Language"
+            placeholder="Enter Option"
             value={option?.label || ""}
             onChange={(e) => handleOptionChange(index, e.target.value)}
             maxLength={150}
@@ -397,7 +397,7 @@ const CreateQuizPage = ({ quizId = null, isEdit = false }) => {
                 name="code"
                 value={formData.code}
                 onChange={handleChange}
-                placeholder="Write here"
+                placeholder="Enter Question Title"
                 maxLength={150}
                 className="w-full px-4 py-2.5 border border-[#D1D5DB] rounded-lg text-sm focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316] outline-none"
                 required
@@ -457,7 +457,7 @@ const CreateQuizPage = ({ quizId = null, isEdit = false }) => {
                   name="text"
                   value={formData.text}
                   onChange={handleChange}
-                  placeholder="Write here"
+                  placeholder="Enter Question Text"
                   maxLength={150}
                   className="w-full px-4 py-2.5 border border-[#D1D5DB] rounded-lg text-sm focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316] outline-none"
                   required

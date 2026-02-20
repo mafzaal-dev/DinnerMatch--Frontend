@@ -3,6 +3,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useDinner } from '@/hooks/useDinner';
+import { DatePicker } from '@/components/ui/date-picker';
+import { format } from 'date-fns';
 import toast from 'react-hot-toast';
 import { debounce, isValidSearchQuery } from '@/utils/searchHelper';
 import { CustomDropdown } from '@/components/common';
@@ -201,20 +203,18 @@ const DinnerManagementPage = () => {
                 placeholder="All Locations"
               />
 
-              <input
-                type="date"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
+              <DatePicker
+                date={startDate ? new Date(startDate) : undefined}
+                onSelect={(date) => setStartDate(date ? format(date, "yyyy-MM-dd") : "")}
                 placeholder="From Date"
-                className="w-full px-4 py-2 border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-orange-500 bg-white"
+                className="w-full"
               />
 
-              <input
-                type="date"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
+              <DatePicker
+                date={endDate ? new Date(endDate) : undefined}
+                onSelect={(date) => setEndDate(date ? format(date, "yyyy-MM-dd") : "")}
                 placeholder="To Date"
-                className="w-full px-4 py-2 border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-orange-500 bg-white"
+                className="w-full"
               />
 
               <CustomDropdown

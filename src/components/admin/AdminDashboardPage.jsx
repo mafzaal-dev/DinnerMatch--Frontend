@@ -3,6 +3,8 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { X } from "lucide-react";
 import { api, API_ENDPOINTS } from "../../utils/api";
+import { DatePicker } from "@/components/ui/date-picker";
+import { format } from "date-fns";
 import {
   debounce,
   formatDisplayValue,
@@ -355,28 +357,28 @@ const AdminDashboardPage = () => {
               <label className="text-xs font-medium text-[#6B7280]">
                 Start date
               </label>
-              <input
-                type="date"
-                value={startDate}
-                onChange={(e) => {
-                  setStartDate(e.target.value);
+              <DatePicker
+                date={startDate ? new Date(startDate) : undefined}
+                onSelect={(date) => {
+                  setStartDate(date ? format(date, "yyyy-MM-dd") : "");
                   setCurrentPage(0);
                 }}
-                className="px-3 py-2 border border-[#D1D5DB] rounded-lg text-sm text-[#111827] focus:outline-none focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316]"
+                placeholder="Start date"
+                className="w-full"
               />
             </div>
             <div className="flex flex-col gap-1">
               <label className="text-xs font-medium text-[#6B7280]">
                 End date
               </label>
-              <input
-                type="date"
-                value={endDate}
-                onChange={(e) => {
-                  setEndDate(e.target.value);
+              <DatePicker
+                date={endDate ? new Date(endDate) : undefined}
+                onSelect={(date) => {
+                  setEndDate(date ? format(date, "yyyy-MM-dd") : "");
                   setCurrentPage(0);
                 }}
-                className="px-3 py-2 border border-[#D1D5DB] rounded-lg text-sm text-[#111827] focus:outline-none focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316]"
+                placeholder="End date"
+                className="w-full"
               />
             </div>
           </div>

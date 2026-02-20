@@ -7,6 +7,8 @@ import { toast } from "react-hot-toast";
 import { useDinner } from "@/hooks/useDinner";
 import { api, API_ENDPOINTS } from "@/utils/api";
 import { CustomDropdown } from "@/components/common";
+import { DateTimePicker } from "@/components/ui/date-time-picker";
+import { format } from "date-fns";
 
 const CreateEditDinnerPage = ({ dinnerId = null, isEdit = false }) => {
   const router = useRouter();
@@ -60,7 +62,7 @@ const CreateEditDinnerPage = ({ dinnerId = null, isEdit = false }) => {
 
         setFormData({
           title: dinner.title || "",
-          date: dinner.date ? formatDateForInput(dinner.date) : "",
+          date: dinner.date || "",
           location: dinner.location || "",
           dinner_type: dinner.dinner_type || "Open",
           is_published: isPublished,
@@ -76,18 +78,6 @@ const CreateEditDinnerPage = ({ dinnerId = null, isEdit = false }) => {
     } finally {
       setInitialLoading(false);
     }
-  };
-
-  const formatDateForInput = (dateString) => {
-    if (!dateString) return "";
-    const date = new Date(dateString);
-    // Format: YYYY-MM-DDTHH:MM
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-    const hours = String(date.getHours()).padStart(2, "0");
-    const minutes = String(date.getMinutes()).padStart(2, "0");
-    return `${year}-${month}-${day}T${hours}:${minutes}`;
   };
 
   const handleChange = (e) => {
@@ -115,9 +105,7 @@ const CreateEditDinnerPage = ({ dinnerId = null, isEdit = false }) => {
 
     try {
       // Format date to ISO string if needed
-      const dateToSend = formData.date.includes("T")
-        ? new Date(formData.date).toISOString()
-        : formData.date;
+      const dateToSend = formData.date;
 
       const payload = {
         title: formData.title,
@@ -229,13 +217,16 @@ const CreateEditDinnerPage = ({ dinnerId = null, isEdit = false }) => {
               <label className="block text-sm font-medium text-[#374151] mb-2">
                 Date & Time <span className="text-red-500">*</span>
               </label>
-              <input
-                type="datetime-local"
-                name="date"
-                value={formData.date}
-                onChange={handleChange}
-                className="w-full px-4 py-2.5 border border-[#D1D5DB] rounded-lg text-sm focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316] outline-none"
-                required
+              <DateTimePicker
+                date={formData.date}
+                onSelect={(date) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    date: date ? date.toISOString() : "",
+                  }))
+                }
+                placeholder="Select date and time"
+                className="w-full"
               />
               <p className="mt-1 text-xs text-[#6B7280]">
                 Select the date and time for the dinner event

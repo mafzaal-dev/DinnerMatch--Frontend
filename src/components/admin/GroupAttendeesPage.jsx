@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { api, API_ENDPOINTS } from '../../utils/api';
+import { DatePicker } from "@/components/ui/date-picker";
+import { format } from "date-fns";
 import { toast } from 'react-hot-toast';
 import { debounce, formatDisplayValue, isValidSearchQuery, capitalizeWords } from '../../utils/searchHelper';
 import { CustomDropdown } from '@/components/common';
@@ -876,20 +878,32 @@ const GroupAttendeesPage = () => {
             />
           )}
           
-          <input
-            type="date"
-            value={activeTab === 'groups' ? filterDateFrom : filterRequestDateFrom}
-            onChange={(e) => activeTab === 'groups' ? setFilterDateFrom(e.target.value) : setFilterRequestDateFrom(e.target.value)}
+          <DatePicker
+            date={
+                activeTab === 'groups' 
+                ? (filterDateFrom ? new Date(filterDateFrom) : undefined)
+                : (filterRequestDateFrom ? new Date(filterRequestDateFrom) : undefined)
+            }
+            onSelect={(date) => {
+                const val = date ? format(date, "yyyy-MM-dd") : "";
+                activeTab === 'groups' ? setFilterDateFrom(val) : setFilterRequestDateFrom(val);
+            }}
             placeholder="From Date"
-            className="w-full px-4 py-2 border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-orange-500 bg-white"
+            className="w-full"
           />
           
-          <input
-            type="date"
-            value={activeTab === 'groups' ? filterDateTo : filterRequestDateTo}
-            onChange={(e) => activeTab === 'groups' ? setFilterDateTo(e.target.value) : setFilterRequestDateTo(e.target.value)}
+          <DatePicker
+            date={
+                activeTab === 'groups' 
+                ? (filterDateTo ? new Date(filterDateTo) : undefined)
+                : (filterRequestDateTo ? new Date(filterRequestDateTo) : undefined)
+            }
+            onSelect={(date) => {
+                const val = date ? format(date, "yyyy-MM-dd") : "";
+                activeTab === 'groups' ? setFilterDateTo(val) : setFilterRequestDateTo(val);
+            }}
             placeholder="To Date"
-            className="w-full px-4 py-2 border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-orange-500 bg-white"
+            className="w-full"
           />
           
           {((activeTab === 'groups' && (filterCity || filterDinner || filterDateFrom || filterDateTo)) ||
@@ -978,7 +992,7 @@ const GroupAttendeesPage = () => {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Select Dinner <span className="text-red-500">*</span>
+                  Dinner <span className="text-red-500">*</span>
                 </label>
                 <Controller
                   name="selectedDinnerForGroup"
@@ -1005,19 +1019,19 @@ const GroupAttendeesPage = () => {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Select Restaurant (Optional)
+                  Restaurant (Optional)
                 </label>
                 <CustomDropdown
                   value={selectedRestaurant}
                   onChange={(e) => setSelectedRestaurant(e.target.value)}
                   options={[
-                    { value: '', label: 'Select a restaurant (optional)' },
+                    { value: '', label: 'Select a restaurant' },
                     ...restaurants.map(restaurant => ({
                       value: restaurant.id,
                       label: `${restaurant.name} - ${restaurant.location}`,
                     })),
                   ]}
-                  placeholder="Select a restaurant (optional)"
+                  placeholder="Select a restaurant"
                 />
               </div>
 

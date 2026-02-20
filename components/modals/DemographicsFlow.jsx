@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useState } from 'react';
+import { DatePicker } from '@/components/ui/date-picker';
+import { format } from "date-fns";
 
 const STEPS = [
   {
@@ -255,15 +257,16 @@ const DemographicsFlow = ({ isOpen, onClose, onComplete }) => {
 
           {currentQ.type === 'date' && (
             <div className="space-y-4">
-              <input
-                type="date"
-                value={dateValue}
-                onChange={(e) => setDateValue(e.target.value)}
-                max={today}
-                className={`w-full px-4 py-3 bg-[#111121] border rounded-lg text-[#F5F5F5] placeholder-[#424242] focus:outline-none block ${
-                  isDateInFuture ? 'border-red-500 focus:border-red-500' : 'border-[#2F3A51] focus:border-[#FFAA55]'
-                }`}
+              <DatePicker
+                date={dateValue ? new Date(dateValue) : undefined}
+                onSelect={(date) => setDateValue(date ? format(date, "yyyy-MM-dd") : "")}
+                disabled={{ after: new Date() }}
                 placeholder={currentQ.placeholder}
+                className={`w-full justify-start text-left font-normal bg-[#111121] hover:bg-[#1A1A2E] text-[#F5F5F5] ${
+                  isDateInFuture ? 'border-red-500' : 'border-[#2F3A51]'
+                }`}
+                popoverClassName="bg-[#111121] border-[#2F3A51]"
+                isDark={true}
               />
               {isDateInFuture && (
                 <p className="text-sm text-red-400">Please select a date that is not in the future.</p>
