@@ -114,9 +114,19 @@ const RestaurantManagementPage = () => {
     }
   };
 
-  // Format price for display
+  // Budget display: use value as-is (option text = value) or legacy format
+  const getBudgetDisplay = (budget) => {
+    if (budget == null || budget === "") return null;
+    const b = String(budget);
+    if (b === "$ - Budget Friendly" || b === "$$ - Moderate" || b === "$$$ - Premium") return b;
+    return formatDisplayValue(budget);
+  };
+
   const formatPrice = (price) => {
-    return `R ${parseFloat(price).toFixed(2)}`;
+    if (price == null || price === "") return null;
+    const p = parseFloat(price);
+    if (Number.isNaN(p)) return null;
+    return `R ${p.toFixed(2)}`;
   };
 
   return (
@@ -185,11 +195,9 @@ const RestaurantManagementPage = () => {
                   onChange={(e) => setFilterBudget(e.target.value)}
                   options={[
                     { value: '', label: 'All Budgets' },
-                    { value: 'R0-R250', label: 'R0 - R250' },
-                    { value: 'R250-R500', label: 'R250 - R500' },
-                    { value: 'R500-R750', label: 'R500 - R750' },
-                    { value: 'R750-R1000', label: 'R750 - R1000' },
-                    { value: 'R1000+', label: 'R1000+' },
+                    { value: '$ - Budget Friendly', label: '$ - Budget Friendly' },
+                    { value: '$$ - Moderate', label: '$$ - Moderate' },
+                    { value: '$$$ - Premium', label: '$$$ - Premium' },
                   ]}
                   placeholder="All Budgets"
                 />
@@ -239,6 +247,7 @@ const RestaurantManagementPage = () => {
                     <th className="px-6 py-3 text-left text-xs font-medium text-[#9CA3AF] uppercase tracking-wide whitespace-nowrap">Location</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-[#9CA3AF] uppercase tracking-wide whitespace-nowrap">Rating</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-[#9CA3AF] uppercase tracking-wide whitespace-nowrap">Budget</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-[#9CA3AF] uppercase tracking-wide whitespace-nowrap">Price</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-[#9CA3AF] uppercase tracking-wide whitespace-nowrap">Groups</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-[#9CA3AF] uppercase tracking-wide whitespace-nowrap">Contact No</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-[#9CA3AF] uppercase tracking-wide whitespace-nowrap">Date Added</th>
@@ -267,9 +276,10 @@ const RestaurantManagementPage = () => {
                         )}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-[#374151]">
-                        {restaurant.price != null && restaurant.price !== ''
-                          ? formatPrice(restaurant.price)
-                          : formatDisplayValue(restaurant.budget) || '-'}
+                        {getBudgetDisplay(restaurant.budget) || "-"}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-[#374151]">
+                        {formatPrice(restaurant.price) || "-"}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-[#374151]">
                         <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">

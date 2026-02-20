@@ -74,8 +74,8 @@ const CreateEditRestaurantPage = ({ restaurantId = null, isEdit = false }) => {
         setValue("city", restaurant.city || "");
         setValue("location", restaurant.location || "");
         setValue("number", restaurant.number || "");
-        setValue("price", restaurant.price || "");
-        setValue("budget", restaurant.budget || "");
+        setValue("price", restaurant.price != null && restaurant.price !== "" ? restaurant.price : "");
+        setValue("budget", restaurant.budget != null ? String(restaurant.budget) : "");
         setValue("is_meat", restaurant.is_meat || false);
         setValue("is_vegetarian", restaurant.is_vegetarian || false);
         setValue("is_vegan", restaurant.is_vegan || false);
@@ -102,7 +102,7 @@ const CreateEditRestaurantPage = ({ restaurantId = null, isEdit = false }) => {
         city: data.city,
         location: data.location,
         number: data.number,
-        price: parseFloat(data.price).toFixed(2),
+        price: data.price !== "" && data.price != null && !isNaN(Number(data.price)) ? parseFloat(data.price).toFixed(2) : null,
         budget: data.budget,
         is_meat: data.is_meat,
         is_vegetarian: data.is_vegetarian,
@@ -309,7 +309,7 @@ const CreateEditRestaurantPage = ({ restaurantId = null, isEdit = false }) => {
 
               <div>
                 <label className="block text-sm font-medium text-[#374151] mb-2">
-                  Price (per person) <span className="text-red-500">*</span>
+                  Price (per person)
                 </label>
                 <div className="relative">
                   <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-[#6B7280]">
@@ -346,11 +346,9 @@ const CreateEditRestaurantPage = ({ restaurantId = null, isEdit = false }) => {
                     onChange={(e) => field.onChange(e.target.value)}
                     options={[
                       { value: "", label: "Select budget range" },
-                      { value: "R0-R250", label: "R0 - R250" },
-                      { value: "R250-R500", label: "R250 - R500" },
-                      { value: "R500-R750", label: "R500 - R750" },
-                      { value: "R750-R1000", label: "R750 - R1000" },
-                      { value: "R1000+", label: "R1000+" },
+                      { value: "$ - Budget Friendly", label: "$ - Budget Friendly" },
+                      { value: "$$ - Moderate", label: "$$ - Moderate" },
+                      { value: "$$$ - Premium", label: "$$$ - Premium" },
                     ]}
                     placeholder="Select budget range"
                     required

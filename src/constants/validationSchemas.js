@@ -58,10 +58,12 @@ export const restaurantSchema = yup.object().shape({
   city: requiredString('City'),
   location: requiredString('Location'),
   number: requiredString('Contact number'),
-  price: yup.number()
-    .transform((value) => (isNaN(value) ? undefined : value))
-    .positive('Price must be greater than 0')
-    .required('Price is required'),
+  price: yup
+    .number()
+    .nullable()
+    .optional()
+    .transform((value, orig) => (orig === '' || orig === undefined ? null : (isNaN(Number(orig)) ? undefined : Number(orig))))
+    .positive('Price must be greater than 0'),
   budget: requiredString('Budget'),
   is_meat: yup.boolean(),
   is_vegetarian: yup.boolean(),
