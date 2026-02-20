@@ -8,7 +8,7 @@ import PricingSection from "@/components/pricing/PricingSection";
 function SubscriptionContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const from = searchParams.get("from"); // "signup" | "dinner-details" | null
+  const from = searchParams.get("from");
 
   const handleSelectPlan = (plan) => {
     if (from === "signup") {
