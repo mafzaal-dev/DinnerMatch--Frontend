@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/hooks/useAuth';
 import Navbar from "../../components/Navbar";
 import Hero from "../../components/Hero";
 import Testimonials from "../../components/Testimonials";
@@ -54,6 +55,7 @@ function buildProfileUpdatePayload(formData, demographicsData, selectedCity, sel
 
 export default function Home() {
   const router = useRouter();
+  const { refreshUserFromStorage } = useAuth();
   const [quizStep, setQuizStep] = useState(null);
   const [selectedCity, setSelectedCity] = useState(null);
   const [selectedPlace, setSelectedPlace] = useState(null);
@@ -265,6 +267,7 @@ export default function Home() {
   };
 
   const handleWelcomeNext = () => {
+    refreshUserFromStorage();
     setQuizStep('subscription');
   };
 
@@ -341,7 +344,10 @@ export default function Home() {
       
       <WelcomeModal
         isOpen={quizStep === 'welcome'}
-        onClose={resetQuizFlow}
+        onClose={() => {
+          refreshUserFromStorage();
+          resetQuizFlow();
+        }}
         onNext={handleWelcomeNext}
       />
       

@@ -14,23 +14,34 @@ export const AuthProvider = ({ children }) => {
   const router = useRouter();
 
   // Load user from storage on mount
+  const refreshUserFromStorage = useCallback(() => {
+    try {
+      const storedUser = localStorage.getItem('user_data');
+      const token = localStorage.getItem('access_token');
+
+      if (token && storedUser) {
+        try {
+          const parsedUser = JSON.parse(storedUser);
+          setUser(parsedUser);
+        } catch (parseError) {
+          console.error('Failed to parse stored user:', parseError);
+          localStorage.removeItem('user_data');
+          localStorage.removeItem('access_token');
+          localStorage.removeItem('refresh_token');
+          setUser(null);
+        }
+      } else {
+        setUser(null);
+      }
+    } catch (err) {
+      console.error('Failed to refresh auth state:', err);
+    }
+  }, []);
+
   useEffect(() => {
     const loadUser = async () => {
       try {
-        const storedUser = localStorage.getItem('user_data');
-        const token = localStorage.getItem('access_token');
-        
-        if (token && storedUser) {
-          try {
-            const parsedUser = JSON.parse(storedUser);
-            setUser(parsedUser);
-          } catch (parseError) {
-            console.error('Failed to parse stored user:', parseError);
-            localStorage.removeItem('user_data');
-            localStorage.removeItem('access_token');
-            localStorage.removeItem('refresh_token');
-          }
-        }
+        refreshUserFromStorage();
       } catch (err) {
         console.error('Failed to load auth state:', err);
       } finally {
@@ -39,7 +50,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     loadUser();
-  }, []);
+  }, [refreshUserFromStorage]);
 
   const login = useCallback(async (credentials, redirectPath = ROUTES.ACCOUNT) => {
     try {
@@ -186,6 +197,7 @@ export const AuthProvider = ({ children }) => {
     getProfile,
     updateProfile,
     registerWithQuiz,
+    refreshUserFromStorage,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
