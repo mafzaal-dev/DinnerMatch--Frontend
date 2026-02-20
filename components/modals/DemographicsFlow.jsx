@@ -150,11 +150,16 @@ const DemographicsFlow = ({ isOpen, onClose, onComplete }) => {
     ? currentQ.options.filter(o => o.label.toLowerCase().includes(searchQuery.toLowerCase()))
     : [];
 
+  const today = new Date().toISOString().split('T')[0];
+
   const handleDateConfirm = () => {
-    if (dateValue) {
-      handleAnswer(currentQ.id, dateValue);
-    }
+    if (!dateValue) return;
+    const selected = new Date(dateValue);
+    if (selected > new Date()) return; // reject future dates
+    handleAnswer(currentQ.id, dateValue);
   };
+
+  const isDateInFuture = dateValue ? new Date(dateValue) > new Date() : false;
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
@@ -254,15 +259,21 @@ const DemographicsFlow = ({ isOpen, onClose, onComplete }) => {
                 type="date"
                 value={dateValue}
                 onChange={(e) => setDateValue(e.target.value)}
-                className="w-full px-4 py-3 bg-[#111121] border border-[#2F3A51] rounded-lg text-[#F5F5F5] placeholder-[#424242] focus:outline-none focus:border-[#FFAA55] block"
+                max={today}
+                className={`w-full px-4 py-3 bg-[#111121] border rounded-lg text-[#F5F5F5] placeholder-[#424242] focus:outline-none block ${
+                  isDateInFuture ? 'border-red-500 focus:border-red-500' : 'border-[#2F3A51] focus:border-[#FFAA55]'
+                }`}
                 placeholder={currentQ.placeholder}
               />
+              {isDateInFuture && (
+                <p className="text-sm text-red-400">Please select a date that is not in the future.</p>
+              )}
               <button
                 onClick={handleDateConfirm}
-                disabled={!dateValue}
+                disabled={!dateValue || isDateInFuture}
                 className={`w-full py-3 rounded-lg font-bold text-sm uppercase tracking-wide transition-colors ${
-                  dateValue 
-                    ? 'bg-[#FFAA55] text-white hover:bg-[#FF9955]' 
+                  dateValue && !isDateInFuture
+                    ? 'bg-[#FFAA55] text-white hover:bg-[#FF9955]'
                     : 'bg-[#2F3A51] text-[#757575] cursor-not-allowed'
                 }`}
               >
