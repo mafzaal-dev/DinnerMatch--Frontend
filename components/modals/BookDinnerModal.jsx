@@ -75,7 +75,7 @@ const BookDinnerModal = ({ isOpen, onClose, onSuccess, onBack, selectedCity, sel
   if (loading) {
     return (
       <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div className="bg-[#080814] rounded-xl w-full max-w-154 p-10">
+        <div className="bg-[#080814] rounded-xl w-full max-w-154 p-10 max-h-[90vh] overflow-y-auto">
           <div className="text-center text-[#F5F5F5]">Loading dinner slots...</div>
         </div>
       </div>
@@ -84,7 +84,7 @@ const BookDinnerModal = ({ isOpen, onClose, onSuccess, onBack, selectedCity, sel
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-[#080814] rounded-xl w-full max-w-154 p-10 relative shadow-2xl">
+      <div className="bg-[#080814] rounded-xl w-full max-w-154 p-10 relative shadow-2xl max-h-[90vh] overflow-y-auto">
         {onClose && (
           <button
             onClick={onClose}
