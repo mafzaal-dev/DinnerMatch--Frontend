@@ -12,8 +12,10 @@ import { CustomDropdown } from "@/components/common";
 import { TablePagination } from "@/components/ui/Pagination";
 import EmailModal from "./EmailModal";
 import toast from "react-hot-toast";
+import { useAuth } from "@/hooks/useAuth";
 
 const AdminDashboardPage = () => {
+  const { user: currentUser } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedUserType, setSelectedUserType] = useState("All Users");
   const [selectedCity, setSelectedCity] = useState("All Cities");
@@ -127,6 +129,10 @@ const AdminDashboardPage = () => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  const isCurrentUser = (rowUser) =>
+    (rowUser?.id && currentUser?.id && rowUser.id === currentUser.id) ||
+    (rowUser?.email && currentUser?.email && rowUser.email === currentUser.email);
 
   const handleUpdateUserStatus = async (userId, isActive) => {
     if (!userId) return;
@@ -588,8 +594,10 @@ const AdminDashboardPage = () => {
                                 }
                                 disabled={
                                   updatingUserId === (user.id || user.email) ||
-                                  user.is_active === true
+                                  user.is_active === true ||
+                                  isCurrentUser(user)
                                 }
+                                title={isCurrentUser(user) ? "You cannot change your own status" : undefined}
                                 className="w-full px-3 py-2 text-left text-sm text-[#111827] hover:bg-[#F9FAFB] disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                               >
                                 {user.is_active === true && (
@@ -607,8 +615,10 @@ const AdminDashboardPage = () => {
                                 }
                                 disabled={
                                   updatingUserId === (user.id || user.email) ||
-                                  user.is_active === false
+                                  user.is_active === false ||
+                                  isCurrentUser(user)
                                 }
+                                title={isCurrentUser(user) ? "You cannot change your own status" : undefined}
                                 className="w-full px-3 py-2 text-left text-sm text-[#111827] hover:bg-[#F9FAFB] disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                               >
                                 {user.is_active === false && (
