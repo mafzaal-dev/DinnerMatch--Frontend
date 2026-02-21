@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { api, API_ENDPOINTS } from '../../src/utils/api';
+import { useSubscription } from '../../src/hooks/useDinners';
+import { toast } from 'react-hot-toast';
 
 const BookDinnerModal = ({ isOpen, onClose, onSuccess, onBack, selectedCity, selectedPlace }) => {
   const [selectedSlot, setSelectedSlot] = useState(null);
@@ -9,6 +11,7 @@ const BookDinnerModal = ({ isOpen, onClose, onSuccess, onBack, selectedCity, sel
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const { data: subscriptionData } = useSubscription();
 
   useEffect(() => {
     if (isOpen) {
@@ -44,6 +47,12 @@ const BookDinnerModal = ({ isOpen, onClose, onSuccess, onBack, selectedCity, sel
 
   const handleSecureSpot = async () => {
     if (!selectedSlot) return;
+
+    const hasActiveSubscription = subscriptionData && subscriptionData.length > 0;
+    if (!hasActiveSubscription) {
+      toast.error('You need an active subscription to request a dinner.');
+      return;
+    }
 
     try {
       setSubmitting(true);

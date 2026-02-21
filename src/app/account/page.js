@@ -48,7 +48,7 @@ export default function Account() {
   };
 
   const handleBack = () => {
-    router.back();
+    router.push('/');
   };
 
   return (

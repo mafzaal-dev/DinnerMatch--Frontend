@@ -3,12 +3,14 @@
 import React, { useState, useEffect } from 'react';
 import { api, API_ENDPOINTS } from '../../src/utils/api';
 import { toast } from 'react-hot-toast';
+import { useSubscription } from '../../src/hooks/useDinners';
 
 const AvailableDinnersPage = ({ onMyAccount, onViewDetails }) => {
   const [dinners, setDinners] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [requestingDinner, setRequestingDinner] = useState(null);
+  const { data: subscriptionData } = useSubscription();
 
   useEffect(() => {
     fetchDinners();
@@ -40,6 +42,13 @@ const AvailableDinnersPage = ({ onMyAccount, onViewDetails }) => {
   };
 
   const handleRequestDinner = async (dinnerId) => {
+    // Check for active subscription
+    const hasActiveSubscription = subscriptionData && subscriptionData.length > 0;
+    if (!hasActiveSubscription) {
+      toast.error('You need an active subscription to request a dinner.');
+      return;
+    }
+
     try {
       setRequestingDinner(dinnerId);
       setError('');

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 
 const DinnerDetailsPage = ({
@@ -11,6 +11,7 @@ const DinnerDetailsPage = ({
     time: "",
     restaurant: "",
     address: "",
+    current_user_attendance: null,
     group: {
       languages: [],
       nationalities: {},
@@ -34,6 +35,18 @@ const DinnerDetailsPage = ({
   upcomingDates = [],
 }) => {
   const [rsvpStatus, setRsvpStatus] = useState(null);
+
+  useEffect(() => {
+    if (dinner?.current_user_attendance === 'there') {
+      setRsvpStatus("I'll be There");
+    } else if (dinner?.current_user_attendance === 'late') {
+      setRsvpStatus("I'll be Late");
+    } else if (dinner?.current_user_attendance === 'cant_make_it') {
+      setRsvpStatus("Can't Make It");
+    } else {
+      setRsvpStatus(null);
+    }
+  }, [dinner?.current_user_attendance]);
 
   const hasActiveSubscription = subscriptionData && subscriptionData.length > 0;
   const activeSubscription = hasActiveSubscription ? subscriptionData[0] : null;
@@ -136,6 +149,27 @@ const DinnerDetailsPage = ({
   };
 
   const { groupReveal, restaurantReveal, dinnerExperience } = getDynamicDates();
+
+  const getDinnerDateObj = () => {
+    if (dinner?.isoDate) return new Date(dinner.isoDate);
+    if (dinner?.date && dinner?.time) return new Date(`${dinner.date} ${dinner.time}`);
+    return null;
+  };
+
+  const dinnerDateObj = useMemo(() => getDinnerDateObj(), [dinner]);
+
+  const showTableTalk = useMemo(() => {
+    if (!dinnerDateObj || isNaN(dinnerDateObj.getTime())) return false;
+    const now = new Date();
+    const diffMs = dinnerDateObj.getTime() - now.getTime();
+    const oneDayMs = 24 * 60 * 60 * 1000;
+    // Show only if within 24 hours before the dinner starts
+    return diffMs > 0 && diffMs < oneDayMs;
+  }, [dinnerDateObj]);
+
+  const unlockTime = dinnerDateObj && !isNaN(dinnerDateObj.getTime())
+    ? dinnerDateObj.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
+    : "7:00 PM";
 
   return (
     <div className="min-h-screen bg-black p-4 md:p-8">
@@ -677,19 +711,21 @@ const DinnerDetailsPage = ({
                 </div>
 
                 {/* TableTalk Unlock */}
-                <div
-                  className="bg-[#1A1711] border border-[#534A3E] rounded-lg p-4"
-                  style={{
-                    boxShadow: "0 0 16px rgba(0, 0, 0, 0.12)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <p className="text-[#FFAA55] text-sm font-semibold">
-                    TableTalk Unlocks at 7:00 PM
-                  </p>
-                </div>
+                {showTableTalk && (
+                  <div
+                    className="bg-[#1A1711] border border-[#534A3E] rounded-lg p-4"
+                    style={{
+                      boxShadow: "0 0 16px rgba(0, 0, 0, 0.12)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <p className="text-[#FFAA55] text-sm font-semibold">
+                      TableTalk Unlocks at {unlockTime}
+                    </p>
+                  </div>
+                )}
               </>
             )}
 

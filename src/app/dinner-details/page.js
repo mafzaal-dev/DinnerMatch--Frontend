@@ -97,6 +97,7 @@ function DinnerDetailsContent() {
       restaurant: d.group?.restaurant?.name || "To be announced", // Use restaurant name if available, else placeholder
       address: d.group?.restaurant?.address || d.location,
       status: d.dinner_status,
+      current_user_attendance: d.current_user_attendance,
       group: {
         languages: [], // Not provided in API yet
         nationalities: calculatePercentages(nationalityCounts),
