@@ -1,8 +1,41 @@
 "use client";
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
-const QuizResultsModal = ({ isOpen, onClose, onContinue, compatibilityScore = 90 }) => {
+const QuizResultsModal = ({ isOpen, onClose, onContinue }) => {
+  const [displayedScore, setDisplayedScore] = useState(0);
+
+  useEffect(() => {
+    let animationFrameId;
+
+    if (isOpen) {
+      const targetScore = Math.floor(Math.random() * (90 - 80 + 1)) + 80;
+      let startTime = null;
+      const duration = 2000;
+
+      const animate = (currentTime) => {
+        if (!startTime) startTime = currentTime;
+        const progress = Math.min((currentTime - startTime) / duration, 1);
+        
+        const ease = 1 - Math.pow(1 - progress, 4);
+        
+        setDisplayedScore(Math.floor(ease * targetScore));
+
+        if (progress < 1) {
+          animationFrameId = requestAnimationFrame(animate);
+        }
+      };
+
+      animationFrameId = requestAnimationFrame(animate);
+    } else {
+      setDisplayedScore(0);
+    }
+
+    return () => {
+      if (animationFrameId) cancelAnimationFrame(animationFrameId);
+    };
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   return (
@@ -21,7 +54,7 @@ const QuizResultsModal = ({ isOpen, onClose, onContinue, compatibilityScore = 90
           <h2 className="text-[32px] font-bold text-[#F5F5F5]">DinnersMatch</h2>
 
           <div>
-            <p className="text-[80px] font-bold text-[#FFAA55]">{compatibilityScore}%</p>
+            <p className="text-[80px] font-bold text-[#FFAA55]">{displayedScore}%</p>
             <p className="text-[#f5f5f5] text-lg">
               The percentage of members you're compatible with
             </p>
