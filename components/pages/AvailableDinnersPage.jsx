@@ -42,7 +42,6 @@ const AvailableDinnersPage = ({ onMyAccount, onViewDetails }) => {
   };
 
   const handleRequestDinner = async (dinnerId) => {
-    // Check for active subscription
     const hasActiveSubscription = subscriptionData && subscriptionData.length > 0;
     if (!hasActiveSubscription) {
       toast.error('You need an active subscription to request a dinner.');

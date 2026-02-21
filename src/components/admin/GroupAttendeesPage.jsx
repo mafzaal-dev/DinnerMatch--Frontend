@@ -583,18 +583,121 @@ const GroupAttendeesPage = () => {
 
   const handleExportCSV = async () => {
     try {
-      const response = await api.get(API_ENDPOINTS.USER_EXPORT_CSV, {
-        params: { search: searchQuery },
-        responseType: 'blob'
-      });
-      
-      const url = window.URL.createObjectURL(new Blob([response]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', `export-${new Date().toISOString().split('T')[0]}.csv`);
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
+      if (activeTab === 'groups') {
+        const params = new URLSearchParams();
+        params.append("export", "true");
+        
+        if (isValidSearchQuery(searchQuery)) {
+          params.append("search", searchQuery);
+        }
+        if (filterCity) params.append('city', filterCity);
+        if (filterDinner) params.append('dinner', filterDinner);
+        if (filterDateFrom) params.append('start_date', filterDateFrom);
+        if (filterDateTo) params.append('end_date', filterDateTo);
+
+        const response = await api.get(`${API_ENDPOINTS.GROUP_LIST}?${params}`);
+        const allGroups = response.groups || [];
+
+        if (allGroups.length === 0) {
+          toast.error("No groups to export");
+          return;
+        }
+
+        const headers = ["Group Name", "Member Name", "Member Email", "Member Gender"];
+        
+        const csvRows = [headers.join(",")];
+
+        allGroups.forEach(group => {
+           const members = group.members || [];
+           if (members.length === 0) {
+             csvRows.push([
+               `"${String(group.name).replace(/"/g, '""')}"`,
+               "-",
+               "-",
+               "-"
+             ].join(","));
+           } else {
+             members.forEach(member => {
+               csvRows.push([
+                 `"${String(group.name).replace(/"/g, '""')}"`,
+                 `"${String(member.first_name || '' + ' ' + member.last_name || '').trim().replace(/"/g, '""')}"`,
+                 `"${String(member.email).replace(/"/g, '""')}"`,
+                 `"${String(member.profile?.gender || '-').replace(/"/g, '""')}"`
+               ].join(","));
+             });
+           }
+        });
+
+        const csvContent = csvRows.join("\n");
+        const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", `groups_export_${new Date().toISOString().split("T")[0]}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.URL.revokeObjectURL(url);
+
+      } else {
+        // Users Tab (Dinner Requests)
+        const params = new URLSearchParams();
+        params.append("export", "true");
+        if (selectedDinner) params.append('dinner_id', selectedDinner);
+        
+        if (isValidSearchQuery(searchQuery)) {
+          params.append('search', searchQuery);
+        }
+        if (filterRequestCity) params.append('city', filterRequestCity);
+        if (filterRequestDinner) params.append('dinner', filterRequestDinner);
+        if (filterRequestDateFrom) params.append('start_date', filterRequestDateFrom);
+        if (filterRequestDateTo) params.append('end_date', filterRequestDateTo);
+        
+        const response = await api.get(`${API_ENDPOINTS.DINNER_REQUESTS_LIST}?${params}`);
+        const allRequests = response.data || [];
+
+        if (allRequests.length === 0) {
+          toast.error("No requests to export");
+          return;
+        }
+
+        const headers = [
+          "Name", "Email", "Gender", "Age", "Area", 
+          "Language", "Nationality", "Meal Preference", "Budget"
+        ];
+
+        const csvContent = [
+          headers.join(","),
+          ...allRequests.map(item => {
+            const user = item.user || {};
+            const profile = user.profile || {};
+            
+            const row = [
+              formatDisplayValue(`${user.first_name || ''} ${user.last_name || ''}`.trim()),
+              formatDisplayValue(user.email),
+              formatDisplayValue(profile.gender),
+              calculateAge(profile.date_of_birth),
+              formatDisplayValue(profile.area),
+              capitalizeWords(profile.language),
+              capitalizeWords(profile.nationality),
+              capitalizeWords(profile.meal_preference),
+              formatDisplayValue(profile.budget)
+            ];
+            
+            return row.map(field => `"${String(field).replace(/"/g, '""')}"`).join(",");
+          })
+        ].join("\n");
+
+        const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", `dinner_requests_export_${new Date().toISOString().split("T")[0]}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.URL.revokeObjectURL(url);
+      }
     } catch (err) {
       console.error('Error exporting CSV:', err);
       toast.error('Failed to export CSV');

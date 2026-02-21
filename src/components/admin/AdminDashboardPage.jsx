@@ -196,25 +196,99 @@ const AdminDashboardPage = () => {
 
   const handleExportCSV = async () => {
     try {
-      // Use axiosInstance directly from api to handle responseType: 'blob'
-      // Or if the utility doesn't expose the instance, we might need to handle it in api.js
-      // Let's check api.js again.
-      const response = await api.get(API_ENDPOINTS.USER_EXPORT_CSV, {
-        responseType: "blob",
-      });
+      const params = new URLSearchParams();
 
-      // Create a link to download the blob
-      const url = window.URL.createObjectURL(new Blob([response]));
+      params.append("export", "true");
+
+      if (isValidSearchQuery(searchQuery)) {
+        params.append("search", searchQuery);
+      }
+
+      if (selectedUserType !== "All Users") {
+        params.append("membership", selectedUserType.toLowerCase());
+      }
+      if (selectedCity !== "All Cities") {
+        params.append("city", selectedCity);
+      }
+      if (selectedUpcomingDinner !== "Any Upcoming Dinner") {
+        params.append(
+          "has_upcoming_booking",
+          selectedUpcomingDinner === "Has Booking" ? "true" : "false",
+        );
+      }
+      if (selectedStatus !== "All Users") {
+        params.append("status", selectedStatus.toLowerCase());
+      }
+      params.append("start_date", startDate || "null");
+      params.append("end_date", endDate || "null");
+
+      const endpoint = `${API_ENDPOINTS.USER_LIST}?${params.toString()}`;
+      
+      const response = await api.get(endpoint);
+      const allUsers = response?.data?.users ?? response?.users ?? [];
+
+      if (!allUsers || allUsers.length === 0) {
+        toast.error("No users to export");
+        return;
+      }
+
+      const headers = [
+        "Name",
+        "Email",
+        "Mobile",
+        "Tickets",
+        "Membership",
+        "Status",
+        "Next Dinner",
+        "Past Dinner",
+      ];
+
+      const csvContent = [
+        headers.join(","),
+        ...allUsers.map((user) => {
+          const row = [
+            formatDisplayValue(
+              user.name ||
+                `${user.first_name || ""} ${user.last_name || ""}`.trim(),
+            ),
+            formatDisplayValue(user.email),
+            formatDisplayValue(
+              user.mobile ||
+                user.phone_number ||
+                user.profile?.phone_number,
+            ),
+            formatDisplayValue(user.tickets),
+            formatDisplayValue(user.membership),
+            user.is_active === true
+              ? "Active"
+              : user.is_active === false
+              ? "Inactive"
+              : formatDisplayValue(user.status) ?? "-",
+            formatDisplayValue(
+              user.nextDinner || user.next_dinner || "Not Booked",
+            ),
+            formatDisplayValue(
+              user.pastDinner || user.past_dinner || "Not Booked",
+            ),
+          ];
+          return row
+            .map((field) => `"${String(field).replace(/"/g, '""')}"`)
+            .join(",");
+        }),
+      ].join("\n");
+
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
-      link.href = url;
+      link.setAttribute("href", url);
       link.setAttribute(
         "download",
-        `users-export-${new Date().toISOString().split("T")[0]}.csv`,
+        `users_export_${new Date().toISOString().split("T")[0]}.csv`,
       );
       document.body.appendChild(link);
       link.click();
-      link.remove();
-      window.URL.revokeObjectURL(url);
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
     } catch (err) {
       console.error("Error exporting CSV:", err);
       toast.error("Failed to export CSV. Please try again.");
