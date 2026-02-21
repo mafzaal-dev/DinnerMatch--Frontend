@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import AccountPage from '../../../components/pages/AccountPage';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { SubscriptionModal } from '../../../components/modals';
 
-export default function Account() {
+function AccountContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { logout, user } = useAuth();
@@ -74,3 +74,10 @@ export default function Account() {
   );
 }
 
+export default function Account() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <AccountContent />
+    </Suspense>
+  );
+}
