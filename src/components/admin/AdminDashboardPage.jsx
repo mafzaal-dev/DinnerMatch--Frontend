@@ -128,7 +128,11 @@ const AdminDashboardPage = () => {
     api
       .get(API_ENDPOINTS.GET_CITY_AREA)
       .then((res) => {
-        const raw = Array.isArray(res?.data) ? res.data : Array.isArray(res) ? res : [];
+        const raw = Array.isArray(res?.data)
+          ? res.data
+          : Array.isArray(res)
+            ? res
+            : [];
         setCities(raw);
       })
       .catch(() => setCities([]));
@@ -153,9 +157,10 @@ const AdminDashboardPage = () => {
     { value: "All Dinners", label: "All Dinners" },
     ...dinners.map((d) => ({
       value: d.id,
-      label: d.title && d.date
-        ? `${d.title} - ${new Date(d.date).toLocaleDateString()}`
-        : d.title || `Dinner #${d.id}`,
+      label:
+        d.title && d.date
+          ? `${d.title} - ${new Date(d.date).toLocaleDateString()}`
+          : d.title || `Dinner #${d.id}`,
     })),
   ];
 
@@ -191,7 +196,9 @@ const AdminDashboardPage = () => {
 
   const isCurrentUser = (rowUser) =>
     (rowUser?.id && currentUser?.id && rowUser.id === currentUser.id) ||
-    (rowUser?.email && currentUser?.email && rowUser.email === currentUser.email);
+    (rowUser?.email &&
+      currentUser?.email &&
+      rowUser.email === currentUser.email);
 
   const handleUpdateUserStatus = async (userId, isActive) => {
     if (!userId) return;
@@ -284,7 +291,7 @@ const AdminDashboardPage = () => {
       params.append("end_date", endDate || "null");
 
       const endpoint = `${API_ENDPOINTS.USER_LIST}?${params.toString()}`;
-      
+
       const response = await api.get(endpoint);
       const allUsers = response?.data?.users ?? response?.users ?? [];
 
@@ -325,8 +332,8 @@ const AdminDashboardPage = () => {
             user.is_active === true
               ? "Active"
               : user.is_active === false
-              ? "Inactive"
-              : formatDisplayValue(user.status) ?? "-",
+                ? "Inactive"
+                : (formatDisplayValue(user.status) ?? "-"),
             formatDisplayValue(
               user.nextDinner || user.next_dinner || "Not Booked",
             ),
@@ -461,7 +468,10 @@ const AdminDashboardPage = () => {
                   setCurrentPage(0);
                 }}
                 options={[
-                  { value: "Any Upcoming Dinner", label: "Any Upcoming Dinner" },
+                  {
+                    value: "Any Upcoming Dinner",
+                    label: "Any Upcoming Dinner",
+                  },
                   { value: "Has Booking", label: "Has Booking" },
                   { value: "No Booking", label: "No Booking" },
                 ]}
@@ -470,7 +480,9 @@ const AdminDashboardPage = () => {
             </div>
 
             <div className="flex flex-col gap-1">
-              <label className="text-xs font-medium text-[#6B7280]">Dinner</label>
+              <label className="text-xs font-medium text-[#6B7280]">
+                Dinner
+              </label>
               <CustomDropdown
                 value={selectedDinnerId}
                 onChange={(e) => {
@@ -483,7 +495,9 @@ const AdminDashboardPage = () => {
             </div>
 
             <div className="flex flex-col gap-1">
-              <label className="text-xs font-medium text-[#6B7280]">Status</label>
+              <label className="text-xs font-medium text-[#6B7280]">
+                Status
+              </label>
               <CustomDropdown
                 value={selectedStatus}
                 onChange={(e) => {
@@ -671,22 +685,26 @@ const AdminDashboardPage = () => {
                         )}
                       </td>
                       <td className="px-4 py-3.5 whitespace-nowrap text-sm text-[#6B7280]">
-                        {getCityAreaNames(
-                          user.profile?.city_id ?? user.city_id,
-                          user.profile?.area_id ?? user.area_id,
-                        ).cityName}
+                        {
+                          getCityAreaNames(
+                            user.profile?.city_id ?? user.city_id,
+                            user.profile?.area_id ?? user.area_id,
+                          ).cityName
+                        }
                       </td>
                       <td className="px-4 py-3.5 whitespace-nowrap text-sm text-[#6B7280]">
-                        {getCityAreaNames(
-                          user.profile?.city_id ?? user.city_id,
-                          user.profile?.area_id ?? user.area_id,
-                        ).areaName}
+                        {
+                          getCityAreaNames(
+                            user.profile?.city_id ?? user.city_id,
+                            user.profile?.area_id ?? user.area_id,
+                          ).areaName
+                        }
                       </td>
                       <td className="px-4 py-3.5 whitespace-nowrap text-sm text-[#6B7280]">
                         {formatDisplayValue(user.tickets)}
                       </td>
                       <td className="px-4 py-3.5 whitespace-nowrap text-sm text-[#6B7280]">
-                        {formatDisplayValue(user.membership)}
+                        {formatDisplayValue(user.subscriptions)}
                       </td>
                       <td className="px-4 py-3.5 whitespace-nowrap text-sm">
                         {user.is_active === true ? (
@@ -762,7 +780,9 @@ const AdminDashboardPage = () => {
                                         className="w-full px-3 py-2 text-left text-sm text-[#111827] opacity-50 cursor-not-allowed flex items-center gap-2"
                                       >
                                         {user.is_active === true && (
-                                          <span className="text-[#10B981]">✓</span>
+                                          <span className="text-[#10B981]">
+                                            ✓
+                                          </span>
                                         )}
                                         Set Active
                                       </button>
@@ -781,7 +801,9 @@ const AdminDashboardPage = () => {
                                         className="w-full px-3 py-2 text-left text-sm text-[#111827] opacity-50 cursor-not-allowed flex items-center gap-2"
                                       >
                                         {user.is_active === false && (
-                                          <span className="text-[#10B981]">✓</span>
+                                          <span className="text-[#10B981]">
+                                            ✓
+                                          </span>
                                         )}
                                         Set Inactive
                                       </button>
@@ -799,7 +821,8 @@ const AdminDashboardPage = () => {
                                       )
                                     }
                                     disabled={
-                                      updatingUserId === (user.id || user.email) ||
+                                      updatingUserId ===
+                                        (user.id || user.email) ||
                                       user.is_active === true
                                     }
                                     className="w-full px-3 py-2 text-left text-sm text-[#111827] hover:bg-[#F9FAFB] disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
@@ -818,7 +841,8 @@ const AdminDashboardPage = () => {
                                       )
                                     }
                                     disabled={
-                                      updatingUserId === (user.id || user.email) ||
+                                      updatingUserId ===
+                                        (user.id || user.email) ||
                                       user.is_active === false
                                     }
                                     className="w-full px-3 py-2 text-left text-sm text-[#111827] hover:bg-[#F9FAFB] disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
