@@ -6,6 +6,7 @@
 
   const SubscriptionModal = ({ isOpen, onClose, onContinue, onBack }) => {
     const [plans, setPlans] = useState([]);
+    const [activePlanId, setActivePlanId] = useState(null);
     const [loading, setLoading] = useState(false);
     const [checkoutLoading, setCheckoutLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -24,14 +25,24 @@
       if (isOpen) {
         setError(null);
         setLoading(true);
-        api
-          .get(API_ENDPOINTS.GET_ALL_PLANS)
-          .then((res) => {
-            const list = res?.data?.plans ?? res?.plans;
+        setActivePlanId(null);
+
+        const fetchPlans = api.get(API_ENDPOINTS.GET_ALL_PLANS);
+        const fetchSubscription = api.get(API_ENDPOINTS.USER_SUBSCRIPTIONS).catch(() => null);
+
+        Promise.all([fetchPlans, fetchSubscription])
+          .then(([plansRes, subRes]) => {
+            const list = plansRes?.data?.plans ?? plansRes?.plans;
             if (Array.isArray(list) && list.length > 0) {
               setPlans(list);
-            } else if (Array.isArray(res?.plans)) {
-              setPlans(res.plans);
+            } else if (Array.isArray(plansRes?.plans)) {
+              setPlans(plansRes.plans);
+            }
+
+            const subList = subRes?.data?.subscription ?? subRes?.subscription;
+            if (Array.isArray(subList)) {
+              const active = subList.find((s) => s.status === "active");
+              if (active?.plan?.id) setActivePlanId(active.plan.id);
             }
           })
           .catch((err) => {
@@ -173,7 +184,7 @@
                   checkoutLoading ? "pointer-events-none opacity-70" : ""
                 }
               >
-                <PricingSection plans={plans} onSelectPlan={handleSelectPlan} />
+                <PricingSection plans={plans} onSelectPlan={handleSelectPlan} activePlanId={activePlanId} />
               </div>
               {checkoutLoading && (
                 <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center">

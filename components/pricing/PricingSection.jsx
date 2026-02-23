@@ -78,7 +78,7 @@ const mapPlanToCardProps = (plan, index) => {
   };
 };
 
-const PricingSection = ({ onSelectPlan, plans }) => {
+const PricingSection = ({ onSelectPlan, plans, activePlanId }) => {
   const hasPlans = plans && Array.isArray(plans) && plans.length > 0;
 
   return (
@@ -131,6 +131,7 @@ const PricingSection = ({ onSelectPlan, plans }) => {
                   key={plan.id}
                   {...props}
                   onSelect={onSelectPlan}
+                  isActivePlan={activePlanId === plan.id}
                 />
               );
             })

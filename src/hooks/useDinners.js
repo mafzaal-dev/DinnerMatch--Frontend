@@ -1,6 +1,9 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api, API_ENDPOINTS } from '../utils/api';
 
+const hasAccessToken = () =>
+  typeof window !== 'undefined' && !!localStorage.getItem('access_token');
+
 export const useSubscription = () => {
   return useQuery({
     queryKey: ['subscription'],
@@ -12,6 +15,7 @@ export const useSubscription = () => {
       // Return data object if subscription doesn't exist to prevent undefined error
       return response.data?.subscription || response.subscription || [];
     },
+    enabled: hasAccessToken(), // Only fetch when user is logged in
   });
 };
 

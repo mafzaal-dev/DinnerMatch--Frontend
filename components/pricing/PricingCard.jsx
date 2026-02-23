@@ -15,6 +15,7 @@ const PricingCard = ({
   isHighlighted = false,
   onSelect,
   plan,
+  isActivePlan = false,
 }) => {
   const cardClasses = isHighlighted
     ? "flex relative flex-col grow shrink gap-3 px-4 pt-8 pb-4 font-bold rounded-lg border border-yellow-900 border-solid min-w-60 w-[251px]"
@@ -31,7 +32,7 @@ const PricingCard = ({
   const buttonClasses =
     "flex z-0 gap-2 justify-center cursor-pointer items-center px-4 py-2 mt-6 w-full text-sm font-semibold leading-none rounded-lg min-h-12 text-neutral-800";
   const buttonStyle = isHexColor ? { backgroundColor: buttonColor } : undefined;
-  const buttonBgClass = !isHexColor 
+  const buttonBgClass = !isHexColor
     ? buttonColor === "yellow"
       ? "bg-yellow-500"
       : "bg-[#FFAA55]"
@@ -78,8 +79,11 @@ const PricingCard = ({
         className={`${buttonClasses} ${buttonBgClass}`}
         style={buttonStyle}
       >
-        <div className="self-stretch  my-auto text-neutral-800">
+        <div className="self-stretch my-auto text-neutral-800">
           {buttonText}
+          {isActivePlan && (
+            <span className="ml-1.5 opacity-90 text-xs">(Current Plan)</span>
+          )}
         </div>
       </button>
     </article>
