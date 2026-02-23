@@ -26,6 +26,8 @@ const AdminDashboardPage = () => {
   const [selectedUpcomingDinner, setSelectedUpcomingDinner] = useState(
     "Any Upcoming Dinner",
   );
+  const [selectedDinnerId, setSelectedDinnerId] = useState("All Dinners");
+  const [dinners, setDinners] = useState([]);
   const [selectedStatus, setSelectedStatus] = useState("All Users");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
@@ -73,6 +75,9 @@ const AdminDashboardPage = () => {
             selectedUpcomingDinner === "Has Booking" ? "true" : "false",
           );
         }
+        if (selectedDinnerId !== "All Dinners" && selectedDinnerId) {
+          params.append("dinner_id", selectedDinnerId);
+        }
         if (selectedStatus !== "All Users") {
           params.append("status", selectedStatus.toLowerCase());
         }
@@ -101,6 +106,7 @@ const AdminDashboardPage = () => {
       selectedUserType,
       selectedCity,
       selectedUpcomingDinner,
+      selectedDinnerId,
       selectedStatus,
       startDate,
       endDate,
@@ -128,9 +134,29 @@ const AdminDashboardPage = () => {
       .catch(() => setCities([]));
   }, []);
 
+  useEffect(() => {
+    api
+      .get(`${API_ENDPOINTS.DINNER_LIST}?index=0&offset=100`)
+      .then((res) => {
+        const raw = res?.data ?? (Array.isArray(res) ? res : []);
+        setDinners(Array.isArray(raw) ? raw : []);
+      })
+      .catch(() => setDinners([]));
+  }, []);
+
   const cityOptions = [
     { value: "All Cities", label: "All Cities" },
     ...cities.map((c) => ({ value: c.id, label: c.name })),
+  ];
+
+  const dinnerOptions = [
+    { value: "All Dinners", label: "All Dinners" },
+    ...dinners.map((d) => ({
+      value: d.id,
+      label: d.title && d.date
+        ? `${d.title} - ${new Date(d.date).toLocaleDateString()}`
+        : d.title || `Dinner #${d.id}`,
+    })),
   ];
 
   const getCityAreaNames = (cityId, areaId) => {
@@ -207,6 +233,7 @@ const AdminDashboardPage = () => {
     selectedUserType !== "All Users" ||
     selectedCity !== "All Cities" ||
     selectedUpcomingDinner !== "Any Upcoming Dinner" ||
+    selectedDinnerId !== "All Dinners" ||
     selectedStatus !== "All Users" ||
     startDate !== "" ||
     endDate !== "" ||
@@ -216,6 +243,7 @@ const AdminDashboardPage = () => {
     setSelectedUserType("All Users");
     setSelectedCity("All Cities");
     setSelectedUpcomingDinner("Any Upcoming Dinner");
+    setSelectedDinnerId("All Dinners");
     setSelectedStatus("All Users");
     setStartDate("");
     setEndDate("");
@@ -245,6 +273,9 @@ const AdminDashboardPage = () => {
           "has_upcoming_booking",
           selectedUpcomingDinner === "Has Booking" ? "true" : "false",
         );
+      }
+      if (selectedDinnerId !== "All Dinners" && selectedDinnerId) {
+        params.append("dinner_id", selectedDinnerId);
       }
       if (selectedStatus !== "All Users") {
         params.append("status", selectedStatus.toLowerCase());
@@ -435,6 +466,19 @@ const AdminDashboardPage = () => {
                   { value: "No Booking", label: "No Booking" },
                 ]}
                 placeholder="Any Upcoming Dinner"
+              />
+            </div>
+
+            <div className="flex flex-col gap-1">
+              <label className="text-xs font-medium text-[#6B7280]">Dinner</label>
+              <CustomDropdown
+                value={selectedDinnerId}
+                onChange={(e) => {
+                  setSelectedDinnerId(e.target.value);
+                  setCurrentPage(0);
+                }}
+                options={dinnerOptions}
+                placeholder="All Dinners"
               />
             </div>
 
