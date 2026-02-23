@@ -4,6 +4,7 @@ import { AdminSidebar } from '../../components/admin';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { useEffect, useState } from 'react';
+import { AccessDeniedModal } from '@/components/modals';
 
 export default function AdminLayout({ children }) {
   const router = useRouter();
@@ -11,7 +12,7 @@ export default function AdminLayout({ children }) {
   const { isAdmin, isLoading, isAuthenticated, logout } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  // Protect admin routes
+  // Protect admin routes: require auth, and require admin for non-login pages
   useEffect(() => {
     if (pathname === '/admin/login') return;
 
@@ -19,6 +20,10 @@ export default function AdminLayout({ children }) {
       router.replace('/admin/login');
     }
   }, [isLoading, isAuthenticated, router, pathname]);
+
+  const handleAccessDeniedRedirect = () => {
+    router.push('/');
+  };
 
   // Close sidebar on route change
   useEffect(() => {
@@ -40,6 +45,10 @@ export default function AdminLayout({ children }) {
 
   if (!isAuthenticated) {
       return null;
+  }
+
+  if (isAuthenticated && !isAdmin) {
+    return <AccessDeniedModal isOpen={true} onRedirect={handleAccessDeniedRedirect} />;
   }
 
   return (

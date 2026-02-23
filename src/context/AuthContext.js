@@ -66,13 +66,23 @@ export const AuthProvider = ({ children }) => {
           throw new Error('Invalid response: missing tokens');
         }
         
+        const isAdminPath = redirectPath && redirectPath.startsWith('/admin');
+        const isAdminUser = response.data.is_admin === true;
+
+        // Admin user on regular login: do not allow — clear session and let caller show modal
+        if (!isAdminPath && isAdminUser) {
+          setError(null);
+          return response;
+        }
+
         localStorage.setItem('access_token', access);
         localStorage.setItem('refresh_token', refresh);
         localStorage.setItem('user_data', JSON.stringify(userData));
         
         setUser(userData);
         
-        if (redirectPath) {
+        // Only redirect if not requesting admin area, or user is admin
+        if (redirectPath && (!isAdminPath || isAdminUser)) {
           router.push(redirectPath);
         }
         
@@ -196,7 +206,7 @@ export const AuthProvider = ({ children }) => {
     isLoading,
     error,
     isAuthenticated: !!user,
-    isAdmin: user?.is_staff || user?.role === 'admin',
+    isAdmin: user?.is_admin === true || user?.is_staff || user?.role === 'admin',
     login,
     register,
     logout,
