@@ -6,6 +6,7 @@ import NoSSR from "@/components/common/NoSSR";
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from '@/context/AuthContext';
 import QueryProvider from '@/providers/QueryProvider';
+import AdminUserRouteGuard from '@/components/common/AdminUserRouteGuard';
 
 const roboto = Roboto({
   weight: ['300', '400', '500', '700'],
@@ -28,6 +29,7 @@ export default function RootLayout({ children }) {
               <MetaPixel />
               <UTMTracker />
             </NoSSR>
+            <AdminUserRouteGuard />
             <Toaster position="top-center" toastOptions={{
               style: {
                 background: '#333',

@@ -7,6 +7,16 @@ import { api, API_ENDPOINTS } from '@/utils/api';
 
 const AuthContext = createContext(null);
 
+const ADMIN_COOKIE_NAME = 'dm_admin';
+const setAdminCookie = (isAdmin) => {
+  if (typeof document === 'undefined') return;
+  if (isAdmin) {
+    document.cookie = `${ADMIN_COOKIE_NAME}=1; path=/; max-age=604800; SameSite=Lax`;
+  } else {
+    document.cookie = `${ADMIN_COOKIE_NAME}=; path=/; max-age=0`;
+  }
+};
+
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -23,15 +33,18 @@ export const AuthProvider = ({ children }) => {
         try {
           const parsedUser = JSON.parse(storedUser);
           setUser(parsedUser);
+          setAdminCookie(parsedUser?.is_admin === true);
         } catch (parseError) {
           console.error('Failed to parse stored user:', parseError);
           localStorage.removeItem('user_data');
           localStorage.removeItem('access_token');
           localStorage.removeItem('refresh_token');
           setUser(null);
+          setAdminCookie(false);
         }
       } else {
         setUser(null);
+        setAdminCookie(false);
       }
     } catch (err) {
       console.error('Failed to refresh auth state:', err);
@@ -80,6 +93,7 @@ export const AuthProvider = ({ children }) => {
         localStorage.setItem('user_data', JSON.stringify(userData));
         
         setUser(userData);
+        setAdminCookie(isAdminUser);
         
         // Only redirect if not requesting admin area, or user is admin
         if (redirectPath && (!isAdminPath || isAdminUser)) {
@@ -145,6 +159,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('refresh_token');
     localStorage.removeItem('user_data');
     setUser(null);
+    setAdminCookie(false);
     router.push('/');
   }, [router]);
 
