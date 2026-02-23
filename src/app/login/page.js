@@ -1,21 +1,28 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import LoginPage from '../../../components/pages/LoginPage';
 import { AccessDeniedModal } from '../../../components/modals';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
+import { ROUTES } from '@/constants/routes';
 import { toast } from 'react-hot-toast';
 
 export default function Login() {
   const router = useRouter();
-  const { login, isLoading, error } = useAuth();
+  const { login, isLoading, error, isAuthenticated } = useAuth();
   const [showAdminLoginRequired, setShowAdminLoginRequired] = useState(false);
+
+  useEffect(() => {
+    if (!isLoading && isAuthenticated) {
+      router.push(ROUTES.DINNER_DETAILS);
+    }
+  }, [isAuthenticated, isLoading, router]);
 
   const handleLogin = async (credentials) => {
     try {
       setShowAdminLoginRequired(false);
-      const response = await login(credentials, '/');
+      const response = await login(credentials);
       if (response?.success && response?.data?.is_admin === true) {
         setShowAdminLoginRequired(true);
         return;

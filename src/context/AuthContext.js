@@ -65,7 +65,7 @@ export const AuthProvider = ({ children }) => {
     loadUser();
   }, [refreshUserFromStorage]);
 
-  const login = useCallback(async (credentials, redirectPath = ROUTES.ACCOUNT) => {
+  const login = useCallback(async (credentials, redirectPath = ROUTES.DINNER_DETAILS) => {
     try {
       setIsLoading(true);
       setError(null);

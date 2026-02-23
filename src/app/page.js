@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
+import { ROUTES } from '@/constants/routes';
 import Navbar from "../../components/Navbar";
 import Hero from "../../components/Hero";
 import Testimonials from "../../components/Testimonials";
@@ -55,7 +56,13 @@ function buildProfileUpdatePayload(formData, demographicsData, selectedCity, sel
 
 export default function Home() {
   const router = useRouter();
-  const { refreshUserFromStorage } = useAuth();
+  const { refreshUserFromStorage, isAuthenticated, isLoading } = useAuth();
+
+  useEffect(() => {
+    if (!isLoading && isAuthenticated) {
+      router.push(ROUTES.DINNER_DETAILS);
+    }
+  }, [isAuthenticated, isLoading, router]);
   const [quizStep, setQuizStep] = useState(null);
   const [selectedCity, setSelectedCity] = useState(null);
   const [selectedPlace, setSelectedPlace] = useState(null);

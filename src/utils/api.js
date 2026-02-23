@@ -203,6 +203,7 @@ export const API_ENDPOINTS = {
 
   // Cities & Areas
   GET_CITY_AREA: "/get-city-area/",
+  DINNER_SWIPE: "/swipe/dinner/",
 };
 
 export default axiosInstance;

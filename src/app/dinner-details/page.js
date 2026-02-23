@@ -4,7 +4,8 @@ import { useEffect, useMemo, Suspense, useState } from 'react';
 import DinnerDetailsPage from '../../../components/pages/DinnerDetailsPage';
 import SubscriptionModal from '../../../components/modals/SubscriptionModal';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useSubscription, useRequestedDinners, useDinnerDetail, useUpdateAttendance } from '../../hooks/useDinners';
+import { useSubscription, useRequestedDinners, useDinnerDetail, useUpdateAttendance, useAvailableDinners, useRequestDinner, useSwipeDinner } from '../../hooks/useDinners';
+import { toast } from 'react-hot-toast';
 
 function DinnerDetailsContent() {
   const router = useRouter();
@@ -20,10 +21,17 @@ function DinnerDetailsContent() {
 
   const { 
     data: requestedDinners = [], 
-    isLoading: isDinnersLoading 
+    isLoading: isRequestedLoading 
   } = useRequestedDinners();
 
-  // Determine the dinner ID to fetch details for
+  // Fetch available dinners (upcoming)
+  const today = new Date().toISOString().split('T')[0];
+  const {
+    data: availableDinners = [],
+    isLoading: isAvailableLoading
+  } = useAvailableDinners(today);
+
+  // Determine the dinner ID to fetch details for (Current User's Dinner)
   const currentDinnerId = useMemo(() => {
     if (urlDinnerId) return urlDinnerId;
     if (requestedDinners.length > 0) {
@@ -40,21 +48,25 @@ function DinnerDetailsContent() {
     error: detailError
   } = useDinnerDetail(currentDinnerId);
 
-  // Process upcoming dates
+  // Process available dinners for the "Upcoming/Reschedule" list
   const upcomingDates = useMemo(() => {
-    return requestedDinners.map(item => {
-      const dinner = item.dinner || item;
+    // Filter out the current dinner from the list
+    const filteredDinners = availableDinners.filter(dinner => dinner.id !== currentDinnerId);
+    
+    return filteredDinners.map(dinner => {
       const dateStr = dinner.date;
       const dateObj = dateStr ? new Date(dateStr) : new Date();
 
       return {
+        id: dinner.id,
         date: dateObj.toLocaleDateString('en-US', { month: 'long', day: 'numeric' }),
-        city: dinner.location || 'Location TBD',
-        status: item.request_status || 'confirmed',
-        originalDate: dateObj
+        city: dinner.location || dinner.city || 'Location TBD',
+        status: 'Available', // Or check if requested? But requested ones should be currentDinnerId
+        originalDate: dateObj,
+        title: dinner.title // useful for modal
       };
     });
-  }, [requestedDinners]);
+  }, [availableDinners, currentDinnerId]);
 
   // Process dinner details
   const dinnerData = useMemo(() => {
@@ -89,17 +101,24 @@ function DinnerDetailsContent() {
       return percentages;
     };
 
+    const restaurantObj = d.group?.restaurant;
+    // Format address: "Location, City" - fallback to just location or city if one is missing
+    const restaurantAddress = restaurantObj 
+      ? [restaurantObj.location, restaurantObj.city].filter(Boolean).join(', ')
+      : d.location;
+
     return {
+      id: d.id,
       city: d.location,
       isoDate: d.date,
       date: dateObj.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
       time: dateObj.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
-      restaurant: d.group?.restaurant?.name || "To be announced", // Use restaurant name if available, else placeholder
-      address: d.group?.restaurant?.address || d.location,
+      restaurant: restaurantObj?.name || "To be announced",
+      address: restaurantAddress,
       status: d.dinner_status,
       current_user_attendance: d.current_user_attendance,
       group: {
-        languages: [], // Not provided in API yet
+        languages: [],
         nationalities: calculatePercentages(nationalityCounts),
         occupations: calculatePercentages(industryCounts),
         attendance_stats: d.group?.attendance_stats || {
@@ -127,10 +146,10 @@ function DinnerDetailsContent() {
   };
 
   const { mutate: updateAttendance } = useUpdateAttendance();
+  const { mutate: requestDinner } = useRequestDinner();
+  const { mutate: swipeDinner } = useSwipeDinner();
 
   const handleRSVP = (status) => {
-    console.log('RSVP:', status);
-    
     // Map UI status to API status
     let apiStatus = '';
     if (status === "I'll be There") apiStatus = 'there';
@@ -143,12 +162,11 @@ function DinnerDetailsContent() {
         status: apiStatus 
       }, {
         onSuccess: () => {
-          // You might want to show a toast or notification here
           console.log('Attendance updated successfully');
         },
         onError: (error) => {
           console.error('Failed to update attendance:', error);
-          // Handle error (show toast etc)
+          toast.error("Failed to update RSVP");
         }
       });
     }
@@ -158,7 +176,34 @@ function DinnerDetailsContent() {
     console.log('Address copied:', address);
   };
 
-  const isLoading = isSubLoading || isDinnersLoading || (currentDinnerId && isDetailLoading);
+  const handleReschedule = (newDinnerId) => {
+    // If we have a current dinner, we use the swipe API
+    if (currentDinnerId) {
+      swipeDinner({ 
+        currentDinnerId: currentDinnerId, 
+        newDinnerId: newDinnerId 
+      }, {
+        onSuccess: () => {
+          toast.success("Successfully rescheduled!");
+        },
+        onError: (err) => {
+          toast.error(err.message || "Failed to reschedule");
+        }
+      });
+    } else {
+      // Otherwise fallback to normal request (join)
+      requestDinner({ dinnerId: newDinnerId }, {
+        onSuccess: () => {
+          toast.success("Successfully joined!");
+        },
+        onError: (err) => {
+          toast.error(err.message || "Failed to join dinner");
+        }
+      });
+    }
+  };
+
+  const isLoading = isSubLoading || isRequestedLoading || (currentDinnerId && isDetailLoading) || isAvailableLoading;
 
   if (isLoading) {
     return (
@@ -168,11 +213,9 @@ function DinnerDetailsContent() {
     );
   }
 
-  // Handle case where no dinner is selected or found (e.g. user has no requests)
-  if (!currentDinnerId && !isDinnersLoading) {
-     // You might want to redirect or show a specific empty state here
-     // For now, we render the page with empty data which might look like "No upcoming dinners"
-  }
+  // If no current dinner, show available dinners? 
+  // DinnerDetailsPage handles empty 'dinner' prop gracefully mostly, or we can pass undefined.
+  // We'll let DinnerDetailsPage render, passing undefined for dinner if no current one.
 
   return (
     <>
@@ -185,6 +228,7 @@ function DinnerDetailsContent() {
         onMyAccount={handleMyAccount}
         onRSVP={handleRSVP}
         onCopyAddress={handleCopyAddress}
+        onReschedule={handleReschedule}
       />
       <SubscriptionModal
         isOpen={subscriptionModalOpen}

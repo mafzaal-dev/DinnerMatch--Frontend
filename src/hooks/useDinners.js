@@ -70,3 +70,71 @@ export const useUpdateAttendance = () => {
     },
   });
 };
+
+export const useAvailableDinners = (startDate, index = 0, offset = 50) => {
+  return useQuery({
+    queryKey: ['availableDinners', startDate, index, offset],
+    queryFn: async () => {
+      const params = {
+        index,
+        offset,
+      };
+      if (startDate) {
+        params.start_date = startDate;
+      }
+      
+      const response = await api.get(API_ENDPOINTS.DINNER_LIST, { params });
+      
+      if (!response.success) {
+        throw new Error(response.message || 'Failed to fetch available dinners');
+      }
+      return response.data || [];
+    },
+  });
+};
+
+export const useRequestDinner = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async ({ dinnerId }) => {
+      const response = await api.post(API_ENDPOINTS.DINNER_MAKE_REQUEST, {
+        dinner_id: dinnerId
+      });
+      
+      if (!response.success) {
+        throw new Error(response.message || 'Failed to request dinner');
+      }
+      return response.data;
+    },
+    onSuccess: () => {
+      // Invalidate queries to refresh lists
+      queryClient.invalidateQueries(['requestedDinners']);
+      queryClient.invalidateQueries(['availableDinners']);
+      queryClient.invalidateQueries(['dinnerDetail']); 
+    },
+  });
+};
+
+export const useSwipeDinner = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async ({ currentDinnerId, newDinnerId }) => {
+      const response = await api.put(API_ENDPOINTS.DINNER_SWIPE, {
+        current_dinner_id: currentDinnerId,
+        new_dinner_id: newDinnerId
+      });
+      
+      if (!response.success) {
+        throw new Error(response.message || 'Failed to swipe dinner');
+      }
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(['requestedDinners']);
+      queryClient.invalidateQueries(['availableDinners']);
+      queryClient.invalidateQueries(['dinnerDetail']);
+    },
+  });
+};
