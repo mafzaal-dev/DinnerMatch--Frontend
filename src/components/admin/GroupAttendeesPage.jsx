@@ -100,6 +100,7 @@ const GroupAttendeesPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedDinner, setSelectedDinner] = useState('');
   const [dinners, setDinners] = useState([]);
+  const [cities, setCities] = useState([]);
   const [restaurants, setRestaurants] = useState([]);
   const [dinnerRequests, setDinnerRequests] = useState([]);
   const [groups, setGroups] = useState([]);
@@ -177,6 +178,20 @@ const GroupAttendeesPage = () => {
     fetchRestaurants();
     fetchGroups();
   }, []);
+
+  useEffect(() => {
+    api.get(API_ENDPOINTS.GET_CITY_AREA)
+      .then((res) => {
+        const raw = Array.isArray(res?.data) ? res.data : Array.isArray(res) ? res : [];
+        setCities(raw);
+      })
+      .catch(() => setCities([]));
+  }, []);
+
+  const cityOptions = [
+    { value: '', label: 'All Cities' },
+    ...cities.map((c) => ({ value: c.id, label: c.name })),
+  ];
 
   useEffect(() => {
     if (selectedDinner) {
@@ -993,32 +1008,26 @@ const GroupAttendeesPage = () => {
                placeholder="Select Dinner Event"
              />
           ) : (
-            <CustomDropdown
-              value={filterCity}
-              onChange={(e) => setFilterCity(e.target.value)}
-              options={[
-                { value: '', label: 'All Cities' },
-                { value: 'Cape Town', label: 'Cape Town' },
-                { value: 'Johannesburg', label: 'Johannesburg' },
-                { value: 'Durban', label: 'Durban' },
-              ]}
-              placeholder="All Cities"
-            />
+            <div className="hidden">
+              <CustomDropdown
+                value={filterCity}
+                onChange={(e) => setFilterCity(e.target.value)}
+                options={cityOptions}
+                placeholder="All Cities"
+              />
+            </div>
           )}
           
           {/* Second Filter */}
           {activeTab === 'users' ? (
-             <CustomDropdown
-               value={filterRequestCity}
-               onChange={(e) => setFilterRequestCity(e.target.value)}
-               options={[
-                 { value: '', label: 'All Cities' },
-                 { value: 'Cape Town', label: 'Cape Town' },
-                 { value: 'Johannesburg', label: 'Johannesburg' },
-                 { value: 'Durban', label: 'Durban' },
-               ]}
-               placeholder="All Cities"
-             />
+             <div className="hidden">
+               <CustomDropdown
+                 value={filterRequestCity}
+                 onChange={(e) => setFilterRequestCity(e.target.value)}
+                 options={cityOptions}
+                 placeholder="All Cities"
+               />
+             </div>
           ) : (
             <CustomDropdown
               value={filterDinner}
