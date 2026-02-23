@@ -22,6 +22,7 @@ const AdminDashboardPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedUserType, setSelectedUserType] = useState("All Users");
   const [selectedCity, setSelectedCity] = useState("All Cities");
+  const [cities, setCities] = useState([]);
   const [selectedUpcomingDinner, setSelectedUpcomingDinner] = useState(
     "Any Upcoming Dinner",
   );
@@ -116,6 +117,35 @@ const AdminDashboardPage = () => {
     }, 500),
     [], // eslint-disable-line react-hooks/exhaustive-deps
   );
+
+  useEffect(() => {
+    api
+      .get(API_ENDPOINTS.GET_CITY_AREA)
+      .then((res) => {
+        const raw = Array.isArray(res?.data) ? res.data : Array.isArray(res) ? res : [];
+        setCities(raw);
+      })
+      .catch(() => setCities([]));
+  }, []);
+
+  const cityOptions = [
+    { value: "All Cities", label: "All Cities" },
+    ...cities.map((c) => ({ value: c.id, label: c.name })),
+  ];
+
+  const getCityAreaNames = (cityId, areaId) => {
+    if (!cityId || !cities.length) return { cityName: "—", areaName: "—" };
+    const city = cities.find((c) => c.id === cityId);
+    const cityName = city?.name ?? "—";
+    if (!areaId) return { cityName, areaName: "—" };
+    const areaInCity = city?.area?.find((a) => a.id === areaId);
+    if (areaInCity) return { cityName, areaName: areaInCity.name };
+    for (const c of cities) {
+      const area = c.area?.find((a) => a.id === areaId);
+      if (area) return { cityName: c.name, areaName: area.name };
+    }
+    return { cityName, areaName: "—" };
+  };
 
   // Refetch when pagination or any filter changes (fetchUsers updates when those deps change)
   useEffect(() => {
@@ -253,8 +283,10 @@ const AdminDashboardPage = () => {
             ),
             formatDisplayValue(user.email),
             formatDisplayValue(
-              user.mobile ||
-                user.phone_number ||
+              user.phone ??
+                user.mobile ??
+                user.phone_number ??
+                user.profile?.phone ??
                 user.profile?.phone_number,
             ),
             formatDisplayValue(user.tickets),
@@ -382,11 +414,7 @@ const AdminDashboardPage = () => {
                   setSelectedCity(e.target.value);
                   setCurrentPage(0);
                 }}
-                options={[
-                  { value: "All Cities", label: "All Cities" },
-                  { value: "Cape Town", label: "Cape Town" },
-                  { value: "Johannesburg", label: "Johannesburg" },
-                ]}
+                options={cityOptions}
                 placeholder="All Cities"
               />
             </div>
@@ -500,9 +528,12 @@ const AdminDashboardPage = () => {
                   <th className="px-4 py-3 text-left text-xs font-semibold text-[#374151] uppercase tracking-wide whitespace-nowrap">
                     Mobile
                   </th>
-                  {/* <th className="px-4 py-3 text-left text-xs font-semibold text-[#374151] uppercase tracking-wide whitespace-nowrap">
-                    City ID
-                  </th> */}
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-[#374151] uppercase tracking-wide whitespace-nowrap">
+                    City
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-[#374151] uppercase tracking-wide whitespace-nowrap">
+                    Area
+                  </th>
                   <th className="px-4 py-3 text-left text-xs font-semibold text-[#374151] uppercase tracking-wide whitespace-nowrap">
                     Tickets
                   </th>
@@ -525,7 +556,7 @@ const AdminDashboardPage = () => {
                 {loading ? (
                   <tr>
                     <td
-                      colSpan="10"
+                      colSpan="12"
                       className="px-4 py-8 text-center text-sm text-[#6B7280]"
                     >
                       <div className="flex items-center justify-center gap-2">
@@ -556,7 +587,7 @@ const AdminDashboardPage = () => {
                 ) : error ? (
                   <tr>
                     <td
-                      colSpan="10"
+                      colSpan="12"
                       className="px-4 py-8 text-center text-sm text-red-500"
                     >
                       {error}
@@ -565,7 +596,7 @@ const AdminDashboardPage = () => {
                 ) : users.length === 0 ? (
                   <tr>
                     <td
-                      colSpan="10"
+                      colSpan="12"
                       className="px-4 py-8 text-center text-sm text-[#6B7280]"
                     >
                       No users found.
@@ -588,14 +619,25 @@ const AdminDashboardPage = () => {
                       </td>
                       <td className="px-4 py-3.5 whitespace-nowrap text-sm text-[#6B7280]">
                         {formatDisplayValue(
-                          user.mobile ||
-                            user.phone_number ||
+                          user.phone ??
+                            user.mobile ??
+                            user.phone_number ??
+                            user.profile?.phone ??
                             user.profile?.phone_number,
                         )}
                       </td>
-                      {/* <td className="px-4 py-3.5 whitespace-nowrap text-sm text-[#6B7280]">
-                        {formatDisplayValue(user.city || user.profile?.city_id)}
-                      </td> */}
+                      <td className="px-4 py-3.5 whitespace-nowrap text-sm text-[#6B7280]">
+                        {getCityAreaNames(
+                          user.profile?.city_id ?? user.city_id,
+                          user.profile?.area_id ?? user.area_id,
+                        ).cityName}
+                      </td>
+                      <td className="px-4 py-3.5 whitespace-nowrap text-sm text-[#6B7280]">
+                        {getCityAreaNames(
+                          user.profile?.city_id ?? user.city_id,
+                          user.profile?.area_id ?? user.area_id,
+                        ).areaName}
+                      </td>
                       <td className="px-4 py-3.5 whitespace-nowrap text-sm text-[#6B7280]">
                         {formatDisplayValue(user.tickets)}
                       </td>
