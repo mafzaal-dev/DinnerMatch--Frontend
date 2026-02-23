@@ -60,10 +60,40 @@ const PaymentHistoryPage = ({
           </div>
         ) : list.length === 0 ? (
           <div
-            className="bg-[#111121] border border-[#2F3A51] rounded-lg p-8 text-center"
+            className="bg-[#111121] border border-[#2F3A51] rounded-xl p-12 text-center max-w-md mx-auto"
             style={{ boxShadow: "0 0 16px rgba(0, 0, 0, 0.12)" }}
           >
-            <p className="text-[#757575]">No payment transactions yet.</p>
+            <div className="flex justify-center mb-4">
+              <div className="w-16 h-16 rounded-full bg-[#2F3A51]/50 flex items-center justify-center">
+                <svg
+                  className="w-8 h-8 text-[#FFAA55]/70"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.5}
+                    d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
+                  />
+                </svg>
+              </div>
+            </div>
+            <h2 className="text-[#F5F5F5] font-semibold text-lg mb-2">
+              No transactions yet
+            </h2>
+            <p className="text-[#757575] text-sm leading-relaxed mb-6">
+              Your payment history will appear here once you make a purchase.
+            </p>
+            {onBack && (
+              <button
+                onClick={onBack}
+                className="bg-[#FFAA55] text-[#212121] px-6 py-2.5 rounded-lg font-bold text-sm hover:bg-[#FF9955] transition-colors"
+              >
+                Back to Account
+              </button>
+            )}
           </div>
         ) : (
           <div className="flex flex-col gap-6">

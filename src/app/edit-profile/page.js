@@ -87,8 +87,8 @@ export default function EditProfile() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#080814] flex items-center justify-center">
-        <div className="text-white">Loading...</div>
+      <div className="min-h-screen bg-[#080714] flex items-center justify-center p-4">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#FFAA55]" />
       </div>
     );
   }
