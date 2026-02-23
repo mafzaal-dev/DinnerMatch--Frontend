@@ -200,6 +200,9 @@ export const API_ENDPOINTS = {
 
   // Attendance
   ATTENDANCE_UPDATE: "/attendance/update/",
+
+  // Cities & Areas
+  GET_CITY_AREA: "/get-city-area/",
 };
 
 export default axiosInstance;

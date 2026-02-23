@@ -2,23 +2,10 @@
 
 import React from 'react';
 
-const AreaSelectionModal = ({ isOpen, onClose, onSelectArea, city, selectedCityId }) => {
+const AreaSelectionModal = ({ isOpen, onClose, onSelectArea, selectedCity }) => {
   if (!isOpen) return null;
 
-  const placesByCity = {
-    'cape-town': [
-      { id: 'v-a-waterfront', name: 'V&A Waterfront' },
-      { id: 'camps-bay', name: 'Camps Bay' },
-      { id: 'kloof-street', name: 'Kloof Street' },
-    ],
-    'johannesburg': [
-      { id: 'sandton', name: 'Sandton' },
-      { id: 'rosebank', name: 'Rosebank' },
-      { id: 'melrose-arch', name: 'Melrose Arch' },
-    ],
-  };
-
-  const areas = placesByCity[selectedCityId] || placesByCity['cape-town'];
+  const areas = selectedCity?.area ?? [];
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
@@ -34,7 +21,7 @@ const AreaSelectionModal = ({ isOpen, onClose, onSelectArea, city, selectedCityI
 
         <div className="mb-10">
           <h2 className="text-[32px] text-center font-bold text-[#F5F5F5] mb-2">Select Your Place</h2>
-          <p className="text-base text-center text-[#E0E0E0]">Choose the area place in {city || 'Cape Town'}:</p>
+          <p className="text-base text-center text-[#E0E0E0]">Choose the area in {selectedCity?.name ?? 'your city'}:</p>
         </div>
 
         <button
@@ -48,6 +35,9 @@ const AreaSelectionModal = ({ isOpen, onClose, onSelectArea, city, selectedCityI
         </button>
 
         <div className="space-y-4">
+          {areas.length === 0 && (
+            <p className="text-center text-[#E0E0E0] py-4">No areas available for this city.</p>
+          )}
           {areas.map((area) => (
             <button
               key={area.id}

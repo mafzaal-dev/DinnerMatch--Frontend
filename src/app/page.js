@@ -302,8 +302,7 @@ export default function Home() {
         isOpen={quizStep === 'place'}
         onClose={() => setQuizStep('city')}
         onSelectArea={handlePlaceSelect}
-        city={selectedCity?.name}
-        selectedCityId={selectedCity?.id}
+        selectedCity={selectedCity}
       />
       
       <QuizFlow

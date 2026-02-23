@@ -6,6 +6,9 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { format } from "date-fns";
 import { editProfileSchema } from "@/constants/validationSchemas";
 import { DatePicker } from "@/components/ui/date-picker";
+import { api, API_ENDPOINTS } from "@/utils/api";
+import CitySelectionModal from "../modals/CitySelectionModal";
+import AreaSelectionModal from "../modals/AreaSelectionModal";
 
 // Same questions/options as DemographicsFlow for consistent Identity data
 const IDENTITY_QUESTIONS = [
@@ -138,6 +141,12 @@ const EditProfilePage = ({
   const [languageSearch, setLanguageSearch] = useState("");
   const [languageDropdown, setLanguageDropdown] = useState(false);
 
+  const [cities, setCities] = useState([]);
+  const [selectedCity, setSelectedCity] = useState(null);
+  const [selectedPlace, setSelectedPlace] = useState(null);
+  const [cityModalOpen, setCityModalOpen] = useState(false);
+  const [areaModalOpen, setAreaModalOpen] = useState(false);
+
   const watchedLanguages = watch("languages");
   const watchedMenuPreferences = watch("menuPreferences");
   const watchedPriceRange = watch("priceRange");
@@ -171,6 +180,37 @@ const EditProfilePage = ({
       setValue("priceRange", initialData.priceRange || "");
     }
   }, [initialData, setValue]);
+
+  useEffect(() => {
+    api
+      .get(API_ENDPOINTS.GET_CITY_AREA)
+      .then((res) => {
+        const raw = Array.isArray(res?.data) ? res.data : Array.isArray(res) ? res : [];
+        setCities(raw);
+      })
+      .catch(() => setCities([]));
+  }, []);
+
+  useEffect(() => {
+    if (!profile?.city_id || !cities.length) return;
+    const city = cities.find((c) => c.id === profile.city_id);
+    if (!city) return;
+    setSelectedCity(city);
+    if (profile.area_id) {
+      const areaInCity = city.area?.find((a) => a.id === profile.area_id);
+      if (areaInCity) {
+        setSelectedPlace(areaInCity);
+        return;
+      }
+      for (const c of cities) {
+        const area = c.area?.find((a) => a.id === profile.area_id);
+        if (area) {
+          setSelectedPlace(area);
+          break;
+        }
+      }
+    }
+  }, [profile?.city_id, profile?.area_id, cities]);
 
   useEffect(() => {
     if (!profile) return;
@@ -261,6 +301,8 @@ const EditProfilePage = ({
         nationality: data.nationality || undefined,
         language: data.language || undefined,
         date_of_birth: data.date_of_birth || undefined,
+        city_id: selectedCity?.id || undefined,
+        area_id: selectedPlace?.id || undefined,
       });
     }
   };
@@ -347,156 +389,91 @@ const EditProfilePage = ({
             </div>
           </div>
 
-          {/* Identity Section (same questions as DemographicsFlow) */}
+          {/* Location (City & Area) */}
+          <div className="bg-[#111121] border border-[#2F3A51] rounded-lg p-6 md:p-8 shadow-lg">
+            <h2 className="text-lg font-bold italic uppercase mb-6 tracking-wide text-[#F5F5F5]">
+              Location
+            </h2>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm text-[#757575] font-semibold mb-2">City</label>
+                <div className="flex items-center gap-3">
+                  <span className="flex-1 px-4 py-3 bg-[#111121] border border-[#2F3A51] rounded-lg text-[#F5F5F5]">
+                    {selectedCity?.name ?? "—"}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setCityModalOpen(true)}
+                    className="hidden px-4 py-3 rounded-lg border border-[#FFAA55] text-[#FFAA55] font-semibold hover:bg-[#FFAA55] hover:text-[#212121] transition-colors"
+                  >
+                    Change
+                  </button>
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm text-[#757575] font-semibold mb-2">Area</label>
+                <div className="flex items-center gap-3">
+                  <span className="flex-1 px-4 py-3 bg-[#111121] border border-[#2F3A51] rounded-lg text-[#F5F5F5]">
+                    {selectedPlace?.name ?? "—"}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => selectedCity && setAreaModalOpen(true)}
+                    disabled={!selectedCity}
+                    className="hidden px-4 py-3 rounded-lg border border-[#FFAA55] text-[#FFAA55] font-semibold hover:bg-[#FFAA55] hover:text-[#212121] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Change
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Identity Section – only show selected/current data from profile */}
           <div className="bg-[#111121] border border-[#2F3A51] rounded-lg p-6 md:p-8 shadow-lg">
             <h2 className="text-lg font-bold italic uppercase mb-6 tracking-wide text-[#F5F5F5]">
               Identity
             </h2>
-            <div className="space-y-8">
-              {IDENTITY_QUESTIONS.map((q) => (
-                <div key={q.id}>
-                  <h3 className="text-base font-semibold text-[#F5F5F5] mb-3">
-                    {q.question}
-                  </h3>
-
-                  {q.type === "choice" && (
-                    <div className="space-y-3">
-                      {q.options.map((option) => {
-                        const watched =
-                          q.id === "gender"
-                            ? watchedGender
-                            : q.id === "relationship_status"
-                              ? watchedRelationshipStatus
-                              : watchedIndustry;
-                        const isSelected = watched === option.value;
-                        return (
-                          <button
-                            key={option.value}
-                            type="button"
-                            onClick={() =>
-                              setValue(q.id, option.value, {
-                                shouldValidate: true,
-                              })
-                            }
-                            className={`w-full text-center font-semibold text-base p-3 md:p-4 rounded-lg border bg-[#111121] transition-all ${
-                              isSelected
-                                ? "border-[#FFAA55] text-[#FFAA55]"
-                                : "border-[#2F3A51] text-[#E0E0E0] hover:border-[#FFAA55] hover:text-[#F5F5F5]"
-                            }`}
-                          >
-                            {option.label}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  )}
-
-                  {q.type === "search" && (
-                    <div className="relative">
-                      {q.id === "nationality" ? (
-                        <>
-                          <input
-                            type="text"
-                            value={nationalitySearch}
-                            onChange={(e) => {
-                              setNationalitySearch(e.target.value);
-                              setNationalityDropdown(true);
-                            }}
-                            onFocus={() => setNationalityDropdown(true)}
-                            placeholder={q.placeholder}
-                            className="w-full px-4 py-3 bg-[#111121] border border-[#2F3A51] rounded-lg text-[#F5F5F5] placeholder-[#424242] focus:outline-none focus:border-[#FFAA55]"
-                          />
-                          {nationalityDropdown && (
-                            <div className="w-full mt-2 bg-[#111121] border border-[#2F3A51] rounded-lg max-h-60 overflow-y-auto shadow-lg">
-                              {q.options
-                                .filter((o) =>
-                                  o.label
-                                    .toLowerCase()
-                                    .includes(nationalitySearch.toLowerCase()),
-                                )
-                                .map((option) => (
-                                  <button
-                                    key={option.value}
-                                    type="button"
-                                    onClick={() => {
-                                      setValue("nationality", option.value);
-                                      setNationalitySearch(option.label);
-                                      setNationalityDropdown(false);
-                                    }}
-                                    className="w-full text-left px-4 py-3 text-[#E0E0E0] hover:bg-[#2F3A51] hover:text-[#F5F5F5] transition-colors border-b border-[#2F3A51] last:border-0"
-                                  >
-                                    {option.label}
-                                  </button>
-                                ))}
-                            </div>
-                          )}
-                        </>
-                      ) : (
-                        <>
-                          <input
-                            type="text"
-                            value={languageSearch}
-                            onChange={(e) => {
-                              setLanguageSearch(e.target.value);
-                              setLanguageDropdown(true);
-                            }}
-                            onFocus={() => setLanguageDropdown(true)}
-                            placeholder={q.placeholder}
-                            className="w-full px-4 py-3 bg-[#111121] border border-[#2F3A51] rounded-lg text-[#F5F5F5] placeholder-[#424242] focus:outline-none focus:border-[#FFAA55]"
-                          />
-                          {languageDropdown && (
-                            <div className="w-full mt-2 bg-[#111121] border border-[#2F3A51] rounded-lg max-h-60 overflow-y-auto shadow-lg">
-                              {q.options
-                                .filter((o) =>
-                                  o.label
-                                    .toLowerCase()
-                                    .includes(languageSearch.toLowerCase()),
-                                )
-                                .map((option) => (
-                                  <button
-                                    key={option.value}
-                                    type="button"
-                                    onClick={() => {
-                                      setValue("language", option.value);
-                                      setLanguageSearch(option.label);
-                                      setLanguageDropdown(false);
-                                    }}
-                                    className="w-full text-left px-4 py-3 text-[#E0E0E0] hover:bg-[#2F3A51] hover:text-[#F5F5F5] transition-colors border-b border-[#2F3A51] last:border-0"
-                                  >
-                                    {option.label}
-                                  </button>
-                                ))}
-                            </div>
-                          )}
-                        </>
-                      )}
-                    </div>
-                  )}
-
-                  {q.type === "date" && (
-                    <div className="space-y-2">
-                      <DatePicker
-                        date={
-                          watchedDateOfBirth
-                            ? new Date(watchedDateOfBirth)
-                            : undefined
-                        }
-                        onSelect={(date) =>
-                          setValue(
-                            "date_of_birth",
-                            date ? format(date, "yyyy-MM-dd") : "",
-                          )
-                        }
-                        disabled={{ after: new Date() }}
-                        placeholder={q.placeholder}
-                        className="w-full justify-start text-left font-normal bg-[#111121] hover:bg-[#1A1A2E] text-[#F5F5F5] border-[#2F3A51]"
-                        popoverClassName="bg-[#111121] border-[#2F3A51]"
-                        isDark={true}
-                      />
-                    </div>
-                  )}
-                </div>
-              ))}
+            <div className="space-y-6">
+              {IDENTITY_QUESTIONS.map((q) => {
+                const watched =
+                  q.id === "gender"
+                    ? watchedGender
+                    : q.id === "relationship_status"
+                      ? watchedRelationshipStatus
+                      : q.id === "industry"
+                        ? watchedIndustry
+                        : q.id === "nationality"
+                          ? watchedNationality
+                          : q.id === "date_of_birth"
+                            ? watchedDateOfBirth
+                            : null;
+                let displayLabel = "—";
+                if (q.type === "choice" && q.options?.length && watched) {
+                  const opt = q.options.find((o) => o.value === watched);
+                  displayLabel = opt ? opt.label : String(watched);
+                } else if (q.type === "search" && q.id === "nationality") {
+                  displayLabel = nationalitySearch || "—";
+                } else if (q.type === "date" && watched) {
+                  try {
+                    displayLabel = format(new Date(watched), "PPP");
+                  } catch {
+                    displayLabel = String(watched);
+                  }
+                } else if (watched) {
+                  displayLabel = String(watched);
+                }
+                return (
+                  <div key={q.id}>
+                    <h3 className="text-sm text-[#757575] font-semibold mb-1.5">
+                      {q.question}
+                    </h3>
+                    <p className="text-base text-[#F5F5F5] font-medium px-4 py-3 bg-[#0d0d18] border border-[#2F3A51] rounded-lg">
+                      {displayLabel}
+                    </p>
+                  </div>
+                );
+              })}
             </div>
           </div>
 
@@ -601,6 +578,25 @@ const EditProfilePage = ({
           </button>
         </div>
       </div>
+
+      <CitySelectionModal
+        isOpen={cityModalOpen}
+        onClose={() => setCityModalOpen(false)}
+        onSelectCity={(city) => {
+          setSelectedCity(city);
+          setSelectedPlace(null);
+          setCityModalOpen(false);
+        }}
+      />
+      <AreaSelectionModal
+        isOpen={areaModalOpen}
+        onClose={() => setAreaModalOpen(false)}
+        selectedCity={selectedCity}
+        onSelectArea={(area) => {
+          setSelectedPlace(area);
+          setAreaModalOpen(false);
+        }}
+      />
     </div>
   );
 };

@@ -185,7 +185,7 @@ const ModalDemo = () => {
         isOpen={areaOpen}
         onClose={() => setAreaOpen(false)}
         onSelectArea={handleAreaSelect}
-        city={selectedCity?.name || 'Cape Town'}
+        selectedCity={selectedCity}
       />
 
       <QuizFlow
