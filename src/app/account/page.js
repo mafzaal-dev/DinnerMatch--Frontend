@@ -31,6 +31,10 @@ function AccountContent() {
     setShowSubscriptionModal(true);
   };
 
+  const handlePaymentHistory = () => {
+    router.push('/payment-history');
+  };
+
   const handleHelpCenter = () => {
     router.push('/help-center');
   };
@@ -57,6 +61,7 @@ function AccountContent() {
         onEditProfile={handleEditProfile}
         onMyTickets={handleMyTickets}
         onManageSubscription={handleManageSubscription}
+        onPaymentHistory={handlePaymentHistory}
         onHelpCenter={handleHelpCenter}
         onPrivacyPolicy={handlePrivacyPolicy}
         onTermsConditions={handleTermsConditions}

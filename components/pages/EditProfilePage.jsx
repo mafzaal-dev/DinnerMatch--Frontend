@@ -1,9 +1,107 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useForm, Controller } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { format } from "date-fns";
 import { editProfileSchema } from "@/constants/validationSchemas";
+import { DatePicker } from "@/components/ui/date-picker";
+
+// Same questions/options as DemographicsFlow for consistent Identity data
+const IDENTITY_QUESTIONS = [
+  {
+    id: "gender",
+    question: "How do you define yourself?",
+    type: "choice",
+    options: [
+      { value: "woman", label: "Women" },
+      { value: "man", label: "Men" },
+      { value: "non_binary", label: "Non-Binary" },
+    ],
+  },
+  {
+    id: "relationship_status",
+    question: "What's your relationship status?",
+    type: "choice",
+    options: [
+      { value: "single", label: "Flying Solo" },
+      { value: "married", label: "Locked in for Life (Married)" },
+      { value: "complicated", label: "It's a rollercoaster (Complicated)" },
+      { value: "taken", label: "Taken" },
+      { value: "prefer_not_to_say", label: "Prefer not to say" },
+    ],
+  },
+  {
+    id: "industry",
+    question: "What industry do you work in?",
+    type: "choice",
+    options: [
+      { value: "not_working", label: "Not Working" },
+      { value: "studying", label: "Studying" },
+      { value: "healthcare", label: "Healthcare" },
+      { value: "technology", label: "Technology" },
+      { value: "retail", label: "Retail" },
+      { value: "food", label: "Food" },
+      { value: "services", label: "Services" },
+      { value: "arts", label: "Arts" },
+      { value: "others", label: "Others" },
+    ],
+  },
+  {
+    id: "nationality",
+    question: "What is your nationality?",
+    type: "search",
+    placeholder: "Search your nationality",
+    options: [
+      { value: "american", label: "American" },
+      { value: "british", label: "British" },
+      { value: "canadian", label: "Canadian" },
+      { value: "australian", label: "Australian" },
+      { value: "indian", label: "Indian" },
+      { value: "chinese", label: "Chinese" },
+      { value: "japanese", label: "Japanese" },
+      { value: "german", label: "German" },
+      { value: "french", label: "French" },
+      { value: "italian", label: "Italian" },
+      { value: "spanish", label: "Spanish" },
+      { value: "brazilian", label: "Brazilian" },
+      { value: "mexican", label: "Mexican" },
+      { value: "russian", label: "Russian" },
+      { value: "south_african", label: "South African" },
+      { value: "other", label: "Other" },
+    ],
+  },
+
+  {
+    id: "date_of_birth",
+    question: "When is your birthday?",
+    type: "date",
+    placeholder: "Select your birthday",
+  },
+];
+
+// Map API response values (e.g. "Male", "British") to our option values (e.g. "man", "british")
+function apiValueToOptionValue(questionId, apiValue, options) {
+  if (!apiValue) return null;
+  const str = String(apiValue).trim();
+  const normalized = str.toLowerCase().replace(/\s+/g, "_");
+  const option = options?.find(
+    (o) =>
+      o.value === normalized ||
+      o.value === str ||
+      o.label.toLowerCase() === str.toLowerCase()
+  );
+  if (option) return option.value;
+  // API may return "Male"/"Female" for gender
+  if (questionId === "gender") {
+    if (/^male|men$/i.test(str)) return "man";
+    if (/^female|women$/i.test(str)) return "woman";
+    if (/non.binary/i.test(str)) return "non_binary";
+  }
+  // Fallback: try value that matches normalized (e.g. "complicated" from "Complicated")
+  const byNormalized = options?.find((o) => o.value === normalized);
+  return byNormalized ? byNormalized.value : null;
+}
 
 const EditProfilePage = ({
   onSave,
@@ -14,7 +112,6 @@ const EditProfilePage = ({
   const {
     register,
     handleSubmit,
-    control,
     setValue,
     watch,
     formState: { errors },
@@ -27,13 +124,34 @@ const EditProfilePage = ({
       languages: ["English"],
       menuPreferences: [],
       priceRange: "",
+      gender: "",
+      relationship_status: "",
+      industry: "",
+      nationality: "",
+      language: "",
+      date_of_birth: "",
     },
   });
 
-  // Watch values for custom UI components (buttons)
+  const [nationalitySearch, setNationalitySearch] = useState("");
+  const [nationalityDropdown, setNationalityDropdown] = useState(false);
+  const [languageSearch, setLanguageSearch] = useState("");
+  const [languageDropdown, setLanguageDropdown] = useState(false);
+
   const watchedLanguages = watch("languages");
   const watchedMenuPreferences = watch("menuPreferences");
   const watchedPriceRange = watch("priceRange");
+  const watchedGender = watch("gender");
+  const watchedRelationshipStatus = watch("relationship_status");
+  const watchedIndustry = watch("industry");
+  const watchedNationality = watch("nationality");
+  const watchedLanguage = watch("language");
+  const watchedDateOfBirth = watch("date_of_birth");
+
+  const profile =
+    profileApiResponse?.data?.profile ??
+    profileApiResponse?.data ??
+    initialData;
 
   useEffect(() => {
     if (initialData) {
@@ -53,6 +171,44 @@ const EditProfilePage = ({
       setValue("priceRange", initialData.priceRange || "");
     }
   }, [initialData, setValue]);
+
+  useEffect(() => {
+    if (!profile) return;
+
+    const genderQ = IDENTITY_QUESTIONS.find((q) => q.id === "gender");
+    const genderVal = apiValueToOptionValue("gender", profile.gender, genderQ?.options);
+    if (genderVal) setValue("gender", genderVal);
+
+    const relQ = IDENTITY_QUESTIONS.find((q) => q.id === "relationship_status");
+    const relVal = apiValueToOptionValue("relationship_status", profile.relationship_status, relQ?.options);
+    if (relVal) setValue("relationship_status", relVal);
+
+    const indQ = IDENTITY_QUESTIONS.find((q) => q.id === "industry");
+    const indVal = apiValueToOptionValue("industry", profile.industry, indQ?.options);
+    if (indVal) setValue("industry", indVal);
+
+    if (profile.nationality) {
+      const natQ = IDENTITY_QUESTIONS.find((q) => q.id === "nationality");
+      const natVal = apiValueToOptionValue("nationality", profile.nationality, natQ?.options);
+      if (natVal) {
+        setValue("nationality", natVal);
+        const natOption = natQ?.options?.find((o) => o.value === natVal);
+        if (natOption) setNationalitySearch(natOption.label);
+      }
+    }
+
+    if (profile.language) {
+      const langQ = IDENTITY_QUESTIONS.find((q) => q.id === "language");
+      const langVal = apiValueToOptionValue("language", profile.language, langQ?.options);
+      if (langVal) {
+        setValue("language", langVal);
+        const langOption = langQ?.options?.find((o) => o.value === langVal);
+        if (langOption) setLanguageSearch(langOption.label);
+      }
+    }
+
+    if (profile.date_of_birth) setValue("date_of_birth", profile.date_of_birth);
+  }, [profile, setValue]);
 
   const languages = ["English", "Afrikaans", "Xhosa"];
   const menuOptions = [
@@ -87,10 +243,10 @@ const EditProfilePage = ({
 
   const onSubmit = (data) => {
     if (onSave) {
-      // Split full name back into first and last for API if needed
       const nameParts = data.fullName.split(" ");
       const firstName = nameParts[0] || "";
       const lastName = nameParts.slice(1).join(" ") || "";
+      const budgetLabel = priceOptions.find((o) => o.id === data.priceRange)?.label ?? data.priceRange;
 
       onSave({
         first_name: firstName,
@@ -98,7 +254,13 @@ const EditProfilePage = ({
         phone_number: data.phoneNumber,
         languages: data.languages,
         menu_preferences: data.menuPreferences,
-        price_range: data.priceRange,
+        budget: budgetLabel,
+        gender: data.gender || undefined,
+        relationship_status: data.relationship_status || undefined,
+        industry: data.industry || undefined,
+        nationality: data.nationality || undefined,
+        language: data.language || undefined,
+        date_of_birth: data.date_of_birth || undefined,
       });
     }
   };
@@ -185,83 +347,158 @@ const EditProfilePage = ({
             </div>
           </div>
 
-          {/* Profile Data Section (from API) */}
-          {profileApiResponse?.success && profileApiResponse?.data && (
-            <div className="bg-[#111121] border border-[#2F3A51] rounded-lg p-6 md:p-8 shadow-lg">
-              <h2 className="text-lg font-bold italic uppercase mb-6 tracking-wide text-[#F5F5F5]">
-                Profile Data
-              </h2>
-              {profileApiResponse.message && (
-                <p className="text-sm text-[#757575] mb-4">
-                  {profileApiResponse.message}
-                </p>
-              )}
-              {(() => {
-                const profile =
-                  profileApiResponse.data?.profile ?? profileApiResponse.data;
-                const fields = [
-                  { key: "id", label: "Profile ID", value: profile?.id },
-                  { key: "user", label: "User ID", value: profile?.user },
-                  {
-                    key: "date_of_birth",
-                    label: "Date of Birth",
-                    value: profile?.date_of_birth,
-                  },
-                  { key: "gender", label: "Gender", value: profile?.gender },
-                  {
-                    key: "relationship_status",
-                    label: "Relationship Status",
-                    value: profile?.relationship_status,
-                  },
-                  {
-                    key: "industry",
-                    label: "Industry",
-                    value: profile?.industry,
-                  },
-                  {
-                    key: "nationality",
-                    label: "Nationality",
-                    value: profile?.nationality,
-                  },
-                  {
-                    key: "city_id",
-                    label: "City ID",
-                    value: profile?.city_id ?? "—",
-                  },
-                  {
-                    key: "area_id",
-                    label: "Area ID",
-                    value: profile?.area_id ?? "—",
-                  },
-                ];
-                return (
-                  <div className="space-y-4">
-                    {fields.map(({ key, label, value }) => (
-                      <div
-                        key={key}
-                        className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 py-2 border-b border-[#2F3A51] last:border-0"
-                      >
-                        <span className="text-sm text-[#757575] font-semibold min-w-[140px]">
-                          {label}
-                        </span>
-                        <span className="text-[#F5F5F5] font-mono text-sm break-all">
-                          {value ?? "—"}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                );
-              })()}
-              <details className="mt-6">
-                <summary className="text-sm text-[#757575] cursor-pointer hover:text-[#FFAA55]">
-                  View raw JSON
-                </summary>
-                <pre className="mt-3 bg-[#080814] border border-[#2F3A51] rounded-lg p-4 overflow-x-auto text-xs text-[#E0E0E0] font-mono whitespace-pre-wrap break-words">
-                  {JSON.stringify(profileApiResponse, null, 2)}
-                </pre>
-              </details>
+          {/* Identity Section (same questions as DemographicsFlow) */}
+          <div className="bg-[#111121] border border-[#2F3A51] rounded-lg p-6 md:p-8 shadow-lg">
+            <h2 className="text-lg font-bold italic uppercase mb-6 tracking-wide text-[#F5F5F5]">
+              Identity
+            </h2>
+            <div className="space-y-8">
+              {IDENTITY_QUESTIONS.map((q) => (
+                <div key={q.id}>
+                  <h3 className="text-base font-semibold text-[#F5F5F5] mb-3">
+                    {q.question}
+                  </h3>
+
+                  {q.type === "choice" && (
+                    <div className="space-y-3">
+                      {q.options.map((option) => {
+                        const watched =
+                          q.id === "gender"
+                            ? watchedGender
+                            : q.id === "relationship_status"
+                              ? watchedRelationshipStatus
+                              : watchedIndustry;
+                        const isSelected = watched === option.value;
+                        return (
+                          <button
+                            key={option.value}
+                            type="button"
+                            onClick={() =>
+                              setValue(q.id, option.value, {
+                                shouldValidate: true,
+                              })
+                            }
+                            className={`w-full text-center font-semibold text-base p-3 md:p-4 rounded-lg border bg-[#111121] transition-all ${
+                              isSelected
+                                ? "border-[#FFAA55] text-[#FFAA55]"
+                                : "border-[#2F3A51] text-[#E0E0E0] hover:border-[#FFAA55] hover:text-[#F5F5F5]"
+                            }`}
+                          >
+                            {option.label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+
+                  {q.type === "search" && (
+                    <div className="relative">
+                      {q.id === "nationality" ? (
+                        <>
+                          <input
+                            type="text"
+                            value={nationalitySearch}
+                            onChange={(e) => {
+                              setNationalitySearch(e.target.value);
+                              setNationalityDropdown(true);
+                            }}
+                            onFocus={() => setNationalityDropdown(true)}
+                            placeholder={q.placeholder}
+                            className="w-full px-4 py-3 bg-[#111121] border border-[#2F3A51] rounded-lg text-[#F5F5F5] placeholder-[#424242] focus:outline-none focus:border-[#FFAA55]"
+                          />
+                          {nationalityDropdown && (
+                            <div className="w-full mt-2 bg-[#111121] border border-[#2F3A51] rounded-lg max-h-60 overflow-y-auto shadow-lg">
+                              {q.options
+                                .filter((o) =>
+                                  o.label
+                                    .toLowerCase()
+                                    .includes(nationalitySearch.toLowerCase()),
+                                )
+                                .map((option) => (
+                                  <button
+                                    key={option.value}
+                                    type="button"
+                                    onClick={() => {
+                                      setValue("nationality", option.value);
+                                      setNationalitySearch(option.label);
+                                      setNationalityDropdown(false);
+                                    }}
+                                    className="w-full text-left px-4 py-3 text-[#E0E0E0] hover:bg-[#2F3A51] hover:text-[#F5F5F5] transition-colors border-b border-[#2F3A51] last:border-0"
+                                  >
+                                    {option.label}
+                                  </button>
+                                ))}
+                            </div>
+                          )}
+                        </>
+                      ) : (
+                        <>
+                          <input
+                            type="text"
+                            value={languageSearch}
+                            onChange={(e) => {
+                              setLanguageSearch(e.target.value);
+                              setLanguageDropdown(true);
+                            }}
+                            onFocus={() => setLanguageDropdown(true)}
+                            placeholder={q.placeholder}
+                            className="w-full px-4 py-3 bg-[#111121] border border-[#2F3A51] rounded-lg text-[#F5F5F5] placeholder-[#424242] focus:outline-none focus:border-[#FFAA55]"
+                          />
+                          {languageDropdown && (
+                            <div className="w-full mt-2 bg-[#111121] border border-[#2F3A51] rounded-lg max-h-60 overflow-y-auto shadow-lg">
+                              {q.options
+                                .filter((o) =>
+                                  o.label
+                                    .toLowerCase()
+                                    .includes(languageSearch.toLowerCase()),
+                                )
+                                .map((option) => (
+                                  <button
+                                    key={option.value}
+                                    type="button"
+                                    onClick={() => {
+                                      setValue("language", option.value);
+                                      setLanguageSearch(option.label);
+                                      setLanguageDropdown(false);
+                                    }}
+                                    className="w-full text-left px-4 py-3 text-[#E0E0E0] hover:bg-[#2F3A51] hover:text-[#F5F5F5] transition-colors border-b border-[#2F3A51] last:border-0"
+                                  >
+                                    {option.label}
+                                  </button>
+                                ))}
+                            </div>
+                          )}
+                        </>
+                      )}
+                    </div>
+                  )}
+
+                  {q.type === "date" && (
+                    <div className="space-y-2">
+                      <DatePicker
+                        date={
+                          watchedDateOfBirth
+                            ? new Date(watchedDateOfBirth)
+                            : undefined
+                        }
+                        onSelect={(date) =>
+                          setValue(
+                            "date_of_birth",
+                            date ? format(date, "yyyy-MM-dd") : "",
+                          )
+                        }
+                        disabled={{ after: new Date() }}
+                        placeholder={q.placeholder}
+                        className="w-full justify-start text-left font-normal bg-[#111121] hover:bg-[#1A1A2E] text-[#F5F5F5] border-[#2F3A51]"
+                        popoverClassName="bg-[#111121] border-[#2F3A51]"
+                        isDark={true}
+                      />
+                    </div>
+                  )}
+                </div>
+              ))}
             </div>
-          )}
+          </div>
 
           {/* DINNER PREFERENCES Section */}
           <div className="bg-[#111121] border border-[#2F3A51] rounded-lg p-6 md:p-8 shadow-lg">

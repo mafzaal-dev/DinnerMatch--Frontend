@@ -194,6 +194,7 @@ export const API_ENDPOINTS = {
   GET_ALL_PLANS: "/get-all-plans",
   PAYMENTS_CHECKOUT: "/payments/checkout/one-time",
   USER_SUBSCRIPTIONS: "/user/subscriptions",
+  PAYMENT_TRANSACTIONS: "/user/payment-transactions",
   DINNER_REQUESTS_ME: "/dinner/all-requested-dinners/",
   DINNER_DETAIL: "/dinner/detail/",
 

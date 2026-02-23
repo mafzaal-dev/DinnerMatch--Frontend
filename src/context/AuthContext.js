@@ -169,7 +169,13 @@ export const AuthProvider = ({ children }) => {
     try {
       setIsLoading(true);
       setError(null);
-      const response = await api.put(API_ENDPOINTS.USER_PROFILE, data);
+      const idKeys = ['id', 'user_id', 'profile_id', 'city_id', 'area_id', 'user'];
+      const payload = { ...data };
+      idKeys.forEach((key) => delete payload[key]);
+      Object.keys(payload).forEach((key) => {
+        if (key.endsWith('_id')) delete payload[key];
+      });
+      const response = await api.put(API_ENDPOINTS.PROFILE_UPDATE, payload);
       
       if (response.success && response.data) {
           return response.data;

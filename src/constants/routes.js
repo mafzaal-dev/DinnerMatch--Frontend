@@ -17,6 +17,7 @@ export const ROUTES = {
   EDIT_PROFILE: '/edit-profile',
   PREFERENCES: '/preferences',
   YOUR_DINNER: '/your-dinner',
+  PAYMENT_HISTORY: '/payment-history',
   DINNER_DETAILS: '/dinner-details',
   HELP_CENTER: '/help-center',
   
@@ -34,6 +35,7 @@ export const PROTECTED_ROUTES = [
   ROUTES.EDIT_PROFILE,
   ROUTES.PREFERENCES,
   ROUTES.YOUR_DINNER,
+  ROUTES.PAYMENT_HISTORY,
   ROUTES.DINNER_DETAILS,
 ];
 

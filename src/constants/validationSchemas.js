@@ -32,10 +32,10 @@ export const forgotPasswordSchema = yup.object().shape({
 
 export const editProfileSchema = yup.object().shape({
   fullName: requiredString('Full name'),
-  email: yup.string().email('Invalid email').optional(), // Read-only typically, but good to validate if passed
+  email: yup.string().email('Invalid email').optional(),
   phoneNumber: yup.string()
     .test('is-valid-phone', 'Please enter a valid phone number', function(value) {
-      if (!value) return true; // Allow empty
+      if (!value) return true;
       return /^[\d\s\-\+\(\)]+$/.test(value) && value.length >= 10;
     })
     .nullable()
@@ -43,6 +43,12 @@ export const editProfileSchema = yup.object().shape({
   languages: yup.array().of(yup.string()).min(1, 'Select at least one language'),
   priceRange: requiredString('Price range'),
   menuPreferences: yup.array().of(yup.string()).optional(),
+  gender: yup.string().optional(),
+  relationship_status: yup.string().optional(),
+  industry: yup.string().optional(),
+  nationality: yup.string().optional(),
+  language: yup.string().optional(),
+  date_of_birth: yup.string().optional(),
 });
 
 export const dinnerSchema = yup.object().shape({

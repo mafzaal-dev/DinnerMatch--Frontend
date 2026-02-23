@@ -6,6 +6,7 @@ const AccountPage = ({
   onEditProfile,
   onMyTickets,
   onManageSubscription,
+  onPaymentHistory,
   onHelpCenter,
   onPrivacyPolicy,
   onTermsConditions,
@@ -182,6 +183,27 @@ const AccountPage = ({
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             {menuItems.map(renderMenuItem)}
           </div>
+
+          {/* Payment History - box like Manage Subscription, clickable */}
+          <button
+            type="button"
+            onClick={onPaymentHistory}
+            className="w-full bg-[#111121] border border-[#2F3A51] rounded-lg p-6 flex items-center gap-4 hover:bg-[#1A1F2E] transition-colors text-left"
+            style={{ boxShadow: '0 0 16px rgba(0, 0, 0, 0.12)' }}
+          >
+            <div className="bg-[#FFAA55] rounded-lg w-10 h-10 flex items-center justify-center shrink-0">
+              <svg className="w-6 h-6 text-[#212121]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+              </svg>
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-[#F5F5F5] font-bold text-xl">Payment History</p>
+              <p className="text-[#757575] text-sm font-semibold">View your payment transactions</p>
+            </div>
+            <svg className="w-4 h-4 text-[#F5F5F5] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 20 20">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 4l6 6-6 6" />
+            </svg>
+          </button>
 
           {/* Help & Support Section */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
