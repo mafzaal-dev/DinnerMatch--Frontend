@@ -83,6 +83,12 @@ const IDENTITY_QUESTIONS = [
   },
 ];
 
+const BUDGET_LABEL_TO_ID = {
+  "$ - Budget Friendly": "budget",
+  "$$ - Moderate": "moderate",
+  "$$$ - Premium": "premium",
+};
+
 // Map API response values (e.g. "Male", "British") to our option values (e.g. "man", "british")
 function apiValueToOptionValue(questionId, apiValue, options) {
   if (!apiValue) return null;
@@ -173,11 +179,17 @@ const EditProfilePage = ({
       setValue("email", initialData.email || "");
       setValue(
         "phoneNumber",
-        initialData.phone_number || initialData.phoneNumber || "",
+        initialData.phone || initialData.phone_number || initialData.phoneNumber || "",
       );
       setValue("languages", initialData.languages || ["English"]);
-      setValue("menuPreferences", initialData.menuPreferences || []);
-      setValue("priceRange", initialData.priceRange || "");
+      setValue(
+        "menuPreferences",
+        initialData.menu_preferences || initialData.menuPreferences || [],
+      );
+      setValue(
+        "priceRange",
+        initialData.priceRange || (initialData.budget && BUDGET_LABEL_TO_ID[initialData.budget]) || "",
+      );
     }
   }, [initialData, setValue]);
 
@@ -238,13 +250,16 @@ const EditProfilePage = ({
     }
 
     if (profile.language) {
-      const langQ = IDENTITY_QUESTIONS.find((q) => q.id === "language");
-      const langVal = apiValueToOptionValue("language", profile.language, langQ?.options);
-      if (langVal) {
-        setValue("language", langVal);
-        const langOption = langQ?.options?.find((o) => o.value === langVal);
-        if (langOption) setLanguageSearch(langOption.label);
-      }
+      setValue("language", profile.language);
+      setLanguageSearch(typeof profile.language === "string" ? profile.language : "");
+    }
+
+    if (profile.menu_preferences && Array.isArray(profile.menu_preferences)) {
+      setValue("menuPreferences", profile.menu_preferences);
+    }
+    if (profile.budget) {
+      const priceId = BUDGET_LABEL_TO_ID[profile.budget];
+      if (priceId) setValue("priceRange", priceId);
     }
 
     if (profile.date_of_birth) setValue("date_of_birth", profile.date_of_birth);
@@ -474,6 +489,16 @@ const EditProfilePage = ({
                   </div>
                 );
               })}
+              {watchedLanguage || languageSearch ? (
+                <div>
+                  <h3 className="text-sm text-[#757575] font-semibold mb-1.5">
+                    Language
+                  </h3>
+                  <p className="text-base text-[#F5F5F5] font-medium px-4 py-3 bg-[#111121] border border-[#2F3A51] rounded-lg">
+                    {languageSearch || watchedLanguage || "—"}
+                  </p>
+                </div>
+              ) : null}
             </div>
           </div>
 
