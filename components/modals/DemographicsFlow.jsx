@@ -102,7 +102,7 @@ const STEPS = [
   }
 ];
 
-const DemographicsFlow = ({ isOpen, onClose, onComplete }) => {
+const DemographicsFlow = ({ isOpen, onClose, onComplete, onBack }) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [answers, setAnswers] = useState({});
   const [searchQuery, setSearchQuery] = useState('');
@@ -144,7 +144,8 @@ const DemographicsFlow = ({ isOpen, onClose, onComplete }) => {
       setSearchQuery('');
       setShowDropdown(false);
     } else {
-      onClose(); // Or go back to previous modal if handled by parent
+      if (onBack) onBack();
+      else onClose();
     }
   };
 

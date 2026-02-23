@@ -122,7 +122,7 @@ export default function Home() {
     if (typeof window !== 'undefined') {
       localStorage.setItem('quiz_place', JSON.stringify(place));
     }
-    setQuizStep('demographics');
+    setQuizStep('quiz');
   };
 
   const handleQuizComplete = (answers) => {
@@ -133,6 +133,14 @@ export default function Home() {
       localStorage.setItem('quiz_answers', JSON.stringify(validAnswers));
     }
     
+    setQuizStep('demographics');
+  };
+
+  const handleDemographicsComplete = (data) => {
+    setDemographics(data);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('quiz_demographics', JSON.stringify(data));
+    }
     setQuizStep('results');
   };
 
@@ -144,14 +152,6 @@ export default function Home() {
     } else {
       setQuizStep('signup');
     }
-  };
-
-  const handleDemographicsComplete = (data) => {
-    setDemographics(data);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('quiz_demographics', JSON.stringify(data));
-    }
-    setQuizStep('quiz');
   };
 
   const handleSignup = async (formData) => {
@@ -309,7 +309,7 @@ export default function Home() {
       <QuizFlow
         isOpen={quizStep === 'quiz'}
         onClose={resetQuizFlow}
-        onBack={() => setQuizStep('demographics')}
+        onBack={() => setQuizStep('place')}
         onComplete={handleQuizComplete}
       />
       
@@ -323,6 +323,7 @@ export default function Home() {
       <DemographicsFlow
         isOpen={quizStep === 'demographics'}
         onClose={resetQuizFlow}
+        onBack={() => setQuizStep('quiz')}
         onComplete={handleDemographicsComplete}
       />
 
