@@ -34,7 +34,7 @@ const AreaSelectionModal = ({ isOpen, onClose, onSelectArea, selectedCity }) => 
           <span>Back to selection</span>
         </button>
 
-        <div className="space-y-4">
+        <div className="flex flex-col gap-y-2 mt-4">
           {areas.length === 0 && (
             <p className="text-center text-[#E0E0E0] py-4">No areas available for this city.</p>
           )}

@@ -140,7 +140,7 @@ export default function Home() {
       localStorage.setItem('quiz_answers', JSON.stringify(validAnswers));
     }
     
-    setQuizStep('demographics');
+    setQuizStep('results');
   };
 
   const handleDemographicsComplete = (data) => {
@@ -148,10 +148,7 @@ export default function Home() {
     if (typeof window !== 'undefined') {
       localStorage.setItem('quiz_demographics', JSON.stringify(data));
     }
-    setQuizStep('results');
-  };
-
-  const handleResultsContinue = () => {
+    
     const accessToken = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
     
     if (accessToken) {
@@ -159,6 +156,10 @@ export default function Home() {
     } else {
       setQuizStep('signup');
     }
+  };
+
+  const handleResultsContinue = () => {
+    setQuizStep('demographics');
   };
 
   const handleSignup = async (formData) => {
@@ -329,7 +330,7 @@ export default function Home() {
       <DemographicsFlow
         isOpen={quizStep === 'demographics'}
         onClose={resetQuizFlow}
-        onBack={() => setQuizStep('quiz')}
+        onBack={() => setQuizStep('results')}
         onComplete={handleDemographicsComplete}
       />
 

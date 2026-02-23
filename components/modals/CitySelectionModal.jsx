@@ -41,7 +41,7 @@ const CitySelectionModal = ({ isOpen, onClose, onSelectCity }) => {
           <p className="text-[20px] text-[#E0E0E0] text-center">Choose the city where you'd like to have dinner:</p>
         </div>
 
-        <div className="space-y-4">
+        <div className="flex flex-col gap-y-4">
           {loading && (
             <div className="flex justify-center py-10">
               <div className="w-8 h-8 border-2 border-[#FFAA55] border-t-transparent rounded-full animate-spin" />

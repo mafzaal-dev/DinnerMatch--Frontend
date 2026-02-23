@@ -75,7 +75,7 @@ const DinnerDetailsPage = ({
   const subscriptionDisplay = {
     memberSince: memberSinceDate,
     type: activeSubscription?.plan?.name || "Monthly Member",
-    status: activeSubscription.plan?.is_active ? "Active" : "Inactive",
+    status: activeSubscription?.plan?.is_active ? "Active" : "Inactive",
     unlimitedDinners: true,
     renewalDate: renewalDate,
   };
@@ -346,22 +346,7 @@ const DinnerDetailsPage = ({
           <div
             className="bg-[#111121] border border-[#2F3A51] rounded-lg p-6 flex flex-col gap-6"
             style={{ boxShadow: "0 0 16px rgba(0, 0, 0, 0.12)" }}
-          >
-            {/* Warning Banner - Inside the card for no subscription */}
-            {!hasActiveSubscription && (
-              <div className="bg-[#CA8A04] rounded-lg h-10 flex items-center px-3 gap-2">
-                <svg
-                  className="w-6 h-6 text-[#D9D9D9]"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" />
-                </svg>
-                <span className="text-[#F5F5F5] font-normal text-sm">
-                  Payment incomplete - please finish checkout
-                </span>
-              </div>
-            )}
+          >            
 
             {/* Header */}
             <div className="flex items-center gap-3">
@@ -419,25 +404,43 @@ const DinnerDetailsPage = ({
                 Details pending or to be announced.
               </p>
             )}
-
-            {/* Purchase Button - Only show if no active subscription */}
-            {!hasActiveSubscription && (
-              <button className="w-full bg-[#FFAA55] text-[#212121] font-bold py-3 rounded-lg hover:bg-[#FF9955] transition-colors">
-                Purchase Your Ticket
-              </button>
-            )}
+            <button className="w-full bg-[#FFAA55] text-[#212121] font-bold py-3 rounded-lg hover:bg-[#FF9955] transition-colors">
+                Manage Subscription
+            </button>
           </div>
         )}
 
         {/* Empty State for Not Joined */}
         {!hasJoinedDinner && !isAnnualPass && (
           <div className="bg-[#111121] border border-[#2F3A51] rounded-lg p-8 text-center flex flex-col gap-4">
-            <h3 className="text-[#F5F5F5] text-xl font-bold">
+            {!hasActiveSubscription && (
+              <div className="bg-[#CA8A04] rounded-lg h-10 flex items-center px-3 gap-2">
+                <svg
+                  className="w-6 h-6 text-[#D9D9D9]"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" />
+                </svg>
+                <span className="text-[#F5F5F5] font-normal text-sm">
+                  Payment incomplete - please finish checkout
+                </span>
+              </div>
+            )}
+            <h3 className="mt-5 text-[#F5F5F5] text-xl font-bold">
               You haven't joined a dinner yet
             </h3>
-            <p className="text-[#BDBDBD]">
+            <p className="mb-5 text-[#BDBDBD]">
               Select an upcoming dinner below to join the fun!
             </p>
+            {!hasActiveSubscription && (
+              <button 
+                onClick={onManageSubscription}
+                className="w-full bg-[#FFAA55] text-[#212121] font-bold py-3 rounded-lg hover:bg-[#FF9955] transition-colors"
+              >
+                Purchase Your Plan
+              </button>
+            )}
           </div>
         )}
 

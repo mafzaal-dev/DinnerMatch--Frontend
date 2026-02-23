@@ -10,7 +10,6 @@ const QuizFlow = ({ isOpen, onClose, onComplete, onBack }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [showDropdown, setShowDropdown] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -97,10 +96,6 @@ const QuizFlow = ({ isOpen, onClose, onComplete, onBack }) => {
   const currentQ = questions[currentQuestion];
   const currentAnswer = answers[currentQuestion];
 
-  const filteredOptions = currentQ.options.filter((option) =>
-    option.label.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
   const handleAnswer = (answerValue) => {
     const newAnswers = [...answers];
     newAnswers[currentQuestion] = {
@@ -112,7 +107,6 @@ const QuizFlow = ({ isOpen, onClose, onComplete, onBack }) => {
     if (currentQuestion < totalQuestions - 1) {
       setCurrentQuestion(currentQuestion + 1);
       setSearchQuery('');
-      setShowDropdown(false);
     } else {
       onComplete(newAnswers);
     }
@@ -122,7 +116,6 @@ const QuizFlow = ({ isOpen, onClose, onComplete, onBack }) => {
     if (currentQuestion < totalQuestions - 1) {
       setCurrentQuestion(currentQuestion + 1);
       setSearchQuery('');
-      setShowDropdown(false);
     } else {
       const validAnswers = answers.filter(a => a && a.value);
       onComplete(validAnswers);
@@ -133,7 +126,6 @@ const QuizFlow = ({ isOpen, onClose, onComplete, onBack }) => {
     if (currentQuestion > 0) {
       setCurrentQuestion(currentQuestion - 1);
       setSearchQuery('');
-      setShowDropdown(false);
     } else if (onBack) {
       onBack();
     }
@@ -264,38 +256,12 @@ const QuizFlow = ({ isOpen, onClose, onComplete, onBack }) => {
               <input
                 type="text"
                 value={searchQuery}
-                onChange={(e) => {
-                  setSearchQuery(e.target.value);
-                  setShowDropdown(true);
-                }}
-                onFocus={() => setShowDropdown(true)}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Type your answer..."
                 className="w-full px-4 py-3 bg-[#111121] border border-[#2F3A51] rounded-lg text-[#F5F5F5] placeholder-[#424242] focus:outline-none focus:border-[#FFAA55] pr-12"
               />
-              
-              {currentQ.options.length > 0 && showDropdown && (
-                <div className="absolute z-20 w-full mt-2 bg-[#111121] border border-[#2F3A51] rounded-lg max-h-60 overflow-y-auto">
-                  {filteredOptions.length > 0 ? (
-                    filteredOptions.map((option) => (
-                      <button
-                        key={option.id}
-                        onClick={() => {
-                          setSearchQuery(option.label);
-                          setShowDropdown(false);
-                          handleAnswer(option.value);
-                        }}
-                        className="w-full text-left px-4 py-3 text-[#E0E0E0] hover:bg-[#080814] hover:text-[#F5F5F5] transition-colors"
-                      >
-                        {option.label}
-                      </button>
-                    ))
-                  ) : (
-                    <div className="px-4 py-3 text-[#E0E0E0]">No results found</div>
-                  )}
-                </div>
-              )}
 
-              {searchQuery && currentQ.options.length === 0 && (
+              {searchQuery && (
                 <button
                   onClick={() => handleAnswer(searchQuery)}
                   className="w-full mt-4 bg-[#FFAA55] text-white py-4 rounded-lg font-bold text-sm uppercase tracking-wide hover:bg-[#FF9955] transition-colors"
@@ -307,14 +273,14 @@ const QuizFlow = ({ isOpen, onClose, onComplete, onBack }) => {
           )}
         </div>
 
-        <div className="mt-6 mb-4">
+        {/* <div className="mt-6 mb-4">
           <button
             onClick={handleSkip}
             className="w-full py-3 rounded-lg border border-[#2F3A51] text-[#E0E0E0] hover:border-[#FFAA55] hover:text-[#F5F5F5] transition-all text-sm uppercase tracking-wide"
           >
             Skip Question
           </button>
-        </div>
+        </div> */}
 
         <div>
           <p className="text-center text-[#E0E0E0] text-sm">

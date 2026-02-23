@@ -115,7 +115,7 @@ function CheckoutResultContent() {
             Your subscription is now active. You can start booking dinners.
           </p>
           <Link
-            href="/available-dinners"
+            href="/dinner-details"
             className="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-[#FFAA55] text-gray-900 font-medium hover:bg-[#FFBB66] transition-colors"
           >
             Browse dinners
