@@ -468,7 +468,7 @@ const EditProfilePage = ({
                     <h3 className="text-sm text-[#757575] font-semibold mb-1.5">
                       {q.question}
                     </h3>
-                    <p className="text-base text-[#F5F5F5] font-medium px-4 py-3 bg-[#0d0d18] border border-[#2F3A51] rounded-lg">
+                    <p className="text-base text-[#F5F5F5] font-medium px-4 py-3 bg-[#111121] border border-[#2F3A51] rounded-lg">
                       {displayLabel}
                     </p>
                   </div>
