@@ -138,3 +138,34 @@ export const useSwipeDinner = () => {
     },
   });
 };
+
+export const useRateGroup = () => {
+  return useMutation({
+    mutationFn: async ({ groupId, ratings }) => {
+      const response = await api.post(API_ENDPOINTS.MEMBER_RATING, {
+        group_id: groupId,
+        ratings,
+      });
+      if (!response.success) {
+        throw new Error(response.message || 'Failed to rate group');
+      }
+      return response.data;
+    },
+  });
+};
+
+export const useRateRestaurant = () => {
+  return useMutation({
+    mutationFn: async ({ restaurantId, rating, comment }) => {
+      const response = await api.post(API_ENDPOINTS.RESTAURANT_RATING, {
+        restaurant_id: restaurantId,
+        rating,
+        comment
+      });
+      if (!response.success) {
+        throw new Error(response.message || 'Failed to rate restaurant');
+      }
+      return response.data;
+    },
+  });
+};

@@ -4,7 +4,7 @@ import { useEffect, useMemo, Suspense, useState } from 'react';
 import DinnerDetailsPage from '../../../components/pages/DinnerDetailsPage';
 import SubscriptionModal from '../../../components/modals/SubscriptionModal';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useSubscription, useRequestedDinners, useDinnerDetail, useUpdateAttendance, useAvailableDinners, useRequestDinner, useSwipeDinner } from '../../hooks/useDinners';
+import { useSubscription, useRequestedDinners, useDinnerDetail, useUpdateAttendance, useAvailableDinners, useRequestDinner, useSwipeDinner, useRateGroup, useRateRestaurant } from '../../hooks/useDinners';
 import { toast } from 'react-hot-toast';
 
 function DinnerDetailsContent() {
@@ -101,7 +101,7 @@ function DinnerDetailsContent() {
       return percentages;
     };
 
-    const restaurantObj = d.group?.restaurant;
+    const restaurantObj = d.restaurant || d.group?.restaurant;
     // Format address: "Location, City" - fallback to just location or city if one is missing
     const restaurantAddress = restaurantObj 
       ? [restaurantObj.location, restaurantObj.city].filter(Boolean).join(', ')
@@ -114,10 +114,13 @@ function DinnerDetailsContent() {
       date: dateObj.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
       time: dateObj.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
       restaurant: restaurantObj?.name || "To be announced",
+      restaurantId: restaurantObj?.id,
       address: restaurantAddress,
       status: d.dinner_status,
       current_user_attendance: d.current_user_attendance,
       group: {
+        id: d.group?.id,
+        members: members,
         languages: [],
         nationalities: calculatePercentages(nationalityCounts),
         occupations: calculatePercentages(industryCounts),
@@ -148,6 +151,35 @@ function DinnerDetailsContent() {
   const { mutate: updateAttendance } = useUpdateAttendance();
   const { mutate: requestDinner } = useRequestDinner();
   const { mutate: swipeDinner } = useSwipeDinner();
+  const { mutate: rateGroup } = useRateGroup();
+  const { mutate: rateRestaurant } = useRateRestaurant();
+
+  const handleFeedbackSubmit = async (feedback) => {
+    
+    if (feedback.memberRatings && Object.keys(feedback.memberRatings).length > 0 && feedback.groupId) {
+       const ratingsPayload = Object.entries(feedback.memberRatings).map(([userId, rating]) => ({
+         user_id: userId,
+         rating: rating,
+         comment: ""
+       }));
+       
+       rateGroup({ groupId: feedback.groupId, ratings: ratingsPayload }, {
+         onSuccess: () => toast.success("Group feedback submitted!"),
+         onError: (e) => toast.error("Failed to submit group feedback: " + e.message)
+       });
+    }
+
+    if (feedback.restaurantRating && feedback.restaurantId) {
+      rateRestaurant({ 
+        restaurantId: feedback.restaurantId, 
+        rating: feedback.restaurantRating,
+        comment: "" 
+      }, {
+        onSuccess: () => toast.success("Restaurant feedback submitted!"),
+         onError: (e) => toast.error("Failed to submit restaurant feedback: " + e.message)
+      });
+    }
+  };
 
   const handleRSVP = (status) => {
     // Map UI status to API status
@@ -229,6 +261,7 @@ function DinnerDetailsContent() {
         onRSVP={handleRSVP}
         onCopyAddress={handleCopyAddress}
         onReschedule={handleReschedule}
+        onSubmitFeedback={handleFeedbackSubmit}
       />
       <SubscriptionModal
         isOpen={subscriptionModalOpen}

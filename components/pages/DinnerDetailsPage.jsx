@@ -3,6 +3,27 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 
+const RATING_EMOJIS = ['😞', '🙁', '😐', '😊', '😄'];
+
+const getInitials = (firstName, lastName) => {
+  const first = firstName ? firstName.charAt(0).toUpperCase() : '';
+  const last = lastName ? lastName.charAt(0).toUpperCase() : '';
+  return `${first}${last}`;
+};
+
+const stringToColor = (string) => {
+  if (!string) return '#FFAA55';
+  let hash = 0;
+  for (let i = 0; i < string.length; i++) {
+    hash = string.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const c = (hash & 0x00ffffff).toString(16).toUpperCase();
+  return '#' + '00000'.substring(0, 6 - c.length) + c;
+};
+
+const AVATAR_COLORS = ['#3B82F6', '#8B5CF6', '#10B981', '#F59E0B', '#EF4444', '#EC4899'];
+const getAvatarColor = (index) => AVATAR_COLORS[index % AVATAR_COLORS.length];
+
 const DinnerDetailsPage = ({
   dinner = {
     city: "",
@@ -34,10 +55,16 @@ const DinnerDetailsPage = ({
   onCopyAddress,
   upcomingDates = [],
   onReschedule,
+  onSubmitFeedback,
 }) => {
   const [rsvpStatus, setRsvpStatus] = useState(null);
   const [rescheduleModalOpen, setRescheduleModalOpen] = useState(false);
   const [selectedRescheduleDinner, setSelectedRescheduleDinner] = useState(null);
+  
+  // Feedback state
+  const [memberRatings, setMemberRatings] = useState({});
+  const [restaurantRating, setRestaurantRating] = useState(0);
+  const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
 
   useEffect(() => {
     if (dinner?.current_user_attendance === 'there') {
@@ -189,9 +216,37 @@ const DinnerDetailsPage = ({
     return todayStart.getTime() === dinnerStart.getTime();
   }, [dinnerDateObj]);
 
+  const isDinnerPassed = useMemo(() => {
+    if (!dinnerDateObj || isNaN(dinnerDateObj.getTime())) return false;
+    const now = new Date();
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const dinnerStart = new Date(dinnerDateObj.getFullYear(), dinnerDateObj.getMonth(), dinnerDateObj.getDate());
+    
+    return todayStart.getTime() > dinnerStart.getTime();
+  }, [dinnerDateObj]);
+
   const unlockTime = dinnerDateObj && !isNaN(dinnerDateObj.getTime())
     ? dinnerDateObj.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
     : "7:00 PM";
+
+  const handleMemberRating = (userId, rating) => {
+    setMemberRatings(prev => ({
+      ...prev,
+      [userId]: rating
+    }));
+  };
+
+  const submitFeedback = () => {
+    if (onSubmitFeedback) {
+      onSubmitFeedback({
+        memberRatings,
+        restaurantRating,
+        groupId: dinner.group?.id,
+        restaurantId: dinner.restaurantId || dinner.group?.restaurant?.id
+      });
+      setFeedbackSubmitted(true);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-black p-4 md:p-8">
@@ -687,50 +742,138 @@ const DinnerDetailsPage = ({
                 {/* Divider */}
                 <div className="border-t border-[#1B1C1F]"></div>
 
-                {/* RSVP Section */}
-                <h3 className="text-[#F5F5F5] text-lg font-bold">
-                  RSPV FOR TONIGHT
-                </h3>
+                {isDinnerPassed ? (
+                  <div className="space-y-8">
+                    {/* Rate Group */}
+                    <div>
+                      <div className="flex items-center justify-between mb-4">
+                        {dinner.group?.members?.length > 0 && <h3 className="text-[#F5F5F5] text-sm font-bold uppercase tracking-wide">
+                          RATE YOUR GROUP
+                        </h3>}
+                        <div className="flex -space-x-2">
+                          {dinner.group?.members?.slice(0, 3).map((m, i) => (
+                            <div 
+                              key={i} 
+                              className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold border-2 border-[#0F0F14]"
+                              style={{ backgroundColor: getAvatarColor(i) }}
+                            >
+                              {getInitials(m.first_name, m.last_name)}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-3">
+                        {dinner.group?.members?.map((member) => (
+                          <div key={member.id} className="flex items-center justify-between">
+                            <span className="text-[#F5F5F5] text-sm font-normal">
+                              {member.first_name} {member.last_name ? `${member.last_name.charAt(0)}.` : ''}
+                            </span>
+                            <div className="flex gap-1">
+                              {RATING_EMOJIS.map((emoji, index) => (
+                                <button
+                                  key={index}
+                                  onClick={() => handleMemberRating(member.id, index + 1)}
+                                  className={`w-8 h-8 rounded-md flex items-center justify-center text-lg transition-all ${
+                                    memberRatings[member.id] === index + 1 
+                                      ? 'bg-[#FFAA55] text-black' 
+                                      : 'bg-[#1A1A1E] text-[#757575] hover:bg-[#2A2A2E]'
+                                  }`}
+                                >
+                                  <span className={memberRatings[member.id] === index + 1 ? '' : 'opacity-50 grayscale'}>
+                                    {emoji}
+                                  </span>
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
 
-                {isDinnerToday ? (
-                  <div className="flex gap-4">
+                    {/* Rate Restaurant */}
+                    <div>
+                      <h3 className="text-[#F5F5F5] text-sm font-bold mb-4 uppercase tracking-wide">
+                        RATE THE RESTAURANT
+                      </h3>
+                      <div className="flex gap-4">
+                        {[1, 2, 3, 4, 5].map((rating) => (
+                          <button
+                            key={rating}
+                            onClick={() => setRestaurantRating(rating)}
+                            className="focus:outline-none transition-transform hover:scale-110"
+                          >
+                            <svg 
+                              width="28" 
+                              height="28" 
+                              viewBox="0 0 24 24" 
+                              fill={rating <= restaurantRating ? "#E3BF3B" : "#2A2A2E"} 
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z" />
+                            </svg>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Submit Button */}
                     <button
-                      onClick={() => handleRSVP("I'll be There")}
-                      className={`flex-1 rounded-lg py-4 px-2 flex items-center text-sm font-semibold justify-center transition-colors ${
-                        rsvpStatus === "I'll be There"
-                          ? "bg-[#FFAA55] border-[#FFAA55] text-white"
-                          : "bg-[#111121] border border-[#2F3A51] text-white hover:bg-[#1A1F2E]"
-                      }`}
+                      onClick={submitFeedback}
+                      disabled={feedbackSubmitted}
+                      className="w-full bg-[#E3BF3B] text-[#212121] py-4 rounded-lg font-bold text-base hover:bg-[#D4AF37] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      <span className="text-sm font-medium">I'll be There</span>
-                    </button>
-                    <button
-                      onClick={() => handleRSVP("I'll be Late")}
-                      className={`flex-1 rounded-lg py-4 px-2 text-sm font-semibold  flex items-center justify-center transition-colors ${
-                        rsvpStatus === "I'll be Late"
-                          ? "bg-[#FFAA55] border-[#FFAA55] text-white"
-                          : "bg-[#111121] border border-[#2F3A51] text-white hover:bg-[#1A1F2E]"
-                      }`}
-                    >
-                      <span className="text-sm font-medium">I'll be Late</span>
-                    </button>
-                    <button
-                      onClick={() => handleRSVP("Can't Make It")}
-                      className={`flex-1 rounded-lg py-4 px-2 text-sm font-semibold  flex items-center justify-center transition-colors ${
-                        rsvpStatus === "Can't Make It"
-                          ? "bg-[#FFAA55] border-[#FFAA55] text-white"
-                          : "bg-[#111121] border border-[#2F3A51] text-white hover:bg-[#1A1F2E]"
-                      }`}
-                    >
-                      <span className="text-sm font-medium">Can't Make It</span>
+                      {feedbackSubmitted ? 'Feedback Submitted' : 'Submit Feedback'}
                     </button>
                   </div>
                 ) : (
-                  <div className="bg-[#1A1A1E] border border-[#2F3A51] rounded-lg p-4 text-center">
-                    <p className="text-[#77777B] text-sm">
-                      RSVP will open on the day of the dinner.
-                    </p>
-                  </div>
+                  <>
+                    {/* RSVP Section */}
+                    <h3 className="text-[#F5F5F5] text-lg font-bold">
+                      RSPV FOR TONIGHT
+                    </h3>
+
+                    {isDinnerToday ? (
+                      <div className="flex gap-4">
+                        <button
+                          onClick={() => handleRSVP("I'll be There")}
+                          className={`flex-1 rounded-lg py-4 px-2 flex items-center text-sm font-semibold justify-center transition-colors ${
+                            rsvpStatus === "I'll be There"
+                              ? "bg-[#FFAA55] border-[#FFAA55] text-white"
+                              : "bg-[#111121] border border-[#2F3A51] text-white hover:bg-[#1A1F2E]"
+                          }`}
+                        >
+                          <span className="text-sm font-medium">I'll be There</span>
+                        </button>
+                        <button
+                          onClick={() => handleRSVP("I'll be Late")}
+                          className={`flex-1 rounded-lg py-4 px-2 text-sm font-semibold  flex items-center justify-center transition-colors ${
+                            rsvpStatus === "I'll be Late"
+                              ? "bg-[#FFAA55] border-[#FFAA55] text-white"
+                              : "bg-[#111121] border border-[#2F3A51] text-white hover:bg-[#1A1F2E]"
+                          }`}
+                        >
+                          <span className="text-sm font-medium">I'll be Late</span>
+                        </button>
+                        <button
+                          onClick={() => handleRSVP("Can't Make It")}
+                          className={`flex-1 rounded-lg py-4 px-2 text-sm font-semibold  flex items-center justify-center transition-colors ${
+                            rsvpStatus === "Can't Make It"
+                              ? "bg-[#FFAA55] border-[#FFAA55] text-white"
+                              : "bg-[#111121] border border-[#2F3A51] text-white hover:bg-[#1A1F2E]"
+                          }`}
+                        >
+                          <span className="text-sm font-medium">Can't Make It</span>
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="bg-[#1A1A1E] border border-[#2F3A51] rounded-lg p-4 text-center">
+                        <p className="text-[#77777B] text-sm">
+                          RSVP will open on the day of the dinner.
+                        </p>
+                      </div>
+                    )}
+                  </>
                 )}
 
                 {/* Group Status */}
