@@ -15,9 +15,11 @@ function AccountContent() {
   useEffect(() => {
     if (searchParams.get('openSubscription') === '1') {
       setShowSubscriptionModal(true);
-      router.replace('/account', { scroll: false });
+      const url = new URL(window.location.href);
+      url.searchParams.delete('openSubscription');
+      window.history.replaceState({}, '', url);
     }
-  }, [searchParams, router]);
+  }, [searchParams]);
 
   const handleEditProfile = () => {
     router.push('/edit-profile');

@@ -65,15 +65,11 @@ export default function EditProfile() {
 
       if (typeof window !== "undefined") {
         const showBookDinner = localStorage.getItem("show_book_dinner");
-        localStorage.removeItem("show_book_dinner");
 
         if (showBookDinner === "true") {
+          localStorage.removeItem("show_book_dinner");
           router.push("/");
-        } else {
-          router.push("/available-dinners");
         }
-      } else {
-        router.push("/available-dinners");
       }
     } catch (error) {
       console.error("Failed to update profile", error);

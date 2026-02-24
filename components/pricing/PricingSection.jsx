@@ -28,7 +28,7 @@ const singleFeatures = [{ icon: tickIcon, text: "Limited to 1 dinner" }];
 const formatPrice = (price) => {
   if (price == null) return "—";
   const p = Number(price);
-  return isNaN(p) ? String(price) : `R${p.toFixed(2).replace(/\.00$/, "")}`;
+  return isNaN(p) ? String(price) : `ZAR ${p.toFixed(2).replace(/\.00$/, "")}`;
 };
 
 const mapPlanToCardProps = (plan, index) => {

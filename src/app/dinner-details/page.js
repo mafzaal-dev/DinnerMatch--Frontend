@@ -216,10 +216,10 @@ function DinnerDetailsContent() {
         newDinnerId: newDinnerId 
       }, {
         onSuccess: () => {
-          toast.success("Successfully rescheduled!");
+          toast.success("Successfully Joined!");
         },
         onError: (err) => {
-          toast.error(err.message || "Failed to reschedule");
+          toast.error(err.message || "Failed to join dinner");
         }
       });
     } else {

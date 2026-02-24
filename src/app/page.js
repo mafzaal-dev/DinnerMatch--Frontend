@@ -276,7 +276,7 @@ export default function Home() {
 
   const handleWelcomeNext = () => {
     refreshUserFromStorage();
-    setQuizStep('subscription');
+    router.push("/dinner-details");
   };
 
   const handleBookDinnerSuccess = (data) => {

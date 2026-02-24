@@ -110,7 +110,7 @@ const PaymentHistoryPage = ({
               const createdAt = tx.created_at ?? "";
               const displayAmount =
                 currency === "ZAR" && amount
-                  ? `R ${Number(amount).toFixed(2)}`
+                  ? `ZAR ${Number(amount).toFixed(2)}`
                   : amount
                   ? `${currency} ${Number(amount).toFixed(2)}`
                   : "—";

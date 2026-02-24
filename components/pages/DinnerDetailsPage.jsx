@@ -401,8 +401,7 @@ const DinnerDetailsPage = ({
           <div
             className="bg-[#111121] border border-[#2F3A51] rounded-lg p-6 flex flex-col gap-6"
             style={{ boxShadow: "0 0 16px rgba(0, 0, 0, 0.12)" }}
-          >            
-
+          >
             {/* Header */}
             <div className="flex items-center gap-3">
               <svg
@@ -459,8 +458,11 @@ const DinnerDetailsPage = ({
                 Details pending or to be announced.
               </p>
             )}
-            <button className="w-full bg-[#FFAA55] text-[#212121] font-bold py-3 rounded-lg hover:bg-[#FF9955] transition-colors">
-                Manage Subscription
+            <button
+              onClick={onManageSubscription}
+              className="w-full bg-[#FFAA55] text-[#212121] font-bold py-3 rounded-lg hover:bg-[#FF9955] transition-colors"
+            >
+              Manage Subscription
             </button>
           </div>
         )}
@@ -489,7 +491,7 @@ const DinnerDetailsPage = ({
               Select an upcoming dinner below to join the fun!
             </p>
             {!hasActiveSubscription && (
-              <button 
+              <button
                 onClick={onManageSubscription}
                 className="w-full bg-[#FFAA55] text-[#212121] font-bold py-3 rounded-lg hover:bg-[#FF9955] transition-colors"
               >
@@ -638,29 +640,31 @@ const DinnerDetailsPage = ({
                     <p className="text-[#BDBDBD] text-sm">{dinner.address}</p>
                   )}
                 </div>
-                {hasDetails && dinner.restaurant !== "To be announced" && onCopyAddress && (
-                  <button
-                    onClick={handleCopyAddress}
-                    className="bg-[#2A2829] border border-[#5B504C] rounded-lg px-2 py-2 flex items-center gap-1 hover:bg-[#333] transition-colors flex-shrink-0 h-10"
-                  >
-                    <svg
-                      className="w-6 h-6 text-[#E3BF3B]"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
+                {hasDetails &&
+                  dinner.restaurant !== "To be announced" &&
+                  onCopyAddress && (
+                    <button
+                      onClick={handleCopyAddress}
+                      className="bg-[#2A2829] border border-[#5B504C] rounded-lg px-2 py-2 flex items-center gap-1 hover:bg-[#333] transition-colors flex-shrink-0 h-10"
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
-                      />
-                    </svg>
-                    <span className="text-[#E3BF3B] text-xs whitespace-nowrap">
-                      Copy Address
-                    </span>
-                  </button>
-                )}
+                      <svg
+                        className="w-6 h-6 text-[#E3BF3B]"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                        />
+                      </svg>
+                      <span className="text-[#E3BF3B] text-xs whitespace-nowrap">
+                        Copy Address
+                      </span>
+                    </button>
+                  )}
               </div>
 
               {/* Group */}
@@ -747,13 +751,15 @@ const DinnerDetailsPage = ({
                     {/* Rate Group */}
                     <div>
                       <div className="flex items-center justify-between mb-4">
-                        {dinner.group?.members?.length > 0 && <h3 className="text-[#F5F5F5] text-sm font-bold uppercase tracking-wide">
-                          RATE YOUR GROUP
-                        </h3>}
+                        {dinner.group?.members?.length > 0 && (
+                          <h3 className="text-[#F5F5F5] text-sm font-bold uppercase tracking-wide">
+                            RATE YOUR GROUP
+                          </h3>
+                        )}
                         <div className="flex -space-x-2">
                           {dinner.group?.members?.slice(0, 3).map((m, i) => (
-                            <div 
-                              key={i} 
+                            <div
+                              key={i}
                               className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold border-2 border-[#0F0F14]"
                               style={{ backgroundColor: getAvatarColor(i) }}
                             >
@@ -762,25 +768,39 @@ const DinnerDetailsPage = ({
                           ))}
                         </div>
                       </div>
-                      
+
                       <div className="space-y-3">
                         {dinner.group?.members?.map((member) => (
-                          <div key={member.id} className="flex items-center justify-between">
+                          <div
+                            key={member.id}
+                            className="flex items-center justify-between"
+                          >
                             <span className="text-[#F5F5F5] text-sm font-normal">
-                              {member.first_name} {member.last_name ? `${member.last_name.charAt(0)}.` : ''}
+                              {member.first_name}{" "}
+                              {member.last_name
+                                ? `${member.last_name.charAt(0)}.`
+                                : ""}
                             </span>
                             <div className="flex gap-1">
                               {RATING_EMOJIS.map((emoji, index) => (
                                 <button
                                   key={index}
-                                  onClick={() => handleMemberRating(member.id, index + 1)}
+                                  onClick={() =>
+                                    handleMemberRating(member.id, index + 1)
+                                  }
                                   className={`w-8 h-8 rounded-md flex items-center justify-center text-lg transition-all ${
-                                    memberRatings[member.id] === index + 1 
-                                      ? 'bg-[#FFAA55] text-black' 
-                                      : 'bg-[#1A1A1E] text-[#757575] hover:bg-[#2A2A2E]'
+                                    memberRatings[member.id] === index + 1
+                                      ? "bg-[#FFAA55] text-black"
+                                      : "bg-[#1A1A1E] text-[#757575] hover:bg-[#2A2A2E]"
                                   }`}
                                 >
-                                  <span className={memberRatings[member.id] === index + 1 ? '' : 'opacity-50 grayscale'}>
+                                  <span
+                                    className={
+                                      memberRatings[member.id] === index + 1
+                                        ? ""
+                                        : "opacity-50 grayscale"
+                                    }
+                                  >
                                     {emoji}
                                   </span>
                                 </button>
@@ -803,11 +823,15 @@ const DinnerDetailsPage = ({
                             onClick={() => setRestaurantRating(rating)}
                             className="focus:outline-none transition-transform hover:scale-110"
                           >
-                            <svg 
-                              width="28" 
-                              height="28" 
-                              viewBox="0 0 24 24" 
-                              fill={rating <= restaurantRating ? "#E3BF3B" : "#2A2A2E"} 
+                            <svg
+                              width="28"
+                              height="28"
+                              viewBox="0 0 24 24"
+                              fill={
+                                rating <= restaurantRating
+                                  ? "#E3BF3B"
+                                  : "#2A2A2E"
+                              }
                               xmlns="http://www.w3.org/2000/svg"
                             >
                               <path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z" />
@@ -823,7 +847,9 @@ const DinnerDetailsPage = ({
                       disabled={feedbackSubmitted}
                       className="w-full bg-[#E3BF3B] text-[#212121] py-4 rounded-lg font-bold text-base hover:bg-[#D4AF37] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      {feedbackSubmitted ? 'Feedback Submitted' : 'Submit Feedback'}
+                      {feedbackSubmitted
+                        ? "Feedback Submitted"
+                        : "Submit Feedback"}
                     </button>
                   </div>
                 ) : (
@@ -843,7 +869,9 @@ const DinnerDetailsPage = ({
                               : "bg-[#111121] border border-[#2F3A51] text-white hover:bg-[#1A1F2E]"
                           }`}
                         >
-                          <span className="text-sm font-medium">I'll be There</span>
+                          <span className="text-sm font-medium">
+                            I'll be There
+                          </span>
                         </button>
                         <button
                           onClick={() => handleRSVP("I'll be Late")}
@@ -853,7 +881,9 @@ const DinnerDetailsPage = ({
                               : "bg-[#111121] border border-[#2F3A51] text-white hover:bg-[#1A1F2E]"
                           }`}
                         >
-                          <span className="text-sm font-medium">I'll be Late</span>
+                          <span className="text-sm font-medium">
+                            I'll be Late
+                          </span>
                         </button>
                         <button
                           onClick={() => handleRSVP("Can't Make It")}
@@ -863,7 +893,9 @@ const DinnerDetailsPage = ({
                               : "bg-[#111121] border border-[#2F3A51] text-white hover:bg-[#1A1F2E]"
                           }`}
                         >
-                          <span className="text-sm font-medium">Can't Make It</span>
+                          <span className="text-sm font-medium">
+                            Can't Make It
+                          </span>
                         </button>
                       </div>
                     ) : (
@@ -1086,23 +1118,12 @@ const DinnerDetailsPage = ({
                     </p>
                     <p className="text-[#77777B] text-sm">{item.city}</p>
                   </div>
-
-                  {/* Reschedule / Join Button */}
-                  {hasJoinedDinner ? (
-                    <button
-                      onClick={() => handleRescheduleClick(item)}
-                      className="bg-[#2A2829] text-[#FFAA55] border border-[#5B504C] px-6 py-2 rounded-lg font-medium text-sm hover:bg-[#333] transition-colors whitespace-nowrap"
-                    >
-                      Reschedule
-                    </button>
-                  ) : (
-                    <button
-                      onClick={() => handleRescheduleClick(item)} // Re-use same handler/modal or different text
-                      className="bg-[#FFAA55] text-[#212121] px-6 py-2 rounded-lg font-bold text-sm hover:bg-[#FF9955] transition-colors whitespace-nowrap"
-                    >
-                      Join This Dinner
-                    </button>
-                  )}
+                  <button
+                    onClick={() => handleRescheduleClick(item)} // Re-use same handler/modal or different text
+                    className="bg-[#FFAA55] text-[#212121] px-6 py-2 rounded-lg font-bold text-sm hover:bg-[#FF9955] transition-colors whitespace-nowrap"
+                  >
+                    Join This Dinner
+                  </button>
                 </div>
               ))}
             </div>
@@ -1143,11 +1164,11 @@ const DinnerDetailsPage = ({
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-[#111121] rounded-xl w-full max-w-md p-6 border border-[#2F3A51] shadow-2xl relative">
             <h3 className="text-xl font-bold text-[#F5F5F5] mb-4">
-              {hasJoinedDinner ? "Reschedule Dinner" : "Join Dinner"}
+              Join Dinner
             </h3>
             <p className="text-[#E0E0E0] mb-6">
               {hasJoinedDinner
-                ? `Are you sure you want to reschedule your dinner to ${selectedRescheduleDinner.date}? If you proceed, you will be removed from your current dinner and added to this one.`
+                ? `Are you sure you want to join the dinner on ${selectedRescheduleDinner.date}? If you proceed, you will be removed from your current dinner and added to this one.`
                 : `Are you sure you want to join the dinner on ${selectedRescheduleDinner.date}?`}
             </p>
 

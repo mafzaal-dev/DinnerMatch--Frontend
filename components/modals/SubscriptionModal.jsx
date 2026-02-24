@@ -24,9 +24,9 @@
     useEffect(() => {
       if (isOpen) {
         setError(null);
-        setLoading(true);
-        setActivePlanId(null);
-
+        if (!plans || plans.length === 0) {
+          setLoading(true);
+        }       
         const fetchPlans = api.get(API_ENDPOINTS.GET_ALL_PLANS);
         const fetchSubscription = api.get(API_ENDPOINTS.USER_SUBSCRIPTIONS).catch(() => null);
 
@@ -42,13 +42,21 @@
             const subList = subRes?.data?.subscription ?? subRes?.subscription;
             if (Array.isArray(subList)) {
               const active = subList.find((s) => s.status === "active");
-              if (active?.plan?.id) setActivePlanId(active.plan.id);
+              if (active?.plan?.id) {
+                setActivePlanId(active.plan.id);
+              } else {
+                setActivePlanId(null);
+              }
+            } else {
+                setActivePlanId(null);
             }
           })
           .catch((err) => {
             console.error("Failed to fetch plans:", err);
             setError(err?.message || "Failed to load plans");
-            setPlans([]);
+             if (!plans || plans.length === 0) {
+               setPlans([]);
+             }
           })
           .finally(() => setLoading(false));
       }

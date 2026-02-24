@@ -190,6 +190,11 @@ const EditProfilePage = ({
         "priceRange",
         initialData.priceRange || (initialData.budget && BUDGET_LABEL_TO_ID[initialData.budget]) || "",
       );
+
+      setValue(
+        "phoneNumber",
+        initialData.phone || initialData.phone_number || initialData.phoneNumber || "",
+      );
     }
   }, [initialData, setValue]);
 
