@@ -51,7 +51,7 @@ const QuizResultsModal = ({ isOpen, onClose, onContinue }) => {
         </button>
 
         <div className="text-center space-y-4">
-          <h2 className="text-[32px] font-bold text-[#F5F5F5]">DinnersMatch</h2>
+          <h2 className="text-[32px] font-bold text-[#F5F5F5]">DinnerMatch</h2>
 
           <div>
             <p className="text-[80px] font-bold text-[#FFAA55]">{displayedScore}%</p>

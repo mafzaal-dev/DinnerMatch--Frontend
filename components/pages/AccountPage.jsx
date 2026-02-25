@@ -151,7 +151,7 @@ const AccountPage = ({
           </div>
 
           {/* Payment History - box like Manage Subscription, clickable */}
-          <button
+          {/* <button
             type="button"
             onClick={onPaymentHistory}
             className="w-full bg-[#111121] border border-[#2F3A51] rounded-lg p-6 flex items-center gap-4 hover:bg-[#1A1F2E] transition-colors text-left"
@@ -169,7 +169,7 @@ const AccountPage = ({
             <svg className="w-4 h-4 text-[#F5F5F5] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 20 20">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 4l6 6-6 6" />
             </svg>
-          </button>
+          </button> */}
 
           {/* Help & Support Section */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>

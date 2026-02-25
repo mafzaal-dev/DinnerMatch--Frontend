@@ -30,19 +30,19 @@ const PrivacyPolicyPage = ({ onBack }) => {
 
           {/* Introductory Paragraph */}
           <p className="text-[#E0E0E0] leading-relaxed">
-            This Privacy Policy describes how DinnersMatch ("we," "us," or "our") collects, uses, stores, and protects your personal data. It also outlines your rights and choices regarding your information.
+            This Privacy Policy describes how DinnerMatch ("we," "us," or "our") collects, uses, stores, and protects your personal data. It also outlines your rights and choices regarding your information.
           </p>
 
           {/* Agreement Statement */}
           <p className="text-[#E0E0E0] leading-relaxed">
-            By using the DinnersMatch app or website, you agree to the terms of this Privacy Policy and our Terms & Conditions.
+            By using the DinnerMatch app or website, you agree to the terms of this Privacy Policy and our Terms & Conditions.
           </p>
 
           {/* Section 1: Who We Are */}
           <section>
             <h2 className="text-2xl font-bold text-[#F5F5F5] mb-3">1. Who We Are</h2>
             <p className="text-[#E0E0E0] leading-relaxed">
-              DinnersMatch is a platform that organizes group dinners to help people connect socially. The platform is operated by the DinnersMatch team. For all data-related inquiries, please contact us through the Help Center in the app.
+              DinnerMatch is a platform that organizes group dinners to help people connect socially. The platform is operated by the DinnerMatch team. For all data-related inquiries, please contact us through the Help Center in the app.
             </p>
           </section>
 
@@ -50,7 +50,7 @@ const PrivacyPolicyPage = ({ onBack }) => {
           <section>
             <h2 className="text-2xl font-bold text-[#F5F5F5] mb-3">2. What Data We Collect</h2>
             <p className="text-[#E0E0E0] leading-relaxed mb-2">
-              Depending on how you interact with the DinnersMatch platform, we may collect
+              Depending on how you interact with the DinnerMatch platform, we may collect
 the followig categories of personal data:
             </p>
             <ul className="list-disc list-inside text-[#E0E0E0] space-y-2 ml-4">
@@ -158,7 +158,7 @@ We do not knowingly collect data from individuals under the age of 18.</p>
             <p className='text-[#f5f5f5]  mt-2'>
 
 All service providers are bound by confidentiality agreements and only use data
-as instructed by DinnersMatch.</p>
+as instructed by DinnerMatch.</p>
           </section>
 
           {/* Section 8: How We Protect Your Data */}
@@ -228,10 +228,10 @@ acceptance of the revised policy,
             <h2 className="text-2xl font-bold text-[#F5F5F5] mb-3">13. Contact Us</h2>
             <p className="text-[#E0E0E0] leading-relaxed">
               If you have questions about this Privacy Policy or how we handle your data,
-please contact us through the Help Center in the DinnersMatch app.
+please contact us through the Help Center in the DinnerMatch app.
             </p>
           </section>
-          <i className='text-[#f5f5f5]'>Thank you for trusting DinnersMatch to help you connect with new people over
+          <i className='text-[#f5f5f5]'>Thank you for trusting DinnerMatch to help you connect with new people over
 great food</i>
         </div>
 

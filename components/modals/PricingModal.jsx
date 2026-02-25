@@ -17,9 +17,9 @@ const PricingModal = ({ isOpen, onClose, onSelectPlan }) => {
       savings: "Save R1000",
       billing: "Billed Annually",
       features: [
-        "Unlimited DinnersMatch Dinner for 12 months.",
+        "Unlimited DinnerMatch Dinner for 12 months.",
         "First access to every dinner",
-        "Discount + First access to exclusive DinnersMatch parties",
+        "Discount + First access to exclusive DinnerMatch parties",
         "Community member perks",
       ],
       buttonText: "Get Annual Pass",
@@ -36,24 +36,11 @@ const PricingModal = ({ isOpen, onClose, onSelectPlan }) => {
       billing: "Billed Monthly",
       features: [
         "Access to all Dinners - build your social rhythm.",
-        "Early access to exclusive DinnersMatch parties",
+        "Early access to exclusive DinnerMatch parties",
         "Cancel anytime - no question asked.",
       ],
       buttonText: "Start Monthly Pass",
       buttonColor: "bg-[#FFAA55] hover:bg-[#FF9955]",
-    },
-    {
-      id: "single",
-      title: "Single Dinner",
-      badge: null,
-      badgeColor: "",
-      price: "R200",
-      priceColor: "text-[#F5F5F5]",
-      savings: null,
-      billing: "One Time Payment",
-      features: ["Limited to 1 dinner"],
-      buttonText: "Get Single Ticket",
-      buttonColor: "bg-[#FFAA55]  hover:bg-[#FF9955]",
     },
   ];
 
@@ -84,7 +71,7 @@ const PricingModal = ({ isOpen, onClose, onSelectPlan }) => {
         {/* Header */}
         <div className="text-center mb-8">
           <h2 className="text-4xl font-bold text-[#F5F5F5] mb-2">
-            Choose Your DinnersMatch Pass
+            Choose Your DinnerMatch Pass
           </h2>
           <p className="text-[#E0E0E0]">
             No more waiting for plans. Join Cape Town most exciting social
@@ -165,7 +152,7 @@ const PricingModal = ({ isOpen, onClose, onSelectPlan }) => {
           </h3>
           <p className="text-[#E0E0E0] leading-relaxed">
             Building a social life isn't a once-off event - it's a rhythm.
-            DinnersMatch happens every 2 weeks, and the magic only works when
+            DinnerMatch happens every 2 weeks, and the magic only works when
             people show up consistently. A subscription lets us guarantee great
             groups, exciting restaurants, and a reliable social rhythm you can
             count on.

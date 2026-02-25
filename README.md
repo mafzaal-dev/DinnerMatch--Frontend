@@ -1,4 +1,4 @@
-# DinnersMatch Frontend
+# DinnerMatch Frontend
 
 A modern, scalable Next.js application for social dining experiences.
 

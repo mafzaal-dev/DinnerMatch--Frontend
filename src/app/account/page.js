@@ -1,25 +1,20 @@
 "use client";
 
-import { useState, useEffect, Suspense } from 'react';
+import { useEffect, Suspense } from 'react';
 import AccountPage from '../../../components/pages/AccountPage';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
-import { SubscriptionModal } from '../../../components/modals';
 
 function AccountContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { logout, user } = useAuth();
-  const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
 
   useEffect(() => {
     if (searchParams.get('openSubscription') === '1') {
-      setShowSubscriptionModal(true);
-      const url = new URL(window.location.href);
-      url.searchParams.delete('openSubscription');
-      window.history.replaceState({}, '', url);
+      router.push('/manage-subscription');
     }
-  }, [searchParams]);
+  }, [searchParams, router]);
 
   const handleEditProfile = () => {
     router.push('/edit-profile');
@@ -30,7 +25,7 @@ function AccountContent() {
   };
 
   const handleManageSubscription = () => {
-    setShowSubscriptionModal(true);
+    router.push('/manage-subscription');
   };
 
   const handlePaymentHistory = () => {
@@ -54,11 +49,10 @@ function AccountContent() {
   };
 
   const handleBack = () => {
-    router.push('/');
+    router.push('/dinner-details');
   };
 
   return (
-    <>
       <AccountPage
         onEditProfile={handleEditProfile}
         onMyTickets={handleMyTickets}
@@ -71,13 +65,6 @@ function AccountContent() {
         onBack={handleBack}
         user={user}
       />
-      <SubscriptionModal
-        isOpen={showSubscriptionModal}
-        onClose={() => setShowSubscriptionModal(false)}
-        onBack={() => setShowSubscriptionModal(false)}
-        onContinue={() => setShowSubscriptionModal(false)}
-      />
-    </>
   );
 }
 

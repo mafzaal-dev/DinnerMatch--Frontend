@@ -51,7 +51,7 @@ const PreferencesPage = ({ onSave, onBack }) => {
               <span>Back</span>
             </button>
           )}
-          <h1 className="text-3xl font-bold text-[#F5F5F5] mb-2">DinnersMatch</h1>
+          <h1 className="text-3xl font-bold text-[#F5F5F5] mb-2">DinnerMatch</h1>
           <p className="text-sm text-[#FFAA55] uppercase tracking-wide">PREFERENCES</p>
           <p className="text-[#E0E0E0] mt-2">Set Your Dining Preferences</p>
         </div>

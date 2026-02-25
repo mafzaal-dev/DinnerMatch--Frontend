@@ -40,7 +40,7 @@ const HowItWorksModal = ({ isOpen, onClose, onNext, onBack }) => {
 
         {/* Header */}
         <div className="text-center flex flex-col" style={{ gap: '6px' }}>
-          <h2 className="text-[32px] font-bold text-[#F5F5F5]">DinnersMatch</h2>
+          <h2 className="text-[32px] font-bold text-[#F5F5F5]">DinnerMatch</h2>
           <p className="text-[14px] text-[#FFAA55] uppercase tracking-wide">Identity</p>
         </div>
 

@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, Suspense, useState } from 'react';
 import DinnerDetailsPage from '../../../components/pages/DinnerDetailsPage';
-import SubscriptionModal from '../../../components/modals/SubscriptionModal';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useSubscription, useRequestedDinners, useDinnerDetail, useUpdateAttendance, useAvailableDinners, useRequestDinner, useSwipeDinner, useRateGroup, useRateRestaurant } from '../../hooks/useDinners';
 import { toast } from 'react-hot-toast';
@@ -11,7 +10,6 @@ function DinnerDetailsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const urlDinnerId = searchParams.get('id');
-  const [subscriptionModalOpen, setSubscriptionModalOpen] = useState(false);
 
   // Fetch all necessary data using React Query
   const { 
@@ -137,7 +135,7 @@ function DinnerDetailsContent() {
   }, [dinnerDetailData]);
 
   const handleManageSubscription = () => {
-    setSubscriptionModalOpen(true);
+    router.push('/manage-subscription');
   };
 
   const handleContactSupport = () => {
@@ -262,10 +260,6 @@ function DinnerDetailsContent() {
         onCopyAddress={handleCopyAddress}
         onReschedule={handleReschedule}
         onSubmitFeedback={handleFeedbackSubmit}
-      />
-      <SubscriptionModal
-        isOpen={subscriptionModalOpen}
-        onClose={() => setSubscriptionModalOpen(false)}
       />
     </>
   );

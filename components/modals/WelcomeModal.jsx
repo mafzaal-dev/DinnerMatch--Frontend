@@ -20,13 +20,13 @@ const WelcomeModal = ({ isOpen, onClose, onNext }) => {
         )}
 
         <div className="text-center flex flex-col" style={{ gap: '6px' }}>
-          <h2 className="text-[32px] font-bold text-[#F5F5F5]">DinnersMatch</h2>
+          <h2 className="text-[32px] font-bold text-[#F5F5F5]">DinnerMatch</h2>
           <p className="text-sm text-[#FFAA55] uppercase tracking-wide">Identity</p>
         </div>
 
         <div className="bg-[#111121] border border-[#2F3A51] rounded-lg p-6 flex flex-col shadow-lg" style={{ gap: '15px' }}>
           <h3 className="text-xl font-bold text-[#FFAA55]">
-            Welcome to DinnersMatch
+            Welcome to DinnerMatch
           </h3>
           <p className="text-base text-[#F5F5F5] leading-relaxed">
             Life's too short to work, sleep and die. A life well lived is one filled with adventure

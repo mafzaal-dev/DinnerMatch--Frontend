@@ -81,7 +81,7 @@ const SignupModal = ({
 
         <div className="mb-10 text-center">
           <h2 className="text-[32px] font-bold text-[#F5F5F5] mb-2">
-            DinnersMatch
+            DinnerMatch
           </h2>
           <p className="text-[#E0E0E0]">Create your accounts</p>
         </div>

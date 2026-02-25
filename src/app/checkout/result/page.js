@@ -1,15 +1,14 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
-import SubscriptionModal from "@/components/modals/SubscriptionModal";
 
 function CheckoutResultContent() {
   const searchParams = useSearchParams();
   const [status, setStatus] = useState("loading");
   const [description, setDescription] = useState("");
-  const [subscriptionModalOpen, setSubscriptionModalOpen] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     // Peach Payments V2: params can come from redirectPostData (query string) or top-level response
@@ -190,15 +189,11 @@ function CheckoutResultContent() {
           </p>
           <button
             type="button"
-            onClick={() => setSubscriptionModalOpen(true)}
+            onClick={() => router.push('/manage-subscription')}
             className="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-[#FFAA55] text-gray-900 font-medium hover:bg-[#FFBB66] transition-colors"
           >
             Try again
           </button>
-          <SubscriptionModal
-            isOpen={subscriptionModalOpen}
-            onClose={() => setSubscriptionModalOpen(false)}
-          />
         </div>
       </main>
     );

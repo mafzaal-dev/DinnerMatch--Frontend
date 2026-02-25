@@ -18,7 +18,6 @@ import {
   QuizResultsModal,
   DemographicsFlow,
   SignupModal,
-  SubscriptionModal,
   WelcomeModal,
   BookDinnerModal
 } from "../../components/modals";
@@ -267,12 +266,6 @@ export default function Home() {
     }
   };
 
-  const handleSubscriptionContinue = (plan) => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('show_book_dinner', 'true');
-    }
-    router.push('/subscriptions');
-  };
 
   const handleWelcomeNext = () => {
     refreshUserFromStorage();
@@ -341,13 +334,6 @@ export default function Home() {
         onSignup={handleSignup}
         loading={loading}
         error={error}
-      />
-
-      <SubscriptionModal
-        isOpen={quizStep === 'subscription'}
-        onClose={() => setQuizStep('book-dinner')}
-        onBack={() => setQuizStep('welcome')}
-        onContinue={handleSubscriptionContinue}
       />
       
       <WelcomeModal

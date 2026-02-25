@@ -89,15 +89,13 @@ const DinnerDetailsPage = ({
 
   const memberSinceDate = activeSubscription
     ? new Date(activeSubscription.start_date || activeSubscription.created_at)
-        .toLocaleDateString("en-US", { month: "short", year: "numeric" })
-        .toUpperCase()
-    : "NOV 2025";
+        .toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })
+    : "25 Nov 2025";
 
   const renewalDate = activeSubscription
     ? new Date(activeSubscription.end_date)
-        .toLocaleDateString("en-US", { month: "short", year: "numeric" })
-        .toUpperCase()
-    : "NOV 2025";
+        .toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })
+    : "25 Nov 2025";
 
   const subscriptionDisplay = {
     memberSince: memberSinceDate,
@@ -257,7 +255,7 @@ const DinnerDetailsPage = ({
         {/* Header */}
         <div className="flex items-center justify-between ">
           <h1 className="text-[32px] text-center font-bold text-[#F5F5F5]">
-            DinnersMatch
+            DinnerMatch
           </h1>
           {onMyAccount && (
             <Link
@@ -269,7 +267,7 @@ const DinnerDetailsPage = ({
           )}
         </div>
 
-        {/* DinnersMatch Pass Section - Show only if Annual Pass */}
+        {/* DinnerMatch Pass Section - Show only if Annual Pass */}
         {isAnnualPass && (
           <div
             className="relative rounded-lg p-6 overflow-hidden"
@@ -304,7 +302,7 @@ const DinnerDetailsPage = ({
                     MEMBER SINCE {subscriptionDisplay.memberSince}
                   </p>
                   <h2 className="text-[#E3BF3B] text-2xl font-bold">
-                    DinnersMatch Pass
+                    DinnerMatch Pass
                   </h2>
                   <p className="text-[#F5F5F5] font-semibold text-lg">
                     {subscriptionDisplay.type}
@@ -342,7 +340,7 @@ const DinnerDetailsPage = ({
                     </svg>
                   </div>
                   <span className="text-[#F5F5F5] text-base">
-                    Unlimited dinners this month
+                    Access to all dinners this month
                   </span>
                 </div>
                 <div className="flex items-center gap-3">
@@ -724,7 +722,10 @@ const DinnerDetailsPage = ({
                     </p>
                     <p className="text-[#F5F5F5] text-base">
                       {Object.entries(dinner.group.nationalities)
-                        .map(([key, value]) => `${key} ${value}%`)
+                        .map(([key, value]) => {
+                          const formatted = key.replace(/_/g, " ");
+                          return `${formatted.charAt(0).toUpperCase() + formatted.slice(1)} ${value}%`;
+                        })
                         .join(" - ")}
                     </p>
                   </div>
@@ -737,7 +738,10 @@ const DinnerDetailsPage = ({
                     </p>
                     <p className="text-[#F5F5F5] text-base">
                       {Object.entries(dinner.group.occupations)
-                        .map(([key, value]) => `${key} ${value}%`)
+                        .map(([key, value]) => {
+                          const formatted = key.replace(/_/g, " ");
+                          return `${formatted.charAt(0).toUpperCase() + formatted.slice(1)} ${value}%`;
+                        })
                         .join(" - ")}
                     </p>
                   </div>
@@ -756,17 +760,6 @@ const DinnerDetailsPage = ({
                             RATE YOUR GROUP
                           </h3>
                         )}
-                        <div className="flex -space-x-2">
-                          {dinner.group?.members?.slice(0, 3).map((m, i) => (
-                            <div
-                              key={i}
-                              className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold border-2 border-[#0F0F14]"
-                              style={{ backgroundColor: getAvatarColor(i) }}
-                            >
-                              {getInitials(m.first_name, m.last_name)}
-                            </div>
-                          ))}
-                        </div>
                       </div>
 
                       <div className="space-y-3">
@@ -983,7 +976,7 @@ const DinnerDetailsPage = ({
             </h2>
             <div className="">
               <p className="text-[#F5F5F5] text-base font-semibold">
-                Unlimited dinners this month.
+                Access to all dinners this month.
               </p>
               <p className="text-[#77777B] text-base">
                 Renewal on {subscriptionDisplay.renewalDate}.

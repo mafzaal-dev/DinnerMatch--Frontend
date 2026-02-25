@@ -54,22 +54,22 @@ const STEPS = [
     placeholder: 'Search your nationality',
     options: [
       // Common nationalities
-      { value: 'american', label: 'American' },
-      { value: 'british', label: 'British' },
-      { value: 'canadian', label: 'Canadian' },
-      { value: 'australian', label: 'Australian' },
-      { value: 'indian', label: 'Indian' },
-      { value: 'chinese', label: 'Chinese' },
-      { value: 'japanese', label: 'Japanese' },
-      { value: 'german', label: 'German' },
-      { value: 'french', label: 'French' },
-      { value: 'italian', label: 'Italian' },
-      { value: 'spanish', label: 'Spanish' },
-      { value: 'brazilian', label: 'Brazilian' },
-      { value: 'mexican', label: 'Mexican' },
-      { value: 'russian', label: 'Russian' },
-      { value: 'south_african', label: 'South African' },
-      { value: 'other', label: 'Other' }
+      { value: 'American', label: 'American' },
+      { value: 'British', label: 'British' },
+      { value: 'Canadian', label: 'Canadian' },
+      { value: 'Australian', label: 'Australian' },
+      { value: 'Indian', label: 'Indian' },
+      { value: 'Chinese', label: 'Chinese' },
+      { value: 'Japanese', label: 'Japanese' },
+      { value: 'German', label: 'German' },
+      { value: 'French', label: 'French' },
+      { value: 'Italian', label: 'Italian' },
+      { value: 'Spanish', label: 'Spanish' },
+      { value: 'Brazilian', label: 'Brazilian' },
+      { value: 'Mexican', label: 'Mexican' },
+      { value: 'Russian', label: 'Russian' },
+      { value: 'South African', label: 'South African' },
+      { value: 'Other', label: 'Other' }
     ]
   },
   {
@@ -187,7 +187,7 @@ const DemographicsFlow = ({ isOpen, onClose, onComplete, onBack }) => {
         </button>
 
         <div className="mt-8 mb-6 text-center">
-          <h2 className="text-2xl font-bold text-[#F5F5F5] mb-1">DinnersMatch</h2>
+          <h2 className="text-2xl font-bold text-[#F5F5F5] mb-1">DinnerMatch</h2>
           <p className="text-xs text-[#FFAA55] uppercase tracking-wide">
             {currentQ.title}
           </p>

@@ -28,14 +28,14 @@ const TermsConditionsPage = ({ onBack }) => {
           <section>
             <h2 className="text-xl font-bold text-[#F5F5F5] mb-3">1. Acceptance of Terms</h2>
             <p className="text-[#E0E0E0] leading-relaxed">
-              By accessing and using DinnersMatch, you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to these terms, please do not use our service.
+              By accessing and using DinnerMatch, you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to these terms, please do not use our service.
             </p>
           </section>
 
           <section>
             <h2 className="text-xl font-bold text-[#F5F5F5] mb-3">2. Description of Service</h2>
             <p className="text-[#E0E0E0] leading-relaxed">
-              DinnersMatch is a social dining platform that connects individuals for group dining experiences. We facilitate matches between users based on compatibility and preferences.
+              DinnerMatch is a social dining platform that connects individuals for group dining experiences. We facilitate matches between users based on compatibility and preferences.
             </p>
           </section>
 
@@ -82,21 +82,21 @@ const TermsConditionsPage = ({ onBack }) => {
           <section>
             <h2 className="text-xl font-bold text-[#F5F5F5] mb-3">7. Limitation of Liability</h2>
             <p className="text-[#E0E0E0] leading-relaxed">
-              DinnersMatch is not liable for any interactions between users, the quality of restaurants, or any incidents that occur during dinners. Users participate at their own risk.
+              DinnerMatch is not liable for any interactions between users, the quality of restaurants, or any incidents that occur during dinners. Users participate at their own risk.
             </p>
           </section>
 
           <section>
             <h2 className="text-xl font-bold text-[#F5F5F5] mb-3">8. Intellectual Property</h2>
             <p className="text-[#E0E0E0] leading-relaxed">
-              All content on DinnersMatch, including text, graphics, logos, and software, is the property of DinnersMatch and is protected by copyright and other intellectual property laws.
+              All content on DinnerMatch, including text, graphics, logos, and software, is the property of DinnerMatch and is protected by copyright and other intellectual property laws.
             </p>
           </section>
 
           <section>
             <h2 className="text-xl font-bold text-[#F5F5F5] mb-3">9. Privacy</h2>
             <p className="text-[#E0E0E0] leading-relaxed">
-              Your use of DinnersMatch is also governed by our Privacy Policy. Please review our Privacy Policy to understand our practices.
+              Your use of DinnerMatch is also governed by our Privacy Policy. Please review our Privacy Policy to understand our practices.
             </p>
           </section>
 
@@ -117,7 +117,7 @@ const TermsConditionsPage = ({ onBack }) => {
           <section>
             <h2 className="text-xl font-bold text-[#F5F5F5] mb-3">12. Contact Information</h2>
             <p className="text-[#E0E0E0] leading-relaxed">
-              If you have any questions about these Terms & Conditions, please contact us at support@dinnersmatch.com or through our Help Center.
+              If you have any questions about these Terms & Conditions, please contact us at support@DinnerMatch.com or through our Help Center.
             </p>
           </section>
         </div>

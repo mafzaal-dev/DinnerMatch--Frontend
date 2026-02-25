@@ -27,7 +27,7 @@ const SignupPage = ({ onRegister, onLogin, isLoading, error }) => {
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-[#F5F5F5] mb-2">DinnersMatch</h1>
+          <h1 className="text-4xl font-bold text-[#F5F5F5] mb-2">DinnerMatch</h1>
         </div>
 
         {/* Main Content */}

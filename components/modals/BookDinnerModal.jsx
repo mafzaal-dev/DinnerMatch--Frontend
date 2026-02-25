@@ -118,7 +118,7 @@ const BookDinnerModal = ({ isOpen, onClose, onSuccess, onBack, selectedCity, sel
         )}
 
         <div className="mb-10 text-center">
-          <h2 className="text-[32px] font-bold text-[#F5F5F5] mb-1">DinnersMatch</h2>
+          <h2 className="text-[32px] font-bold text-[#F5F5F5] mb-1">DinnerMatch</h2>
           <p className="text-base text-[#FFAA55] uppercase tracking-wide">Identity</p>
         </div>
 

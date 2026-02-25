@@ -14,7 +14,7 @@ const YourDinnerPage = ({ dinners = [], onViewDetails, onMyAccount, error }) => 
         <div className="mb-8 flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-[#F5F5F5] mb-2">
-              DinnersMatch
+              DinnerMatch
             </h1>
             <p className="text-sm text-[#FFAA55] uppercase tracking-wide">
               YOUR DINNER

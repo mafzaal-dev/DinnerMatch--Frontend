@@ -28,7 +28,7 @@ export const capitalizeText = (text) => {
 // Capitalize first letter of each word
 export const capitalizeWords = (text) => {
   if (!text) return '-';
-  return text.replace(/\b\w/g, (char) => char.toUpperCase());
+  return text.replace(/_/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase());
 };
 
 // Validate search query (minimum 3 characters)

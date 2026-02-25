@@ -154,7 +154,7 @@ const QuizFlow = ({ isOpen, onClose, onComplete, onBack }) => {
         </button>
 
         <div className="mb-6">
-          <h2 className="text-[32px] font-bold text-[#F5F5F5] mb-1 text-center">DinnersMatch</h2>
+          <h2 className="text-[32px] font-bold text-[#F5F5F5] mb-1 text-center">DinnerMatch</h2>
           <p className="text-base text-[#FFAA55] uppercase tracking-wide text-center">
             {currentQ.section === 'basic' ? 'Identity' : 'Personality'}
           </p>
