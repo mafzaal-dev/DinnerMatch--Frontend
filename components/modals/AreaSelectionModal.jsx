@@ -9,7 +9,7 @@ const AreaSelectionModal = ({ isOpen, onClose, onSelectArea, selectedCity }) => 
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-[#080814] rounded-xl w-full max-w-154 p-10 relative shadow-2xl max-h-[90vh] overflow-y-auto">
+      <div className="min-h-full w-full text-white md:bg-[#0F1123] md:rounded-xl md:p-8 md:max-w-4xl md:mx-4 md:relative md:animate-fadeIn md:max-h-[85vh] md:overflow-y-auto md:min-h-0 flex flex-col p-4 pb-20">
         <button
           onClick={onClose}
           className="absolute top-10 right-10 text-[#D9D9D9] hover:text-[#F5F5F5] transition-colors"
@@ -31,7 +31,7 @@ const AreaSelectionModal = ({ isOpen, onClose, onSelectArea, selectedCity }) => 
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
-          <span>Back to selection</span>
+          <span>Back to city selection</span>
         </button>
 
         <div className="flex flex-col gap-y-2 mt-4">
@@ -42,7 +42,7 @@ const AreaSelectionModal = ({ isOpen, onClose, onSelectArea, selectedCity }) => 
             <button
               key={area.id}
               onClick={() => onSelectArea(area)}
-              className="w-full h-14 px-4 bg-[#111121] border border-[#2f3a51] rounded-lg hover:border-[#FFAA55] transition-colors text-left"
+              className="w-full h-14 px-4 border border-[#2f3a51] rounded-lg hover:border-[#FFAA55] transition-colors text-left"
             >
               <div className="flex items-center gap-3">
                 <svg

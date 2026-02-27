@@ -3,6 +3,7 @@ import { useRouter } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
 import { useQuiz } from "@/hooks/useQuiz";
 import { toast } from "react-hot-toast";
+import dynamic from 'next/dynamic';
 import { CustomDropdown } from "@/components/common";
 import {
   DndContext,
@@ -21,6 +22,9 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
+// Dynamically import EmojiPicker to avoid SSR issues
+const EmojiPicker = dynamic(() => import('emoji-picker-react'), { ssr: false });
+
 const SortableOption = ({
   id,
   index,
@@ -30,6 +34,7 @@ const SortableOption = ({
 }) => {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id });
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -60,10 +65,45 @@ const SortableOption = ({
             type="text"
             placeholder="Enter Option"
             value={option?.label || ""}
-            onChange={(e) => handleOptionChange(index, e.target.value)}
+            onChange={(e) => handleOptionChange(index, "label", e.target.value)}
             maxLength={150}
-            className="w-full px-4 py-2.5 border border-[#D1D5DB] rounded-lg text-sm focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316] outline-none"
+            className="flex-1 px-4 py-2.5 border border-[#D1D5DB] rounded-lg text-sm focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316] outline-none"
           />
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+              className="w-12 h-10 border border-[#D1D5DB] rounded-lg text-xl flex items-center justify-center hover:bg-gray-50 transition-colors bg-white"
+            >
+              {option?.emoji ? (
+                // Use default rendering if it fails
+                <span>
+                 {String.fromCodePoint(parseInt(option.emoji, 16))}
+                </span>
+              ) : (
+                <span className="text-gray-400 text-sm">☺</span>
+              )}
+            </button>
+            
+            {showEmojiPicker && (
+              <>
+                <div 
+                  className="fixed inset-0 z-40" 
+                  onClick={() => setShowEmojiPicker(false)}
+                />
+                <div className="absolute top-12 right-0 z-50 shadow-xl rounded-lg">
+                  <EmojiPicker
+                    onEmojiClick={(emojiData) => {
+                      handleOptionChange(index, "emoji", emojiData.unified);
+                      setShowEmojiPicker(false);
+                    }}
+                    width={300}
+                    height={400}
+                  />
+                </div>
+              </>
+            )}
+          </div>
           <button
             type="button"
             onClick={() => handleDeleteOption(index)}
@@ -120,6 +160,7 @@ const CreateQuizPage = ({ quizId = null, isEdit = false }) => {
         id: `temp-${Date.now()}-${i}`,
         label: "",
         value: "",
+        emoji: "",
         sort_order: i + 1,
       })),
   );
@@ -162,6 +203,7 @@ const CreateQuizPage = ({ quizId = null, isEdit = false }) => {
         ) {
           const formattedOptions = data.options.map((opt) => ({
             ...opt,
+            emoji: opt.emoji || "",
             // Ensure we have a string ID for DndKit if the API id is missing (unlikely)
             id: opt.id || `temp-${Date.now()}-${Math.random()}`,
           }));
@@ -190,9 +232,13 @@ const CreateQuizPage = ({ quizId = null, isEdit = false }) => {
   };
 
   // Handle Option Changes
-  const handleOptionChange = (index, value) => {
+  const handleOptionChange = (index, field, value) => {
     const newOptions = [...options];
-    newOptions[index] = { ...newOptions[index], label: value, value: value };
+    if (field === "label") {
+      newOptions[index] = { ...newOptions[index], label: value, value: value };
+    } else {
+      newOptions[index] = { ...newOptions[index], [field]: value };
+    }
     setOptions(newOptions);
   };
 
@@ -201,6 +247,7 @@ const CreateQuizPage = ({ quizId = null, isEdit = false }) => {
       id: `temp-${Date.now()}`,
       label: "",
       value: "",
+      emoji: "",
       sort_order: options.length + 1,
     };
     setOptions([...options, newOption]);
@@ -263,6 +310,7 @@ const CreateQuizPage = ({ quizId = null, isEdit = false }) => {
             const optionPayload = {
               value: opt.value || opt.label, // Use label if value is empty
               label: opt.label,
+              emoji: opt.emoji || null,
               sort_order: index + 1,
             };
             if (opt.id && !String(opt.id).startsWith("temp-")) {
@@ -337,6 +385,7 @@ const CreateQuizPage = ({ quizId = null, isEdit = false }) => {
           id: `temp-${Date.now()}-${i}`,
           label: "",
           value: "",
+          emoji: "",
           sort_order: i + 1,
         })),
     );
@@ -488,6 +537,7 @@ const CreateQuizPage = ({ quizId = null, isEdit = false }) => {
                             id: `temp-${Date.now()}-${i}`,
                             label: "",
                             value: "",
+                            emoji: "",
                             sort_order: newOptions.length + 1,
                           });
                         }

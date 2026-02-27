@@ -26,7 +26,7 @@ const CitySelectionModal = ({ isOpen, onClose, onSelectCity }) => {
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-[#080814] rounded-xl w-full max-w-154 p-10 relative shadow-2xl max-h-[90vh] overflow-y-auto">
+      <div className="min-h-full w-full text-white md:bg-[#0F1123] md:rounded-xl md:p-8 md:max-w-4xl md:mx-4 md:relative md:animate-fadeIn md:max-h-[85vh] md:overflow-y-auto md:min-h-0 flex flex-col p-4 pb-20">
         <button
           onClick={onClose}
           className="absolute top-10 right-10 text-[#D9D9D9] hover:text-[#F5F5F5] transition-colors"
@@ -57,7 +57,7 @@ const CitySelectionModal = ({ isOpen, onClose, onSelectCity }) => {
             <button
               key={city.id}
               onClick={() => onSelectCity(city)}
-              className="w-full bg-[#111121] border border-[#2f3a51] rounded-lg flex px-4 items-center h-14.75 hover:border-[#FFAA55] transition-colors text-left"
+              className="w-full border border-[#2f3a51] rounded-lg flex px-4 items-center h-14.75 hover:border-[#FFAA55] transition-colors text-left"
             >
               <div className="flex items-center gap-3">
                 <svg

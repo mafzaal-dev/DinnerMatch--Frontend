@@ -133,7 +133,7 @@ const QuizFlow = ({ isOpen, onClose, onComplete, onBack }) => {
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-[#080814] rounded-xl w-full max-w-154 p-10 relative shadow-2xl max-h-[90vh] overflow-y-auto">
+      <div className="min-h-full w-full text-white md:bg-[#0F1123] md:rounded-xl md:p-8 md:max-w-4xl md:mx-4 md:relative md:animate-fadeIn md:max-h-[85vh] md:overflow-y-auto md:min-h-0 flex flex-col p-4 pb-20">
         <button
           onClick={onClose}
           className="absolute top-10 right-10 text-[#D9D9D9] hover:text-[#F5F5F5] transition-colors z-10"
@@ -169,26 +169,43 @@ const QuizFlow = ({ isOpen, onClose, onComplete, onBack }) => {
           </div>
         </div>
 
-        <div className="mb-8">
-          <h3 className="text-2xl md:text-4xl font-bold text-[#F5F5F5] text-center mb-8">
+        <div className="flex-1 flex flex-col justify-center max-w-4xl mx-auto w-full">
+          <h3 className="text-3xl md:text-5xl font-bold text-white text-center mb-16 leading-tight">
             {currentQ.text}
           </h3>
 
           {currentQ.answer_type === 'choice' && (
-            <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-3xl mx-auto">
               {currentQ.options.map((option) => {
                 const isSelected = currentAnswer?.value === option.value;
+                // Emoji comes as hex code string (e.g. "1f600"), need to convert to char
+                let emojiChar = null;
+                if (option.emoji) {
+                    try {
+                        emojiChar = String.fromCodePoint(parseInt(option.emoji, 16));
+                    } catch (e) {
+                        console.error("Invalid emoji code:", option.emoji);
+                    }
+                }
+
                 return (
                   <button
                     key={option.id}
                     onClick={() => handleAnswer(option.value)}
-                    className={`w-full text-center font-semibold text-xl p-4 rounded-lg border transition-all ${
+                    className={`answer-button bg-transparent text-white border-white border-2 rounded-xl p-3 md:p-4 w-full h-40 flex flex-col items-center justify-center gap-4 transition-all duration-200 ${
                       isSelected
-                        ? 'bg-[#111121] border-[#eeeeee] text-[#F5F5F5]'
-                        : 'bg-[#111121] border-[#2f3a51] text-[#E0E0E0] hover:border-[#FFAA55]'
+                        ? 'bg-[#1F2133] shadow-[0_0_20px_rgba(255,255,255,0.2)]'
+                        : 'hover:bg-white/10'
                     }`}
                   >
-                    {option.label}
+                    {emojiChar && (
+                        <span className="text-4xl filter drop-shadow-md">
+                            {emojiChar}
+                        </span>
+                    )}
+                    <span className="text-lg font-medium text-center">
+                      {option.label}
+                    </span>
                   </button>
                 );
               })}
@@ -196,51 +213,61 @@ const QuizFlow = ({ isOpen, onClose, onComplete, onBack }) => {
           )}
 
           {currentQ.answer_type === 'boolean' && (
-            <div className="flex gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-3xl mx-auto">
               <button
                 onClick={() => handleAnswer('true')}
-                className={`flex-1 py-4 rounded-lg border transition-all font-semibold text-xl ${
+                className={`answer-button bg-transparent text-white border-white border-2 rounded-xl p-3 md:p-4 w-full h-40 flex flex-col items-center justify-center gap-4 transition-all duration-200 ${
                   currentAnswer?.value === 'true'
-                    ? 'bg-[#FFAA55] border-[#FFAA55] text-white'
-                    : 'bg-[#111121] border-[#2F3A51] text-[#E0E0E0] hover:border-[#FFAA55] hover:text-[#F5F5F5]'
+                    ? 'bg-[#1F2133] shadow-[0_0_20px_rgba(255,255,255,0.2)]'
+                    : 'hover:bg-white/10'
                 }`}
               >
-                Yes
+                <span className="text-4xl filter drop-shadow-md">
+                  👍
+                </span>
+                <span className="text-lg font-medium text-center">
+                  Yes
+                </span>
               </button>
               <button
                 onClick={() => handleAnswer('false')}
-                className={`flex-1 py-4 rounded-lg border transition-all font-semibold text-xl ${
+                className={`answer-button bg-transparent text-white border-white border-2 rounded-xl p-3 md:p-4 w-full h-40 flex flex-col items-center justify-center gap-4 transition-all duration-200 ${
                   currentAnswer?.value === 'false'
-                    ? 'bg-[#FFAA55] border-[#FFAA55] text-white'
-                    : 'bg-[#111121] border-[#2F3A51] text-[#E0E0E0] hover:border-[#FFAA55] hover:text-[#F5F5F5]'
+                    ? 'bg-[#1F2133] shadow-[0_0_20px_rgba(255,255,255,0.2)]'
+                    : 'hover:bg-white/10'
                 }`}
               >
-                No
+                <span className="text-4xl filter drop-shadow-md">
+                  👎
+                </span>
+                <span className="text-lg font-medium text-center">
+                  No
+                </span>
               </button>
             </div>
           )}
 
           {(currentQ.answer_type === 'scale' || currentQ.answer_type === 'scale_1_10') && (
-            <div>
-              <div className="flex justify-between mb-6 text-sm text-[#E0E0E0]">
-                <span className='text-[#FFAA55]'>
+            <div className="w-full max-w-3xl mx-auto">
+              <div className="flex justify-between mb-8 text-sm md:text-base font-medium text-[#E0E0E0]">
+                <span className='text-[#FFAA55] uppercase tracking-wide'>
                   {currentQ.options.find(o => o.value === String(currentQ.min_value || 1))?.label || 'Very Low'}
                 </span>
-                <span className='text-[#FFAA55]'>
+                <span className='text-[#FFAA55] uppercase tracking-wide'>
                   {currentQ.options.find(o => o.value === String(currentQ.max_value || 10))?.label || 'Very High'}
                 </span>
               </div>
-              <div className="grid grid-cols-5 gap-3">
+              <div className="grid grid-cols-5 gap-3 md:gap-4">
                 {Array.from({ length: (currentQ.max_value || 10) - (currentQ.min_value || 1) + 1 }, (_, i) => i + (currentQ.min_value || 1)).map((value) => {
                   const isSelected = currentAnswer?.value === String(value);
                   return (
                     <button
                       key={value}
                       onClick={() => handleAnswer(value)}
-                      className={`py-4 px-5 rounded-lg border transition-all font-semibold text-xl ${
+                      className={`aspect-square rounded-xl border-2 transition-all duration-300 font-bold text-xl md:text-2xl flex items-center justify-center ${
                         isSelected
-                          ? 'bg-[#FFAA55] border-[#FFAA55] text-white'
-                          : 'bg-[#080814] border-white text-[#E0E0E0] hover:border-[#FFAA55]'
+                          ? 'bg-[#FFAA55] border-[#FFAA55] text-white shadow-[0_0_20px_rgba(255,170,85,0.4)] transform scale-105'
+                          : 'bg-[#151725] border-[#2F3A51] text-[#E0E0E0] hover:border-[#FFAA55] hover:text-white'
                       }`}
                     >
                       {value}
@@ -252,40 +279,26 @@ const QuizFlow = ({ isOpen, onClose, onComplete, onBack }) => {
           )}
 
           {currentQ.answer_type === 'text' && (
-            <div className="relative">
+            <div className="w-full max-w-2xl mx-auto">
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Type your answer..."
-                className="w-full px-4 py-3 bg-[#111121] border border-[#2F3A51] rounded-lg text-[#F5F5F5] placeholder-[#424242] focus:outline-none focus:border-[#FFAA55] pr-12"
+                placeholder="Type your answer here..."
+                className="w-full px-8 py-6 bg-[#151725] border-2 border-[#2F3A51] rounded-2xl text-xl text-white placeholder-[#4B5563] focus:outline-none focus:border-[#FFAA55] focus:shadow-[0_0_20px_rgba(255,170,85,0.2)] transition-all"
+                autoFocus
               />
 
               {searchQuery && (
                 <button
                   onClick={() => handleAnswer(searchQuery)}
-                  className="w-full mt-4 bg-[#FFAA55] text-white py-4 rounded-lg font-bold text-sm uppercase tracking-wide hover:bg-[#FF9955] transition-colors"
+                  className="w-full mt-8 bg-[#FFAA55] text-white py-5 rounded-2xl font-bold text-lg uppercase tracking-wide hover:bg-[#FF9955] transition-all shadow-lg hover:shadow-[0_0_20px_rgba(255,170,85,0.4)]"
                 >
                   Continue
                 </button>
               )}
             </div>
           )}
-        </div>
-
-        {/* <div className="mt-6 mb-4">
-          <button
-            onClick={handleSkip}
-            className="w-full py-3 rounded-lg border border-[#2F3A51] text-[#E0E0E0] hover:border-[#FFAA55] hover:text-[#F5F5F5] transition-all text-sm uppercase tracking-wide"
-          >
-            Skip Question
-          </button>
-        </div> */}
-
-        <div>
-          <p className="text-center text-[#E0E0E0] text-sm">
-            Question {currentQuestion + 1} of {totalQuestions}
-          </p>
         </div>
       </div>
     </div>
