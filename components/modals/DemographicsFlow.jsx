@@ -166,7 +166,7 @@ const DemographicsFlow = ({ isOpen, onClose, onComplete, onBack }) => {
 
   return (
     <div className="fixed inset-0 bg-[#0F1123] md:bg-black/80 z-50 flex items-center justify-center p-4">
-      <div className="bg-[#080814] rounded-xl w-full max-w-md md:max-w-lg p-6 md:p-10 relative shadow-2xl max-h-[90vh] overflow-y-auto">
+      <div className="min-h-full w-full text-white md:bg-[#0F1123] md:rounded-xl md:p-8 md:max-w-4xl md:mx-4 md:relative md:animate-fadeIn md:max-h-[85vh] md:overflow-y-auto md:min-h-0 flex flex-col p-4 pb-20 h-screen overflow-y-auto scroll-smooth">
         <button
           onClick={onClose}
           className="absolute top-6 right-6 text-[#D9D9D9] hover:text-[#F5F5F5] transition-colors z-10"
@@ -187,8 +187,8 @@ const DemographicsFlow = ({ isOpen, onClose, onComplete, onBack }) => {
         </button>
 
         <div className="mt-8 mb-6 text-center">
-          <h2 className="text-2xl font-bold text-[#F5F5F5] mb-1">DinnerMatch</h2>
-          <p className="text-xs text-[#FFAA55] uppercase tracking-wide">
+          <h2 className="text-2xl md:text-4xl font-bold mb-1">Dinner<span className="text-[#FFAA55]">Match</span></h2>
+          <p className="text-[#FFAA55] font-medium tracking-widest uppercase text-xs md:text-md">
             {currentQ.title}
           </p>
         </div>
@@ -204,26 +204,33 @@ const DemographicsFlow = ({ isOpen, onClose, onComplete, onBack }) => {
         </div> */}
 
         <div className="mb-6">
-          <h3 className="text-xl md:text-2xl font-bold text-[#F5F5F5] text-center mb-6">
+          <h3 className="text-3xl md:text-4xl font-bold text-center mb-16 mx-auto max-w-2xl">
             {currentQ.question}
           </h3>
 
           {currentQ.type === 'choice' && (
-            <div className="space-y-3">
-              {currentQ.options.map((option) => (
-                <button
-                  key={option.value}
-                  onClick={() => handleAnswer(currentQ.id, option.value)}
-                  className="w-full text-center font-semibold text-base md:text-lg p-3 md:p-4 rounded-lg border border-[#2F3A51] bg-[#111121] text-[#E0E0E0] hover:border-[#FFAA55] hover:text-[#F5F5F5] transition-all"
-                >
-                  {option.label}
-                </button>
-              ))}
+            <div className="flex flex-col space-y-4 max-w-md mx-auto">
+              {currentQ.options.map((option) => {
+                const isSelected = answers[currentQ.id] === option.value;
+                return (
+                  <button
+                    key={option.value}
+                    onClick={() => handleAnswer(currentQ.id, option.value)}
+                    className={`p-5 border-2 rounded-xl text-xl font-medium transition-all duration-300 ${
+                      isSelected 
+                        ? 'border-white' 
+                        : 'border-[#2F3A51] hover:border-[#FFAA55]'
+                    }`}
+                  >
+                    {option.label}
+                  </button>
+                );
+              })}
             </div>
           )}
 
           {currentQ.type === 'search' && (
-            <div className="relative">
+            <div className="relative max-w-md mx-auto">
               <input
                 type="text"
                 value={searchQuery}
@@ -233,7 +240,7 @@ const DemographicsFlow = ({ isOpen, onClose, onComplete, onBack }) => {
                 }}
                 onFocus={() => setShowDropdown(true)}
                 placeholder={currentQ.placeholder}
-                className="w-full px-4 py-3 bg-[#111121] border border-[#2F3A51] rounded-lg text-[#F5F5F5] placeholder-[#424242] focus:outline-none focus:border-[#FFAA55]"
+                className="w-full bg-[#1A1D35] border-2 border-gray-700 rounded-xl text-white px-4 py-4 pr-10 cursor-pointer focus-within:ring-2 focus-within:ring-[#FFAA55] focus-within:border-[#FFAA55] transition-all duration-200"
               />
               
               {showDropdown && (

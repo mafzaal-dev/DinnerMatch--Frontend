@@ -26,7 +26,7 @@ const CitySelectionModal = ({ isOpen, onClose, onSelectCity }) => {
 
   return (
     <div className="fixed inset-0 bg-[#0F1123] md:bg-black/80 z-50 flex items-center justify-center p-4">
-      <div className="min-h-full w-full text-white md:bg-[#0F1123] md:rounded-xl md:p-8 md:max-w-4xl md:mx-4 md:relative md:animate-fadeIn md:max-h-[85vh] md:overflow-y-auto md:min-h-0 flex flex-col p-4 pb-20">
+      <div className="bg-[#0F1123] text-white rounded-lg p-4 md:p-8 max-w-2xl w-full relative animate-fadeIn">
         <button
           onClick={onClose}
           className="absolute top-10 right-10 text-[#D9D9D9] hover:text-[#F5F5F5] transition-colors"
@@ -41,7 +41,7 @@ const CitySelectionModal = ({ isOpen, onClose, onSelectCity }) => {
           <p className="text-[20px] text-[#E0E0E0] text-center">Choose the city where you'd like to have dinner:</p>
         </div>
 
-        <div className="flex flex-col gap-y-4">
+        <div className="space-y-3 md:space-y-4 mb-6 md:mb-8">
           {loading && (
             <div className="flex justify-center py-10">
               <div className="w-8 h-8 border-2 border-[#FFAA55] border-t-transparent rounded-full animate-spin" />
@@ -57,7 +57,7 @@ const CitySelectionModal = ({ isOpen, onClose, onSelectCity }) => {
             <button
               key={city.id}
               onClick={() => onSelectCity(city)}
-              className="w-full border border-[#2f3a51] rounded-lg flex px-4 items-center h-14.75 hover:border-[#FFAA55] transition-colors text-left"
+              className="w-full p-4 rounded-lg border-2 transition-all border-gray-700 hover:border-gray-600"
             >
               <div className="flex items-center gap-3">
                 <svg

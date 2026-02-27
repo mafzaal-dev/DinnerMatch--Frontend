@@ -133,7 +133,7 @@ const QuizFlow = ({ isOpen, onClose, onComplete, onBack }) => {
 
   return (
     <div className="fixed inset-0 bg-[#0F1123] md:bg-black/80 z-50 flex items-center justify-center p-4">
-      <div className="min-h-full w-full text-white md:bg-[#0F1123] md:rounded-xl md:p-8 md:max-w-4xl md:mx-4 md:relative md:animate-fadeIn md:max-h-[85vh] md:overflow-y-auto md:min-h-0 flex flex-col p-4 pb-20">
+      <div className="min-h-full w-full text-white md:bg-[#0F1123] md:rounded-xl md:p-8 md:max-w-4xl md:mx-4 md:relative md:animate-fadeIn md:max-h-[85vh] md:overflow-y-auto md:min-h-0 flex flex-col p-4 pb-20 h-screen overflow-y-auto scroll-smooth">
         <button
           onClick={onClose}
           className="absolute top-10 right-10 text-[#D9D9D9] hover:text-[#F5F5F5] transition-colors z-10"
@@ -192,20 +192,16 @@ const QuizFlow = ({ isOpen, onClose, onComplete, onBack }) => {
                   <button
                     key={option.id}
                     onClick={() => handleAnswer(option.value)}
-                    className={`answer-button bg-transparent text-white border-white border-2 rounded-xl p-3 md:p-4 w-full h-40 flex flex-col items-center justify-center gap-4 transition-all duration-200 ${
-                      isSelected
-                        ? 'bg-[#1F2133] shadow-[0_0_20px_rgba(255,255,255,0.2)]'
-                        : 'hover:bg-white/10'
-                    }`}
+                    className="answer-button bg-transparent text-white border-white border-2 rounded-xl p-3 md:p-4 w-full transition-all duration-200"
                   >
                     {emojiChar && (
-                        <span className="text-4xl filter drop-shadow-md">
+                        <div className="text-2xl md:text-4xl mb-2 md:mb-4">
                             {emojiChar}
-                        </span>
+                        </div>
                     )}
-                    <span className="text-lg font-medium text-center">
+                    <div className="font-medium text-base md:text-xl">
                       {option.label}
-                    </span>
+                    </div>
                   </button>
                 );
               })}
@@ -216,33 +212,25 @@ const QuizFlow = ({ isOpen, onClose, onComplete, onBack }) => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-3xl mx-auto">
               <button
                 onClick={() => handleAnswer('true')}
-                className={`answer-button bg-transparent text-white border-white border-2 rounded-xl p-3 md:p-4 w-full h-40 flex flex-col items-center justify-center gap-4 transition-all duration-200 ${
-                  currentAnswer?.value === 'true'
-                    ? 'bg-[#1F2133] shadow-[0_0_20px_rgba(255,255,255,0.2)]'
-                    : 'hover:bg-white/10'
-                }`}
+                className="answer-button bg-transparent text-white border-white border-2 rounded-xl p-3 md:p-4 w-full transition-all duration-200"
               >
-                <span className="text-4xl filter drop-shadow-md">
+                <div className="text-2xl md:text-4xl mb-2 md:mb-4">
                   👍
-                </span>
-                <span className="text-lg font-medium text-center">
+                </div>
+                <div className="text-2xl md:text-4xl mb-2 md:mb-4">
                   Yes
-                </span>
+                </div>
               </button>
               <button
                 onClick={() => handleAnswer('false')}
-                className={`answer-button bg-transparent text-white border-white border-2 rounded-xl p-3 md:p-4 w-full h-40 flex flex-col items-center justify-center gap-4 transition-all duration-200 ${
-                  currentAnswer?.value === 'false'
-                    ? 'bg-[#1F2133] shadow-[0_0_20px_rgba(255,255,255,0.2)]'
-                    : 'hover:bg-white/10'
-                }`}
+                className="answer-button bg-transparent text-white border-white border-2 rounded-xl p-3 md:p-4 w-full transition-all duration-200"
               >
-                <span className="text-4xl filter drop-shadow-md">
+                <div className="text-2xl md:text-4xl mb-2 md:mb-4">
                   👎
-                </span>
-                <span className="text-lg font-medium text-center">
+                </div>
+                <div className="text-2xl md:text-4xl mb-2 md:mb-4">
                   No
-                </span>
+                </div>
               </button>
             </div>
           )}
