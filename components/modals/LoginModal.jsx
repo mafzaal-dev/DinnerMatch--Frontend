@@ -29,7 +29,7 @@ const LoginModal = ({ isOpen, onClose, onLogin }) => { // Added onLogin prop if 
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 bg-[#0F1123] md:bg-black/80 z-50 flex items-center justify-center p-4">
       <div className="bg-[#1a1f2e] rounded-2xl max-w-154 w-full max-h-103.5 p-6 relative shadow-2xl">
         {/* Close Button */}
         <button

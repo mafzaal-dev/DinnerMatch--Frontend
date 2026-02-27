@@ -442,7 +442,7 @@ export default function OnboardingFlow() {
 
       {/* Step 6: Preferences */}
       {step === 'preferences' && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-[#0F1123] md:bg-black/80 z-50 flex items-center justify-center p-4">
           <PreferencesForm
             onContinue={(prefs) => {
               setPreferences(prefs);
@@ -455,7 +455,7 @@ export default function OnboardingFlow() {
 
       {/* Step 7: Confirmation */}
       {step === 'confirmation' && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-[#0F1123] md:bg-black/80 z-50 flex items-center justify-center p-4">
           <DinnerConfirmation
             preferences={preferences}
             onEdit={() => setStep('preferences')}

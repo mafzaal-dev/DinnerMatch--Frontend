@@ -12,7 +12,7 @@ const AccessDeniedModal = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 bg-[#0F1123] md:bg-black/80 z-50 flex items-center justify-center p-4">
       <div className="bg-[#080814] rounded-xl w-full max-w-md p-10 relative shadow-2xl flex flex-col gap-6">
         <div className="text-center flex flex-col gap-2">
           <div className="mx-auto w-14 h-14 rounded-full bg-red-500/20 flex items-center justify-center">

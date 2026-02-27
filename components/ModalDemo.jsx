@@ -141,7 +141,7 @@ const ModalDemo = () => {
       <LoginModal isOpen={loginOpen} onClose={() => setLoginOpen(false)} />
 
       {preferencesOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-[#0F1123] md:bg-black/80 z-50 flex items-center justify-center p-4">
           <PreferencesForm
             onContinue={handlePreferencesContinue}
             onBack={() => setPreferencesOpen(false)}
@@ -150,7 +150,7 @@ const ModalDemo = () => {
       )}
 
       {confirmationOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-[#0F1123] md:bg-black/80 z-50 flex items-center justify-center p-4">
           <DinnerConfirmation
             preferences={preferences}
             onEdit={() => {
