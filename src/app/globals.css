@@ -27,3 +27,7 @@ button {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+.rdp-month_caption {
+  text-align: center;
+}

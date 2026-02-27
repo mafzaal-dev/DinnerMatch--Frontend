@@ -92,13 +92,14 @@ const SignupModal = ({
           </div>
         )}
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="">
+          <div className="space-y-4 max-w-[500px] mx-auto">
           <div>
             <input
               type="text"
               {...register("first_name")}
               placeholder="First name *"
-              className={`w-full px-4 py-3 bg-[#111121] border rounded-lg text-[#F5F5F5] placeholder-zinc-600 focus:outline-none focus:border-[#FFAA55] transition-colors ${errors.first_name ? "border-red-500" : "border-[#2F3A51]"}`}
+              className={`w-full bg-[#1A1D35] border-2 border-gray-700 rounded-xl text-white px-4 py-4 pr-10 cursor-pointer transition-all duration-200 ${errors.first_name ? "border-red-500" : "border-[#2F3A51]"}`}
               disabled={loading}
             />
             {errors.first_name && (
@@ -113,7 +114,7 @@ const SignupModal = ({
               type="text"
               {...register("last_name")}
               placeholder="Last name *"
-              className={`w-full px-4 py-3 bg-[#111121] border rounded-lg text-[#F5F5F5] placeholder-zinc-600 focus:outline-none focus:border-[#FFAA55] transition-colors ${errors.last_name ? "border-red-500" : "border-[#2F3A51]"}`}
+              className={`w-full bg-[#1A1D35] border-2 border-gray-700 rounded-xl text-white px-4 py-4 pr-10 cursor-pointer transition-all duration-200 ${errors.first_name ? "border-red-500" : "border-[#2F3A51]"}`}
               disabled={loading}
             />
             {errors.last_name && (
@@ -128,7 +129,7 @@ const SignupModal = ({
               type="email"
               {...register("email")}
               placeholder="Email *"
-              className={`w-full px-4 py-3 bg-[#111121] border rounded-lg text-[#F5F5F5] placeholder-zinc-600 focus:outline-none focus:border-[#FFAA55] transition-colors ${errors.email ? "border-red-500" : "border-[#2F3A51]"}`}
+              className={`w-full bg-[#1A1D35] border-2 border-gray-700 rounded-xl text-white px-4 py-4 pr-10 cursor-pointer transition-all duration-200 ${errors.first_name ? "border-red-500" : "border-[#2F3A51]"}`}
               disabled={loading}
             />
             {errors.email && (
@@ -143,7 +144,7 @@ const SignupModal = ({
               type="tel"
               {...register("mobile_number")}
               placeholder="Mobile number *"
-              className={`w-full px-4 py-3 bg-[#111121] border rounded-lg text-[#F5F5F5] placeholder-zinc-600 focus:outline-none focus:border-[#FFAA55] transition-colors ${errors.mobile_number ? "border-red-500" : "border-[#2F3A51]"}`}
+              className={`w-full bg-[#1A1D35] border-2 border-gray-700 rounded-xl text-white px-4 py-4 pr-10 cursor-pointer transition-all duration-200 ${errors.first_name ? "border-red-500" : "border-[#2F3A51]"}`}
               disabled={loading}
             />
             {errors.mobile_number && (
@@ -158,7 +159,7 @@ const SignupModal = ({
               type={showPassword ? "text" : "password"}
               {...register("password")}
               placeholder="Password *"
-              className={`w-full px-4 py-3 bg-[#111121] border rounded-lg text-[#F5F5F5] placeholder-zinc-600 focus:outline-none focus:border-[#FFAA55] transition-colors pr-12 ${errors.password ? "border-red-500" : "border-[#2F3A51]"}`}
+              className={`w-full bg-[#1A1D35] border-2 border-gray-700 rounded-xl text-white px-4 py-4 pr-10 cursor-pointer transition-all duration-200 ${errors.first_name ? "border-red-500" : "border-[#2F3A51]"}`} 
               disabled={loading}
             />
             {errors.password && (
@@ -232,6 +233,7 @@ const SignupModal = ({
             </a>
             .
           </p>
+          </div>
         </form>
       </div>
     </div>

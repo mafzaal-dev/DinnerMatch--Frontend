@@ -252,11 +252,7 @@ const QuizFlow = ({ isOpen, onClose, onComplete, onBack }) => {
                     <button
                       key={value}
                       onClick={() => handleAnswer(value)}
-                      className={`aspect-square rounded-xl border-2 transition-all duration-300 font-bold text-xl md:text-2xl flex items-center justify-center ${
-                        isSelected
-                          ? 'bg-[#FFAA55] border-[#FFAA55] text-white shadow-[0_0_20px_rgba(255,170,85,0.4)] transform scale-105'
-                          : 'bg-[#151725] border-[#2F3A51] text-[#E0E0E0] hover:border-[#FFAA55] hover:text-white'
-                      }`}
+                      className="answer-button bg-transparent text-white border-white border-2 rounded-xl p-2 md:p-4 w-full aspect-square transition-all duration-200"
                     >
                       {value}
                     </button>

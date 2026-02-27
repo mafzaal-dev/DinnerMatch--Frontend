@@ -264,7 +264,7 @@ const DemographicsFlow = ({ isOpen, onClose, onComplete, onBack }) => {
           )}
 
           {currentQ.type === 'date' && (
-            <div className="space-y-4">
+            <div className="space-y-4 max-w-md mx-auto">
               <DatePicker
                 date={dateValue ? new Date(dateValue) : undefined}
                 onSelect={(date) => setDateValue(date ? format(date, "yyyy-MM-dd") : "")}
