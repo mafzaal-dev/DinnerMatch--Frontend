@@ -40,7 +40,7 @@ const QuizResultsModal = ({ isOpen, onClose, onContinue }) => {
 
   return (
     <div className="fixed inset-0 bg-[#0F1123] md:bg-black/80 z-50 flex items-center justify-center p-4">
-      <div className="bg-[#080814] rounded-xl w-full max-w-154 p-10 relative shadow-2xl">
+      <div className="min-h-full w-full text-white md:bg-[#0F1123] md:rounded-xl md:p-8 md:max-w-4xl md:mx-4 md:relative md:animate-fadeIn md:max-h-[85vh] md:overflow-y-auto md:min-h-0 flex flex-col p-4 pb-20">
         <button
           onClick={onClose}
           className="absolute top-10 right-10 text-[#D9D9D9] hover:text-[#F5F5F5] transition-colors"
@@ -51,7 +51,7 @@ const QuizResultsModal = ({ isOpen, onClose, onContinue }) => {
         </button>
 
         <div className="text-center space-y-4">
-          <h2 className="text-[32px] font-bold text-[#F5F5F5]">DinnerMatch</h2>
+          <h2 className="text-[32px] font-bold text-[#F5F5F5]">Dinner<span className="text-[#FFAA55]">Match</span></h2>
 
           <div>
             <p className="text-[80px] font-bold text-[#FFAA55]">{displayedScore}%</p>
@@ -62,7 +62,7 @@ const QuizResultsModal = ({ isOpen, onClose, onContinue }) => {
 
           <button
             onClick={onContinue}
-            className="w-full bg-[#FFAA55] text-white py-4 rounded-lg font-bold text-sm uppercase tracking-wide hover:bg-[#FF9955] transition-colors"
+            className="w-full max-w-md mx-auto bg-[#FFAA55] text-white py-4 rounded-lg font-bold text-sm uppercase tracking-wide hover:bg-[#FF9955] transition-colors"
           >
             Continue
           </button>
