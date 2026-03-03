@@ -27,18 +27,26 @@ const CitySelectionModal = ({ isOpen, onClose, onSelectCity }) => {
   return (
     <div className="fixed inset-0 bg-[#0F1123] md:bg-black/80 z-50 flex items-center justify-center p-4">
       <div className="bg-[#0F1123] text-white rounded-lg p-4 md:p-8 max-w-2xl w-full relative animate-fadeIn">
-        <button
-          onClick={onClose}
-          className="absolute top-10 right-10 text-[#D9D9D9] hover:text-[#F5F5F5] transition-colors"
-        >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
+        {/* Header row: spacer | title | close */}
+        <div className="flex items-start justify-between mb-8 gap-2">
+          {/* Left spacer keeps title centered */}
+          <div className="w-8 shrink-0" />
 
-        <div className="mb-10">
-          <h2 className="text-[32px] font-bold text-[#F5F5F5] text-center mb-2">Select Your City</h2>
-          <p className="text-[20px] text-[#E0E0E0] text-center">Choose the city where you'd like to have dinner:</p>
+          {/* Title */}
+          <div className="flex-1 text-center">
+            <h2 className="text-2xl font-bold text-[#F5F5F5] mb-1">Select Your City</h2>
+            <p className="text-sm text-[#E0E0E0]">Choose the city where you&apos;d like to have dinner:</p>
+          </div>
+
+          {/* Close button */}
+          <button
+            onClick={onClose}
+            className="w-8 shrink-0 text-[#D9D9D9] hover:text-[#F5F5F5] transition-colors mt-1"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
         </div>
 
         <div className="space-y-3 md:space-y-4 mb-6 md:mb-8">

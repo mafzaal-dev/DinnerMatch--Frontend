@@ -107,7 +107,7 @@ const DemographicsFlow = ({ isOpen, onClose, onComplete, onBack }) => {
   const [answers, setAnswers] = useState({});
   const [searchQuery, setSearchQuery] = useState('');
   const [showDropdown, setShowDropdown] = useState(false);
-  
+
   // Date state
   const [dateValue, setDateValue] = useState('');
 
@@ -149,7 +149,7 @@ const DemographicsFlow = ({ isOpen, onClose, onComplete, onBack }) => {
     }
   };
 
-  const filteredOptions = currentQ.type === 'search' 
+  const filteredOptions = currentQ.type === 'search'
     ? currentQ.options.filter(o => o.label.toLowerCase().includes(searchQuery.toLowerCase()))
     : [];
 
@@ -167,30 +167,40 @@ const DemographicsFlow = ({ isOpen, onClose, onComplete, onBack }) => {
   return (
     <div className="fixed inset-0 bg-[#0F1123] md:bg-black/80 z-50 flex items-center justify-center p-4">
       <div className="min-h-full w-full text-white md:bg-[#0F1123] md:rounded-xl md:p-8 md:max-w-4xl md:mx-4 md:relative md:animate-fadeIn md:max-h-[85vh] md:overflow-y-auto md:min-h-0 flex flex-col p-4 pb-20 h-screen overflow-y-auto scroll-smooth">
-        <button
-          onClick={onClose}
-          className="absolute top-6 right-6 text-[#D9D9D9] hover:text-[#F5F5F5] transition-colors z-10"
-        >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
+        {/* Header row: back | title | close */}
+        <div className="flex items-center justify-between mb-6 gap-2">
+          {/* Back button */}
+          <div className="w-16 flex-shrink-0">
+            <button
+              onClick={handleBack}
+              className="flex items-center gap-1 text-[#E0E0E0] hover:text-[#F5F5F5] transition-colors text-sm z-10"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+              <span>Back</span>
+            </button>
+          </div>
 
-        <button
-          onClick={handleBack}
-          className="absolute top-6 left-6 flex items-center gap-2 text-[#E0E0E0] hover:text-[#F5F5F5] transition-colors z-10 text-sm"
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-          <span>Back</span>
-        </button>
+          {/* Title */}
+          <div className="flex-1 text-center">
+            <h2 className="text-2xl font-bold mb-0.5">Dinner<span className="text-[#FFAA55]">Match</span></h2>
+            <p className="text-[#FFAA55] font-medium tracking-widest uppercase text-xs">
+              {currentQ.title}
+            </p>
+          </div>
 
-        <div className="mt-8 mb-6 text-center">
-          <h2 className="text-2xl md:text-4xl font-bold mb-1">Dinner<span className="text-[#FFAA55]">Match</span></h2>
-          <p className="text-[#FFAA55] font-medium tracking-widest uppercase text-xs md:text-md">
-            {currentQ.title}
-          </p>
+          {/* Close button */}
+          <div className="w-16 flex-shrink-0 flex justify-end">
+            <button
+              onClick={onClose}
+              className="text-[#D9D9D9] hover:text-[#F5F5F5] transition-colors z-10"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
         </div>
 
         {/* Removed progress bar based on screenshots, or keep if preferred. Screenshots don't clearly show one but QuizFlow has one. */}
@@ -216,11 +226,10 @@ const DemographicsFlow = ({ isOpen, onClose, onComplete, onBack }) => {
                   <button
                     key={option.value}
                     onClick={() => handleAnswer(currentQ.id, option.value)}
-                    className={`p-5 border-2 rounded-xl text-xl font-medium transition-all duration-300 ${
-                      isSelected 
-                        ? 'border-white' 
+                    className={`p-5 border-2 rounded-xl text-xl font-medium transition-all duration-300 ${isSelected
+                        ? 'border-white'
                         : 'border-[#2F3A51] hover:border-[#FFAA55]'
-                    }`}
+                      }`}
                   >
                     {option.label}
                   </button>
@@ -242,7 +251,7 @@ const DemographicsFlow = ({ isOpen, onClose, onComplete, onBack }) => {
                 placeholder={currentQ.placeholder}
                 className="w-full bg-[#1A1D35] border-2 border-gray-700 rounded-xl text-white px-4 py-4 pr-10 cursor-pointer focus-within:ring-2 focus-within:ring-[#FFAA55] focus-within:border-[#FFAA55] transition-all duration-200"
               />
-              
+
               {showDropdown && (
                 <div className="w-full mt-2 bg-[#111121] border border-[#2F3A51] rounded-lg max-h-60 overflow-y-auto shadow-lg">
                   {filteredOptions.length > 0 ? (
@@ -270,9 +279,8 @@ const DemographicsFlow = ({ isOpen, onClose, onComplete, onBack }) => {
                 onSelect={(date) => setDateValue(date ? format(date, "yyyy-MM-dd") : "")}
                 disabled={{ after: new Date() }}
                 placeholder={currentQ.placeholder}
-                className={`w-full justify-start text-left font-normal bg-[#111121] hover:bg-[#1A1A2E] text-[#F5F5F5] ${
-                  isDateInFuture ? 'border-red-500' : 'border-[#2F3A51]'
-                }`}
+                className={`w-full justify-start text-left font-normal bg-[#111121] hover:bg-[#1A1A2E] text-[#F5F5F5] ${isDateInFuture ? 'border-red-500' : 'border-[#2F3A51]'
+                  }`}
                 popoverClassName="bg-[#111121] border-[#2F3A51]"
                 isDark={true}
               />
@@ -282,11 +290,10 @@ const DemographicsFlow = ({ isOpen, onClose, onComplete, onBack }) => {
               <button
                 onClick={handleDateConfirm}
                 disabled={!dateValue || isDateInFuture}
-                className={`w-full py-3 rounded-lg font-bold text-sm uppercase tracking-wide transition-colors ${
-                  dateValue && !isDateInFuture
+                className={`w-full py-3 rounded-lg font-bold text-sm uppercase tracking-wide transition-colors ${dateValue && !isDateInFuture
                     ? 'bg-[#FFAA55] text-white hover:bg-[#FF9955]'
                     : 'bg-[#2F3A51] text-[#757575] cursor-not-allowed'
-                }`}
+                  }`}
               >
                 Confirm
               </button>

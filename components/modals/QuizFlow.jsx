@@ -22,7 +22,7 @@ const QuizFlow = ({ isOpen, onClose, onComplete, onBack }) => {
       setLoading(true);
       setError(null);
       const response = await api.get(API_ENDPOINTS.QUIZ_QUESTIONS_LIST);
-      
+
       if (response.success && response.data) {
         const sortedQuestions = response.data
           .sort((a, b) => a.sort_order - b.sort_order)
@@ -36,7 +36,7 @@ const QuizFlow = ({ isOpen, onClose, onComplete, onBack }) => {
             max_value: q.max_value,
             options: (q.options || []).sort((a, b) => a.sort_order - b.sort_order)
           }));
-        
+
         setQuestions(sortedQuestions);
       }
     } catch (err) {
@@ -134,30 +134,40 @@ const QuizFlow = ({ isOpen, onClose, onComplete, onBack }) => {
   return (
     <div className="fixed inset-0 bg-[#0F1123] md:bg-black/80 z-50 flex items-center justify-center p-4">
       <div className="min-h-full w-full text-white md:bg-[#0F1123] md:rounded-xl md:p-8 md:max-w-4xl md:mx-4 md:relative md:animate-fadeIn md:max-h-[85vh] md:overflow-y-auto md:min-h-0 flex flex-col p-4 pb-20 h-screen overflow-y-auto scroll-smooth">
-        <button
-          onClick={onClose}
-          className="absolute top-10 right-10 text-[#D9D9D9] hover:text-[#F5F5F5] transition-colors z-10"
-        >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
+        {/* Header row: back | title | close */}
+        <div className="flex items-center justify-between mb-4 gap-2">
+          {/* Back button */}
+          <div className="w-16 flex-shrink-0">
+            <button
+              onClick={handleBack}
+              className="flex items-center gap-1 text-[#E0E0E0] hover:text-[#F5F5F5] transition-colors text-sm z-10"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+              <span>Back</span>
+            </button>
+          </div>
 
-        <button
-          onClick={handleBack}
-          className="absolute top-10 left-10 flex items-center gap-2 text-[#E0E0E0] hover:text-[#F5F5F5] transition-colors z-10"
-        >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-          <span>Back</span>
-        </button>
+          {/* Title */}
+          <div className="flex-1 text-center">
+            <h2 className="text-2xl font-bold text-[#F5F5F5] mb-0.5">Dinner<span className='text-[#FFAA55]'>Match</span></h2>
+            <p className="text-sm text-[#FFAA55] uppercase tracking-wide">
+              {currentQ.section === 'basic' ? 'Identity' : 'Personality'}
+            </p>
+          </div>
 
-        <div className="mb-6">
-          <h2 className="text-[32px] font-bold text-[#F5F5F5] mb-1 text-center">Dinner<span className='text-[#FFAA55]'>Match</span></h2>
-          <p className="text-base text-[#FFAA55] uppercase tracking-wide text-center">
-            {currentQ.section === 'basic' ? 'Identity' : 'Personality'}
-          </p>
+          {/* Close button */}
+          <div className="w-16 flex-shrink-0 flex justify-end">
+            <button
+              onClick={onClose}
+              className="text-[#D9D9D9] hover:text-[#F5F5F5] transition-colors z-10"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
         </div>
 
         <div className="mb-8">
@@ -181,11 +191,11 @@ const QuizFlow = ({ isOpen, onClose, onComplete, onBack }) => {
                 // Emoji comes as hex code string (e.g. "1f600"), need to convert to char
                 let emojiChar = null;
                 if (option.emoji) {
-                    try {
-                        emojiChar = String.fromCodePoint(parseInt(option.emoji, 16));
-                    } catch (e) {
-                        console.error("Invalid emoji code:", option.emoji);
-                    }
+                  try {
+                    emojiChar = String.fromCodePoint(parseInt(option.emoji, 16));
+                  } catch (e) {
+                    console.error("Invalid emoji code:", option.emoji);
+                  }
                 }
 
                 return (
@@ -195,9 +205,9 @@ const QuizFlow = ({ isOpen, onClose, onComplete, onBack }) => {
                     className="answer-button bg-transparent text-white border-white border-2 rounded-xl p-3 md:p-4 w-full transition-all duration-200"
                   >
                     {emojiChar && (
-                        <div className="text-2xl md:text-4xl mb-2 md:mb-4">
-                            {emojiChar}
-                        </div>
+                      <div className="text-2xl md:text-4xl mb-2 md:mb-4">
+                        {emojiChar}
+                      </div>
                     )}
                     <div className="font-medium text-base md:text-xl">
                       {option.label}

@@ -24,7 +24,7 @@ const BookDinnerModal = ({ isOpen, onClose, onSuccess, onBack, selectedCity, sel
       setLoading(true);
       setError('');
       const response = await api.get(API_ENDPOINTS.DINNER_LIST);
-      
+
       if (response.success && response.data) {
         const formattedSlots = response.data.map(dinner => ({
           id: dinner.id,
@@ -94,32 +94,42 @@ const BookDinnerModal = ({ isOpen, onClose, onSuccess, onBack, selectedCity, sel
   return (
     <div className="fixed inset-0 bg-[#0F1123] md:bg-black/80 z-50 flex items-center justify-center p-4">
       <div className="min-h-full w-full text-white md:bg-[#0F1123] md:rounded-xl md:p-8 md:max-w-4xl md:mx-4 md:relative md:animate-fadeIn md:max-h-[85vh] md:overflow-y-auto md:min-h-0 flex flex-col p-4 pb-20 h-screen overflow-y-auto scroll-smooth">
-        {onClose && (
-          <button
-            onClick={onClose}
-            className="absolute top-10 right-10 text-[#D9D9D9] hover:text-[#F5F5F5] transition-colors"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        )}
+        {/* Header row: back | title | close */}
+        <div className="flex items-center justify-between mb-8 gap-2">
+          {/* Back button */}
+          <div className="w-16 flex-shrink-0">
+            {onBack && (
+              <button
+                onClick={onBack}
+                className="flex items-center gap-1 text-[#E0E0E0] hover:text-[#F5F5F5] transition-colors text-sm"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+                <span>Back</span>
+              </button>
+            )}
+          </div>
 
-        {onBack && (
-          <button
-            onClick={onBack}
-            className="absolute top-10 left-10 text-[#E0E0E0] hover:text-[#F5F5F5] transition-colors flex items-center gap-2"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-            <span>Back</span>
-          </button>
-        )}
+          {/* Title */}
+          <div className="flex-1 text-center">
+            <h2 className="text-2xl font-bold text-[#F5F5F5] mb-0.5">DinnerMatch</h2>
+            <p className="text-sm text-[#FFAA55] uppercase tracking-wide">Identity</p>
+          </div>
 
-        <div className="mb-10 text-center">
-          <h2 className="text-[32px] font-bold text-[#F5F5F5] mb-1">DinnerMatch</h2>
-          <p className="text-base text-[#FFAA55] uppercase tracking-wide">Identity</p>
+          {/* Close button */}
+          <div className="w-16 flex-shrink-0 flex justify-end">
+            {onClose && (
+              <button
+                onClick={onClose}
+                className="text-[#D9D9D9] hover:text-[#F5F5F5] transition-colors"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            )}
+          </div>
         </div>
 
         {error && (
@@ -143,22 +153,20 @@ const BookDinnerModal = ({ isOpen, onClose, onSuccess, onBack, selectedCity, sel
                 key={slot.id}
                 onClick={() => setSelectedSlot(slot.id)}
                 disabled={submitting}
-                className={`w-full bg-[#111121] border rounded-lg p-6 flex items-center justify-between transition-all ${
-                  selectedSlot === slot.id
+                className={`w-full bg-[#111121] border rounded-lg p-6 flex items-center justify-between transition-all ${selectedSlot === slot.id
                     ? 'border-[#FFAA55] bg-[#080814]'
                     : 'border-[#2F3A51] hover:border-[#FFAA55]'
-                } ${submitting ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  } ${submitting ? 'opacity-50 cursor-not-allowed' : ''}`}
               >
                 <div className="text-left">
                   <p className="text-[#F5F5F5] font-medium text-lg">{slot.date}</p>
                   <p className="text-[#E0E0E0] text-sm">{slot.time}</p>
                 </div>
                 <div
-                  className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-                    selectedSlot === slot.id
+                  className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${selectedSlot === slot.id
                       ? 'border-[#FFAA55] bg-[#FFAA55]'
                       : 'border-[#2F3A51]'
-                  }`}
+                    }`}
                 >
                   {selectedSlot === slot.id && (
                     <div className="w-2 h-2 rounded-full bg-white"></div>
@@ -172,11 +180,10 @@ const BookDinnerModal = ({ isOpen, onClose, onSuccess, onBack, selectedCity, sel
         <button
           onClick={handleSecureSpot}
           disabled={!selectedSlot || submitting}
-          className={`w-full py-4 rounded-lg font-medium text-sm uppercase tracking-wide transition-colors ${
-            selectedSlot && !submitting
+          className={`w-full py-4 rounded-lg font-medium text-sm uppercase tracking-wide transition-colors ${selectedSlot && !submitting
               ? 'bg-[#FFAA55] text-white hover:bg-[#FF9955]'
               : 'bg-[#2F3A51] text-[#E0E0E0] cursor-not-allowed'
-          }`}
+            }`}
         >
           {submitting ? 'Securing spot...' : 'Secure My Spot'}
         </button>

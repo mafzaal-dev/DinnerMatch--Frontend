@@ -98,7 +98,6 @@ const QuizResultsModal = ({ isOpen, onClose, onContinue }) => {
             <img src="/quiz-result2.png" alt="" className="w-full h-full object-cover" />
           </div>
 
-          {/* Right card – rotated right */}
           <div
             className="absolute rounded-xl md:rounded-2xl overflow-hidden border-[3px] border-[#09090f] shadow-2xl"
             style={{
@@ -113,7 +112,6 @@ const QuizResultsModal = ({ isOpen, onClose, onContinue }) => {
             <img src="/quiz-result3.png" alt="" className="w-full h-full object-cover" />
           </div>
 
-          {/* Centre card – on top, slightly lower */}
           <div
             className="absolute rounded-xl md:rounded-2xl overflow-hidden border-[3px] border-[#09090f] shadow-2xl"
             style={{
@@ -128,10 +126,8 @@ const QuizResultsModal = ({ isOpen, onClose, onContinue }) => {
             <img src="/quiz-result1.png" alt="" className="w-full h-full object-cover" />
           </div>
 
-          {/* Bottom fade – blends image area into body on mobile */}
           <div className="absolute bottom-0 left-0 right-0 h-16 md:h-0 bg-gradient-to-t from-[#09090f] to-transparent pointer-events-none z-40" />
 
-          {/* Right-edge fade – blends into right panel on desktop */}
           <div className="hidden md:block absolute top-0 right-0 bottom-0 w-20 bg-gradient-to-l from-[#09090f] to-transparent pointer-events-none z-40" />
         </div>
 
