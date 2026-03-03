@@ -147,6 +147,8 @@ const CreateQuizPage = ({ quizId = null, isEdit = false }) => {
     answer_type: "choice", // Default to choice (was select)
     min_value: null,
     max_value: null,
+    min_label: "",
+    max_label: "",
     sort_order: 1,
     is_active: true,
   });
@@ -192,6 +194,8 @@ const CreateQuizPage = ({ quizId = null, isEdit = false }) => {
           answer_type: data.answer_type || "text",
           min_value: data.min_value || null,
           max_value: data.max_value || null,
+          min_label: data.min_label || "",
+          max_label: data.max_label || "",
           sort_order: data.sort_order || 1,
           is_active: data.is_active ?? true,
         });
@@ -375,6 +379,8 @@ const CreateQuizPage = ({ quizId = null, isEdit = false }) => {
       answer_type: "choice", // Default
       min_value: null,
       max_value: null,
+      min_label: "",
+      max_label: "",
       sort_order: 1,
       is_active: true,
     });
@@ -591,51 +597,89 @@ const CreateQuizPage = ({ quizId = null, isEdit = false }) => {
 
             {/* Scale Inputs */}
             {formData.answer_type === "scale" && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-gray-50 p-4 rounded-lg mt-4">
-                <div>
-                  <label className="block text-sm font-medium text-[#374151] mb-2">
-                    Min Value <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="number"
-                    name="min_value"
-                    value={formData.min_value || ""}
-                    onChange={(e) => {
-                      const value =
-                        e.target.value === "" ? "" : parseInt(e.target.value);
-                      if (value === "" || value > 0) {
-                        setFormData((prev) => ({ ...prev, min_value: value }));
-                      }
-                    }}
-                    min="1"
-                    required
-                    className="w-full px-4 py-2.5 border border-[#D1D5DB] rounded-lg text-sm focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316] outline-none"
-                  />
-                  <p className="mt-1 text-xs text-[#6B7280]">
-                    Must be greater than 0
-                  </p>
+              <div className="space-y-4 bg-gray-50 p-4 rounded-lg mt-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-[#374151] mb-2">
+                      Min Value <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="number"
+                      name="min_value"
+                      value={formData.min_value || ""}
+                      onChange={(e) => {
+                        const value =
+                          e.target.value === "" ? "" : parseInt(e.target.value);
+                        if (value === "" || value > 0) {
+                          setFormData((prev) => ({ ...prev, min_value: value }));
+                        }
+                      }}
+                      min="1"
+                      required
+                      className="w-full px-4 py-2.5 border border-[#D1D5DB] rounded-lg text-sm focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316] outline-none"
+                    />
+                    <p className="mt-1 text-xs text-[#6B7280]">
+                      Must be greater than 0
+                    </p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-[#374151] mb-2">
+                      Max Value <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="number"
+                      name="max_value"
+                      value={formData.max_value || ""}
+                      onChange={(e) => {
+                        const value =
+                          e.target.value === "" ? "" : parseInt(e.target.value);
+                        if (value === "" || (value > 0 && value <= 15)) {
+                          setFormData((prev) => ({ ...prev, max_value: value }));
+                        }
+                      }}
+                      min="1"
+                      max="15"
+                      required
+                      className="w-full px-4 py-2.5 border border-[#D1D5DB] rounded-lg text-sm focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316] outline-none"
+                    />
+                    <p className="mt-1 text-xs text-[#6B7280]">Must be ≤ 15</p>
+                  </div>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-[#374151] mb-2">
-                    Max Value <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="number"
-                    name="max_value"
-                    value={formData.max_value || ""}
-                    onChange={(e) => {
-                      const value =
-                        e.target.value === "" ? "" : parseInt(e.target.value);
-                      if (value === "" || (value > 0 && value <= 15)) {
-                        setFormData((prev) => ({ ...prev, max_value: value }));
-                      }
-                    }}
-                    min="1"
-                    max="15"
-                    required
-                    className="w-full px-4 py-2.5 border border-[#D1D5DB] rounded-lg text-sm focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316] outline-none"
-                  />
-                  <p className="mt-1 text-xs text-[#6B7280]">Must be ≤ 15</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-[#374151] mb-2">
+                      Min Label
+                    </label>
+                    <input
+                      type="text"
+                      name="min_label"
+                      value={formData.min_label || ""}
+                      onChange={handleChange}
+                      placeholder="e.g. Not at all"
+                      maxLength={50}
+                      className="w-full px-4 py-2.5 border border-[#D1D5DB] rounded-lg text-sm focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316] outline-none"
+                    />
+                    <p className="mt-1 text-xs text-[#6B7280]">
+                      Label shown at the low end of the scale
+                    </p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-[#374151] mb-2">
+                      Max Label
+                    </label>
+                    <input
+                      type="text"
+                      name="max_label"
+                      value={formData.max_label || ""}
+                      onChange={handleChange}
+                      placeholder="e.g. Absolutely"
+                      maxLength={50}
+                      className="w-full px-4 py-2.5 border border-[#D1D5DB] rounded-lg text-sm focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316] outline-none"
+                    />
+                    <p className="mt-1 text-xs text-[#6B7280]">
+                      Label shown at the high end of the scale
+                    </p>
+                  </div>
                 </div>
               </div>
             )}
