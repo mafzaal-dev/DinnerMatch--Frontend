@@ -99,11 +99,10 @@ const SortableRow = ({
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
         <span
-          className={`px-3 py-1 text-xs font-medium rounded-full ${
-            question.is_active
+          className={`px-3 py-1 text-xs font-medium rounded-full ${question.is_active
               ? "bg-[#D1FAE5] text-[#065F46]"
               : "bg-[#F3F4F6] text-[#6B7280]"
-          }`}
+            }`}
         >
           {question.is_active ? "Active" : "Inactive"}
         </span>
@@ -159,11 +158,10 @@ const SortableRow = ({
               e.stopPropagation();
               handleToggleActive(question);
             }}
-            className={`p-1.5 rounded transition-colors ${
-              question.is_active
+            className={`p-1.5 rounded transition-colors ${question.is_active
                 ? "hover:bg-[#FEE2E2] text-[#DC2626]"
                 : "hover:bg-[#D1FAE5] text-[#065F46]"
-            }`}
+              }`}
             title={question.is_active ? "Deactivate" : "Activate"}
           >
             {question.is_active ? (
@@ -219,9 +217,15 @@ const QuizListPage = () => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [questionToDelete, setQuestionToDelete] = useState(null);
 
-  // Pagination
   const [currentPage, setCurrentPage] = useState(0);
-  const [pageSize] = useState(10);
+  const [pageSize, setPageSize] = useState(10);
+
+  const PAGE_SIZE_OPTIONS = [
+    { value: 10, label: "10 / page" },
+    { value: 50, label: "50 / page" },
+    { value: 100, label: "100 / page" },
+    { value: Infinity, label: "All" },
+  ];
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -321,10 +325,11 @@ const QuizListPage = () => {
   // Disable DnD when searching or filtering
   const isDndEnabled = searchQuery === "" && !filterSection && !filterType;
 
-  // Pagination
+  // Pagination — Infinity means "All"
+  const effectivePageSize = pageSize === Infinity ? filteredQuestions.length || 1 : pageSize;
   const paginatedQuestions = filteredQuestions.slice(
-    currentPage * pageSize,
-    (currentPage + 1) * pageSize,
+    currentPage * effectivePageSize,
+    (currentPage + 1) * effectivePageSize,
   );
 
   const handleCreateQuestion = () => {
@@ -549,8 +554,13 @@ const QuizListPage = () => {
             <TablePagination
               currentPage={currentPage}
               total={filteredQuestions.length}
-              pageSize={pageSize}
+              pageSize={pageSize === Infinity ? filteredQuestions.length || 1 : pageSize}
               onPageChange={setCurrentPage}
+              pageSizeOptions={PAGE_SIZE_OPTIONS}
+              onPageSizeChange={(size) => {
+                setPageSize(size);
+                setCurrentPage(0);
+              }}
             />
           )}
         </div>
