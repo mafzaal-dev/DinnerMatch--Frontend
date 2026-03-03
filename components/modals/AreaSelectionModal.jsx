@@ -20,7 +20,7 @@ const AreaSelectionModal = ({ isOpen, onClose, onSelectArea, selectedCity }) => 
         </button>
 
         <div className="mb-10">
-          <h2 className="text-[32px] text-center font-bold text-[#F5F5F5] mb-2">Select Your Place</h2>
+          <h2 className="text-[32px] text-center font-bold text-[#F5F5F5] mb-2">Select Your Area</h2>
           <p className="text-base text-center text-[#E0E0E0]">Choose the area in {selectedCity?.name ?? 'your city'}:</p>
         </div>
 
