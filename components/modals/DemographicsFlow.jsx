@@ -288,8 +288,17 @@ const DemographicsFlow = ({ isOpen, onClose, onComplete, onBack }) => {
   const progress = ((currentStep + 1) / totalSteps) * 100;
 
   React.useEffect(() => {
-    document.body.style.overflow = isOpen ? 'hidden' : '';
-    return () => { document.body.style.overflow = ''; };
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+      document.documentElement.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+      document.documentElement.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+      document.documentElement.style.overflow = '';
+    };
   }, [isOpen]);
 
   // Restore date value when revisiting the step
@@ -342,8 +351,8 @@ const DemographicsFlow = ({ isOpen, onClose, onComplete, onBack }) => {
   const isDateInFuture = dateValue ? new Date(dateValue) > new Date() : false;
 
   return (
-    <div className="fixed inset-0 z-50 bg-[#0F1123] md:bg-black/80 md:flex md:items-center md:justify-center">
-      <div className="min-h-full w-full text-white md:bg-[#0F1123] md:rounded-xl md:p-8 md:max-w-4xl md:mx-4 md:relative md:animate-fadeIn md:max-h-[85vh] md:overflow-y-auto md:min-h-0 flex flex-col p-4 pb-20">
+    <div className="fixed inset-0 z-50 bg-[#0F1123] overflow-y-auto md:bg-black/80 md:overflow-hidden md:flex md:items-center md:justify-center">
+      <div className="min-h-full w-full text-white flex flex-col p-4 pb-10 md:min-h-0 md:bg-[#0F1123] md:rounded-xl md:p-8 md:max-w-4xl md:mx-4 md:relative md:animate-fadeIn md:max-h-[85vh] md:overflow-y-auto">
         <button
           onClick={onClose}
           className="absolute top-4 right-4 md:top-8 md:right-8 text-gray-400 hover:text-white transition-colors z-10"
@@ -352,7 +361,7 @@ const DemographicsFlow = ({ isOpen, onClose, onComplete, onBack }) => {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
-        <div className='h-screen overflow-y-auto scroll-smooth flex flex-col md:block p-3 md:p-0'>
+        <div className='flex flex-col md:block p-3 md:p-0'>
           <div className='text-center pt-12 pb-4 md:mb-10 md:mt-6 md:pt-0 md:pb-0 relative'>
             <button onClick={handleBack} className="absolute top-2 left-0 md:left-4 text-gray-400 hover:text-white z-10 flex items-center gap-2">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-chevron-left w-5 h-5"><path d="m15 18-6-6 6-6"></path>

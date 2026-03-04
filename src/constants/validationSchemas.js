@@ -6,7 +6,16 @@ const passwordValidation = yup.string()
   .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, 'Password must contain at least one uppercase letter, one lowercase letter, and one number')
   .required('Password is required');
 const requiredString = (label) => yup.string().required(`${label} is required`);
-const phoneValidation = yup.string().matches(/^[\d\s\-\+\(\)]+$/, 'Please enter a valid phone number').min(10, 'Phone number must be at least 10 digits');
+const isSAPhone = (value) => {
+  if (!value) return false;
+  const stripped = value.replace(/[\s\-\(\)]/g, '');
+  return /^(\+27|27)[0-9]{9}$/.test(stripped) || /^0[0-9]{9}$/.test(stripped);
+};
+const phoneValidation = yup.string().test(
+  'sa-phone',
+  'Please enter a valid South African phone number (e.g. 082 123 4567 or +27 82 123 4567)',
+  (value) => !value || isSAPhone(value)
+);
 
 export const loginSchema = yup.object().shape({
   email: emailValidation,
@@ -34,10 +43,7 @@ export const editProfileSchema = yup.object().shape({
   fullName: requiredString('Full name'),
   email: yup.string().email('Invalid email').optional(),
   phoneNumber: yup.string()
-    .test('is-valid-phone', 'Please enter a valid phone number', function(value) {
-      if (!value) return true;
-      return /^[\d\s\-\+\(\)]+$/.test(value) && value.length >= 10;
-    })
+    .test('sa-phone', 'Please enter a valid South African phone number (e.g. 082 123 4567 or +27 82 123 4567)', (value) => !value || isSAPhone(value))
     .nullable()
     .optional(),
   languages: yup.array().of(yup.string()).min(1, 'Select at least one language'),

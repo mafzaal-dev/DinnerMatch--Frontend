@@ -142,6 +142,29 @@ const EditProfilePage = ({
     },
   });
 
+  const [phoneDisplay, setPhoneDisplay] = useState('');
+
+  const formatSAPhone = (input) => {
+    const hasPlus = input.startsWith('+');
+    const digits = input.replace(/\D/g, '');
+    if (hasPlus || digits.startsWith('27')) {
+      const local = digits.startsWith('27') ? digits.slice(2) : digits;
+      if (local.length === 0) return '+27';
+      if (local.length <= 2) return `+27 ${local}`;
+      if (local.length <= 5) return `+27 ${local.slice(0, 2)} ${local.slice(2)}`;
+      return `+27 ${local.slice(0, 2)} ${local.slice(2, 5)} ${local.slice(5, 9)}`;
+    }
+    if (digits.length <= 3) return digits;
+    if (digits.length <= 6) return `${digits.slice(0, 3)} ${digits.slice(3)}`;
+    return `${digits.slice(0, 3)} ${digits.slice(3, 6)} ${digits.slice(6, 10)}`;
+  };
+
+  const handlePhoneChange = (e) => {
+    const formatted = formatSAPhone(e.target.value);
+    setPhoneDisplay(formatted);
+    setValue('phoneNumber', formatted, { shouldValidate: true });
+  };
+
   const [nationalitySearch, setNationalitySearch] = useState("");
   const [nationalityDropdown, setNationalityDropdown] = useState(false);
   const [languageSearch, setLanguageSearch] = useState("");
@@ -177,10 +200,10 @@ const EditProfilePage = ({
           "",
       );
       setValue("email", initialData.email || "");
-      setValue(
-        "phoneNumber",
-        initialData.phone || initialData.phone_number || initialData.phoneNumber || "",
-      );
+      const rawPhone = initialData.phone || initialData.phone_number || initialData.phoneNumber || "";
+      const formattedPhone = rawPhone ? formatSAPhone(rawPhone) : "";
+      setValue("phoneNumber", formattedPhone);
+      setPhoneDisplay(formattedPhone);
       setValue("languages", initialData.languages || ["English"]);
       setValue(
         "menuPreferences",
@@ -191,10 +214,6 @@ const EditProfilePage = ({
         initialData.priceRange || (initialData.budget && BUDGET_LABEL_TO_ID[initialData.budget]) || "",
       );
 
-      setValue(
-        "phoneNumber",
-        initialData.phone || initialData.phone_number || initialData.phoneNumber || "",
-      );
     }
   }, [initialData, setValue]);
 
@@ -396,9 +415,11 @@ const EditProfilePage = ({
                 </label>
                 <input
                   type="tel"
-                  {...register("phoneNumber")}
+                  value={phoneDisplay}
+                  onChange={handlePhoneChange}
+                  maxLength={17}
                   className={`w-full px-4 py-3 bg-[#111121] border rounded-lg text-[#F5F5F5] placeholder-[#424242] focus:outline-none focus:border-[#FFAA55] transition-colors ${errors.phoneNumber ? "border-red-500" : "border-[#2F3A51]"}`}
-                  placeholder="+1 (XXX) XXX-XXXX"
+                  placeholder="e.g. 082 123 4567 or +27 82 123 4567"
                 />
                 {errors.phoneNumber && (
                   <p className="text-red-500 text-xs mt-1">

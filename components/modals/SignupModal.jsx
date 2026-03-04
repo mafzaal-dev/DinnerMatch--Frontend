@@ -14,14 +14,37 @@ const SignupModal = ({
   error = "",
 }) => {
   const [showPassword, setShowPassword] = useState(false);
+  const [phoneDisplay, setPhoneDisplay] = useState('');
 
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(signupSchema),
   });
+
+  const formatSAPhone = (input) => {
+    const hasPlus = input.startsWith('+');
+    const digits = input.replace(/\D/g, '');
+    if (hasPlus || digits.startsWith('27')) {
+      const local = digits.startsWith('27') ? digits.slice(2) : digits;
+      if (local.length === 0) return '+27';
+      if (local.length <= 2) return `+27 ${local}`;
+      if (local.length <= 5) return `+27 ${local.slice(0, 2)} ${local.slice(2)}`;
+      return `+27 ${local.slice(0, 2)} ${local.slice(2, 5)} ${local.slice(5, 9)}`;
+    }
+    if (digits.length <= 3) return digits;
+    if (digits.length <= 6) return `${digits.slice(0, 3)} ${digits.slice(3)}`;
+    return `${digits.slice(0, 3)} ${digits.slice(3, 6)} ${digits.slice(6, 10)}`;
+  };
+
+  const handlePhoneChange = (e) => {
+    const formatted = formatSAPhone(e.target.value);
+    setPhoneDisplay(formatted);
+    setValue('mobile_number', formatted, { shouldValidate: true });
+  };
 
   useEffect(() => {
     document.body.style.overflow = isOpen ? 'hidden' : '';
@@ -117,9 +140,11 @@ const SignupModal = ({
               <div>
                 <input
                   type="tel"
-                  {...register("mobile_number")}
-                  placeholder="Mobile number *"
-                  className={`w-full bg-[#1A1D35] border-2 border-gray-700 rounded-xl text-white px-4 py-4 pr-10 cursor-pointer transition-all duration-200 ${errors.first_name ? "border-red-500" : "border-[#2F3A51]"}`}
+                  value={phoneDisplay}
+                  onChange={handlePhoneChange}
+                  placeholder="e.g. 082 123 4567 or +27 82 123 4567"
+                  maxLength={17}
+                  className={`w-full bg-[#1A1D35] border-2 rounded-xl text-white px-4 py-4 pr-10 cursor-pointer transition-all duration-200 ${errors.mobile_number ? "border-red-500" : "border-[#2F3A51]"}`}
                   disabled={loading}
                 />
                 {errors.mobile_number && (
