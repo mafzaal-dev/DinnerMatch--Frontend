@@ -8,6 +8,11 @@ const QuizResultsModal = ({ isOpen, onClose, onContinue }) => {
   const [targetScore] = useState(() => Math.floor(Math.random() * (90 - 80 + 1)) + 80);
 
   useEffect(() => {
+    document.body.style.overflow = isOpen ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [isOpen]);
+
+  useEffect(() => {
     let animationFrameId;
 
     if (isOpen) {
@@ -134,7 +139,7 @@ const QuizResultsModal = ({ isOpen, onClose, onContinue }) => {
         <div
           className="
             flex-1 flex flex-col justify-between
-            px-6 pt-6 pb-8
+            px-6 pt-6 pb-20
             md:px-10 md:py-12
             overflow-y-auto
           "

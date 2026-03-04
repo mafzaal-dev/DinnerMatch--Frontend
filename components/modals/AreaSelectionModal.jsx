@@ -1,9 +1,14 @@
 "use client";
 
 import { ArrowLeft } from 'lucide-react';
-import React from 'react';
+import React, { useEffect } from 'react';
 
 const AreaSelectionModal = ({ isOpen, onClose, onSelectArea, selectedCity }) => {
+  useEffect(() => {
+    document.body.style.overflow = isOpen ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   const areas = selectedCity?.area ?? [];

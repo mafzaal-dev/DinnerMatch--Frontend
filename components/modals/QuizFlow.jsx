@@ -17,6 +17,11 @@ const QuizFlow = ({ isOpen, onClose, onComplete, onBack }) => {
     }
   }, [isOpen]);
 
+  useEffect(() => {
+    document.body.style.overflow = isOpen ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [isOpen]);
+
   const fetchQuestions = async () => {
     try {
       setLoading(true);

@@ -287,6 +287,11 @@ const DemographicsFlow = ({ isOpen, onClose, onComplete, onBack }) => {
   const totalSteps = STEPS.length;
   const progress = ((currentStep + 1) / totalSteps) * 100;
 
+  React.useEffect(() => {
+    document.body.style.overflow = isOpen ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [isOpen]);
+
   // Restore date value when revisiting the step
   React.useEffect(() => {
     if (isOpen && currentQ.type === 'date' && answers[currentQ.id]) {
