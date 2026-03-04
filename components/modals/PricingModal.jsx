@@ -1,9 +1,20 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 
 const PricingModal = ({ isOpen, onClose, onSelectPlan }) => {
+  const [loadingPlanId, setLoadingPlanId] = useState(null);
+
   if (!isOpen) return null;
+
+  const handleSelectPlan = async (planId) => {
+    try {
+      setLoadingPlanId(planId);
+      await onSelectPlan(planId);
+    } finally {
+      setLoadingPlanId(null);
+    }
+  };
 
   const plans = [
     {
@@ -136,10 +147,17 @@ const PricingModal = ({ isOpen, onClose, onSelectPlan }) => {
                 ))}
               </ul>
               <button
-                onClick={() => onSelectPlan(plan.id)}
-                className={`w-full cursor-pointer ${plan.buttonColor} text-[#F5F5F5] py-3 rounded-lg font-bold text-sm uppercase tracking-wide transition-colors`}
+                onClick={() => handleSelectPlan(plan.id)}
+                disabled={loadingPlanId !== null}
+                className={`w-full cursor-pointer ${plan.buttonColor} text-[#F5F5F5] py-3 rounded-lg font-bold text-sm uppercase tracking-wide transition-colors flex items-center justify-center gap-2 ${loadingPlanId !== null ? 'opacity-60 cursor-not-allowed' : ''}`}
               >
-                {plan.buttonText}
+                {loadingPlanId === plan.id && (
+                  <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  </svg>
+                )}
+                {loadingPlanId === plan.id ? 'Processing...' : plan.buttonText}
               </button>
             </div>
           ))}

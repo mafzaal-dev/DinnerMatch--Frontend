@@ -29,7 +29,7 @@ const Footer = () => {
                         Spaces are limited — take the quiz to secure your spot.
                     </p>
 
-                    <div className="flex flex-wrap max-w-[180px] mx-auto md:max-w-none md:mx-0 gap-2 md:gap-4 mt-6">
+                    <div className="flex flex-wrap md:justify-center max-w-[180px] mx-auto md:max-w-none gap-2 md:gap-4 mt-6">
                         <div className="flex items-center gap-2 text-sm text-[#757575]">
                             <span className="w-1.5 h-1.5 rounded-full bg-[#F97315]"></span>
                             Personality Matching
