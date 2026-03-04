@@ -26,7 +26,7 @@ const AreaSelectionModal = ({ isOpen, onClose, onSelectArea, selectedCity }) => 
         </div>
 
         <div className="space-y-3 md:space-y-4 mb-6 md:mb-8">
-          <button onClick={onClose} class="mb-4 text-[#F9B456] hover:text-[#F9B456]/80 text-sm font-medium transition-colors flex items-center gap-2"><ArrowLeft /> Back to city selection</button>
+          <button onClick={onClose} className="mb-4 text-[#F9B456] hover:text-[#F9B456]/80 text-sm font-medium transition-colors flex items-center gap-2"><ArrowLeft /> Back to city selection</button>
           {areas.length === 0 && (
             <p className="text-center text-[#E0E0E0] py-4">No areas available for this city.</p>
           )}

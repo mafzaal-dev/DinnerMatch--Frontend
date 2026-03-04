@@ -177,10 +177,10 @@ const DemographicsFlow = ({ isOpen, onClose, onComplete, onBack }) => {
         </button>
         <div className='h-screen overflow-y-auto scroll-smooth flex flex-col md:block p-3 md:p-0'>
           <div className='text-center pt-12 pb-4 md:mb-10 md:mt-6 md:pt-0 md:pb-0 relative'>
-            <button onClick={handleBack} class="absolute top-2 left-0 md:left-4 text-gray-400 hover:text-white z-10 flex items-center gap-2">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-left w-5 h-5"><path d="m15 18-6-6 6-6"></path>
+            <button onClick={handleBack} className="absolute top-2 left-0 md:left-4 text-gray-400 hover:text-white z-10 flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-chevron-left w-5 h-5"><path d="m15 18-6-6 6-6"></path>
               </svg>
-              <span class="text-sm">Back</span>
+              <span className="text-sm">Back</span>
             </button>
             <h1 className="text-2xl md:text-4xl font-bold mb-1">
               <span className="text-white">Dinner</span><span className="text-[#FFAA55]">Match</span>

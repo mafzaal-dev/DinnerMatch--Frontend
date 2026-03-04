@@ -144,11 +144,11 @@ const QuizFlow = ({ isOpen, onClose, onComplete, onBack }) => {
         </button>
 
         <div className='h-screen overflow-y-auto scroll-smooth flex flex-col md:block p-3 md:p-0'>
-          <div class="text-center pt-12 pb-4 md:mb-10 md:mt-6 md:pt-0 md:pb-0 relative">
-            <button onClick={handleBack} class="absolute top-2 left-0 md:left-4 text-gray-400 hover:text-white z-10 flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-left w-5 h-5"><path d="m15 18-6-6 6-6"></path></svg><span class="text-sm">Back</span></button>
-            <h1 class="text-2xl md:text-4xl font-bold mb-1"><span class="text-white">Dinner</span><span class="text-[#FFAA55]">Match</span>
+          <div className="text-center pt-12 pb-4 md:mb-10 md:mt-6 md:pt-0 md:pb-0 relative">
+            <button onClick={handleBack} className="absolute top-2 left-0 md:left-4 text-gray-400 hover:text-white z-10 flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-chevron-left w-5 h-5"><path d="m15 18-6-6 6-6"></path></svg><span className="text-sm">Back</span></button>
+            <h1 className="text-2xl md:text-4xl font-bold mb-1"><span className="text-white">Dinner</span><span className="text-[#FFAA55]">Match</span>
             </h1>
-            <div class="text-[#FFAA55] font-medium tracking-widest uppercase text-xs md:text-md">{currentQ.section === 'basic' ? 'Identity' : 'Personality'}</div>
+            <div className="text-[#FFAA55] font-medium tracking-widest uppercase text-xs md:text-md">{currentQ.section === 'basic' ? 'Identity' : 'Personality'}</div>
           </div>
           <div className='mb-4 md:mb-16 w-full px-2 md:px-0'>
             <div className='w-full h-1 bg-gray-700 rounded-full'>
@@ -158,8 +158,8 @@ const QuizFlow = ({ isOpen, onClose, onComplete, onBack }) => {
               /></div>
           </div>
           <div className='animate-fadeIn flex-1 flex flex-col md:block'>
-            <div class="mb-6 md:mb-16">
-              <h2 class="text-xl md:text-4xl font-bold text-center mx-auto max-w-2xl px-3 leading-tight">{currentQ.text}</h2>
+            <div className="mb-6 md:mb-16">
+              <h2 className="text-xl md:text-4xl font-bold text-center mx-auto max-w-2xl px-3 leading-tight">{currentQ.text}</h2>
             </div>
             <div className='pb-6 md:pb-0'>
               {currentQ.answer_type === 'choice' && (
