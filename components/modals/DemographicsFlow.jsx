@@ -165,140 +165,119 @@ const DemographicsFlow = ({ isOpen, onClose, onComplete, onBack }) => {
   const isDateInFuture = dateValue ? new Date(dateValue) > new Date() : false;
 
   return (
-    <div className="fixed inset-0 bg-[#0F1123] md:bg-black/80 z-50 flex items-center justify-center p-4">
-      <div className="min-h-full w-full text-white md:bg-[#0F1123] md:rounded-xl md:p-8 md:max-w-4xl md:mx-4 md:relative md:animate-fadeIn md:max-h-[85vh] md:overflow-y-auto md:min-h-0 flex flex-col p-4 pb-20 h-screen overflow-y-auto scroll-smooth">
-        {/* Header row: back | title | close */}
-        <div className="flex items-center justify-between mb-6 gap-2">
-          {/* Back button */}
-          <div className="w-16 flex-shrink-0">
-            <button
-              onClick={handleBack}
-              className="flex items-center gap-1 text-[#E0E0E0] hover:text-[#F5F5F5] transition-colors text-sm z-10"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+    <div className="fixed inset-0 z-50 bg-[#0F1123] md:bg-black/80 md:flex md:items-center md:justify-center">
+      <div className="min-h-full w-full text-white md:bg-[#0F1123] md:rounded-xl md:p-8 md:max-w-4xl md:mx-4 md:relative md:animate-fadeIn md:max-h-[85vh] md:overflow-y-auto md:min-h-0 flex flex-col p-4 pb-20">
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 md:top-8 md:right-8 text-gray-400 hover:text-white transition-colors z-10"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+        <div className='h-screen overflow-y-auto scroll-smooth flex flex-col md:block p-3 md:p-0'>
+          <div className='text-center pt-12 pb-4 md:mb-10 md:mt-6 md:pt-0 md:pb-0 relative'>
+            <button onClick={handleBack} class="absolute top-2 left-0 md:left-4 text-gray-400 hover:text-white z-10 flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-left w-5 h-5"><path d="m15 18-6-6 6-6"></path>
               </svg>
-              <span>Back</span>
+              <span class="text-sm">Back</span>
             </button>
-          </div>
-
-          {/* Title */}
-          <div className="flex-1 text-center">
-            <h2 className="text-2xl font-bold mb-0.5">Dinner<span className="text-[#FFAA55]">Match</span></h2>
-            <p className="text-[#FFAA55] font-medium tracking-widest uppercase text-xs">
-              {currentQ.title}
-            </p>
-          </div>
-
-          {/* Close button */}
-          <div className="w-16 flex-shrink-0 flex justify-end">
-            <button
-              onClick={onClose}
-              className="text-[#D9D9D9] hover:text-[#F5F5F5] transition-colors z-10"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-        </div>
-
-        {/* Removed progress bar based on screenshots, or keep if preferred. Screenshots don't clearly show one but QuizFlow has one. */}
-        {/* <div className="mb-8">
-          <div className="w-full bg-[#2F3A51] rounded-full h-1">
-            <div
-              className="bg-[#FFAA55] h-1 rounded-full transition-all duration-300"
-              style={{ width: `${progress}%` }}
-            />
-          </div>
-        </div> */}
-
-        <div className="mb-6">
-          <h3 className="text-3xl md:text-4xl font-bold text-center mb-16 mx-auto max-w-2xl">
-            {currentQ.question}
-          </h3>
-
-          {currentQ.type === 'choice' && (
-            <div className="flex flex-col space-y-4 max-w-md mx-auto">
-              {currentQ.options.map((option) => {
-                const isSelected = answers[currentQ.id] === option.value;
-                return (
-                  <button
-                    key={option.value}
-                    onClick={() => handleAnswer(currentQ.id, option.value)}
-                    className={`p-5 border-2 rounded-xl text-xl font-medium transition-all duration-300 ${isSelected
-                        ? 'border-white'
-                        : 'border-[#2F3A51] hover:border-[#FFAA55]'
-                      }`}
-                  >
-                    {option.label}
-                  </button>
-                );
-              })}
+            <h1 className="text-2xl md:text-4xl font-bold mb-1">
+              <span className="text-white">Dinner</span><span className="text-[#FFAA55]">Match</span>
+            </h1>
+            <div className='text-[#FFAA55] font-medium tracking-widest uppercase text-xs md:text-md'>
+              IDENTITY
             </div>
-          )}
+          </div>
+          <div className='animate-fadeIn'>
+            <div className='text-center'>
+              <h2 className="text-3xl md:text-4xl font-bold text-center mb-16 mx-auto max-w-2xl">
+                {currentQ.question}
+              </h2>
 
-          {currentQ.type === 'search' && (
-            <div className="relative max-w-md mx-auto">
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => {
-                  setSearchQuery(e.target.value);
-                  setShowDropdown(true);
-                }}
-                onFocus={() => setShowDropdown(true)}
-                placeholder={currentQ.placeholder}
-                className="w-full bg-[#1A1D35] border-2 border-gray-700 rounded-xl text-white px-4 py-4 pr-10 cursor-pointer focus-within:ring-2 focus-within:ring-[#FFAA55] focus-within:border-[#FFAA55] transition-all duration-200"
-              />
-
-              {showDropdown && (
-                <div className="w-full mt-2 bg-[#111121] border border-[#2F3A51] rounded-lg max-h-60 overflow-y-auto shadow-lg">
-                  {filteredOptions.length > 0 ? (
-                    filteredOptions.map((option) => (
+              {currentQ.type === 'choice' && (
+                <div className="flex flex-col space-y-4 max-w-md mx-auto">
+                  {currentQ.options.map((option) => {
+                    const isSelected = answers[currentQ.id] === option.value;
+                    return (
                       <button
                         key={option.value}
                         onClick={() => handleAnswer(currentQ.id, option.value)}
-                        className="w-full text-left px-4 py-3 text-[#E0E0E0] hover:bg-[#2F3A51] hover:text-[#F5F5F5] transition-colors border-b border-[#2F3A51] last:border-0"
+                        className={`p-5 border-2 rounded-xl text-xl font-medium transition-all duration-300 ${isSelected
+                          ? 'border-white'
+                          : 'border-[#2F3A51] hover:border-[#FFAA55]'
+                          }`}
                       >
                         {option.label}
                       </button>
-                    ))
-                  ) : (
-                    <div className="px-4 py-3 text-[#E0E0E0]">No results found</div>
+                    );
+                  })}
+                </div>
+              )}
+
+              {currentQ.type === 'search' && (
+                <div className="relative max-w-md mx-auto">
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => {
+                      setSearchQuery(e.target.value);
+                      setShowDropdown(true);
+                    }}
+                    onFocus={() => setShowDropdown(true)}
+                    placeholder={currentQ.placeholder}
+                    className="w-full bg-[#1A1D35] border-2 border-gray-700 rounded-xl text-white px-4 py-4 pr-10 cursor-pointer focus-within:ring-2 focus-within:ring-[#FFAA55] focus-within:border-[#FFAA55] transition-all duration-200"
+                  />
+
+                  {showDropdown && (
+                    <div className="w-full mt-2 bg-[#111121] border border-[#2F3A51] rounded-lg max-h-60 overflow-y-auto shadow-lg">
+                      {filteredOptions.length > 0 ? (
+                        filteredOptions.map((option) => (
+                          <button
+                            key={option.value}
+                            onClick={() => handleAnswer(currentQ.id, option.value)}
+                            className="w-full text-left px-4 py-3 text-[#E0E0E0] hover:bg-[#2F3A51] hover:text-[#F5F5F5] transition-colors border-b border-[#2F3A51] last:border-0"
+                          >
+                            {option.label}
+                          </button>
+                        ))
+                      ) : (
+                        <div className="px-4 py-3 text-[#E0E0E0]">No results found</div>
+                      )}
+                    </div>
                   )}
                 </div>
               )}
-            </div>
-          )}
 
-          {currentQ.type === 'date' && (
-            <div className="space-y-4 max-w-md mx-auto">
-              <DatePicker
-                date={dateValue ? new Date(dateValue) : undefined}
-                onSelect={(date) => setDateValue(date ? format(date, "yyyy-MM-dd") : "")}
-                disabled={{ after: new Date() }}
-                placeholder={currentQ.placeholder}
-                className={`w-full justify-start text-left font-normal bg-[#111121] hover:bg-[#1A1A2E] text-[#F5F5F5] ${isDateInFuture ? 'border-red-500' : 'border-[#2F3A51]'
-                  }`}
-                popoverClassName="bg-[#111121] border-[#2F3A51]"
-                isDark={true}
-              />
-              {isDateInFuture && (
-                <p className="text-sm text-red-400">Please select a date that is not in the future.</p>
+              {currentQ.type === 'date' && (
+                <div className="space-y-4 max-w-md mx-auto">
+                  <DatePicker
+                    date={dateValue ? new Date(dateValue) : undefined}
+                    onSelect={(date) => setDateValue(date ? format(date, "yyyy-MM-dd") : "")}
+                    disabled={{ after: new Date() }}
+                    placeholder={currentQ.placeholder}
+                    className={`w-full justify-start text-left font-normal bg-[#111121] hover:bg-[#1A1A2E] text-[#F5F5F5] ${isDateInFuture ? 'border-red-500' : 'border-[#2F3A51]'
+                      }`}
+                    popoverClassName="bg-[#111121] border-[#2F3A51]"
+                    isDark={true}
+                  />
+                  {isDateInFuture && (
+                    <p className="text-sm text-red-400">Please select a date that is not in the future.</p>
+                  )}
+                  <button
+                    onClick={handleDateConfirm}
+                    disabled={!dateValue || isDateInFuture}
+                    className={`w-full py-3 rounded-lg font-bold text-sm uppercase tracking-wide transition-colors ${dateValue && !isDateInFuture
+                      ? 'bg-[#FFAA55] text-white hover:bg-[#FF9955]'
+                      : 'bg-[#2F3A51] text-[#757575] cursor-not-allowed'
+                      }`}
+                  >
+                    Confirm
+                  </button>
+                </div>
               )}
-              <button
-                onClick={handleDateConfirm}
-                disabled={!dateValue || isDateInFuture}
-                className={`w-full py-3 rounded-lg font-bold text-sm uppercase tracking-wide transition-colors ${dateValue && !isDateInFuture
-                    ? 'bg-[#FFAA55] text-white hover:bg-[#FF9955]'
-                    : 'bg-[#2F3A51] text-[#757575] cursor-not-allowed'
-                  }`}
-              >
-                Confirm
-              </button>
             </div>
-          )}
+          </div>
         </div>
       </div>
     </div>

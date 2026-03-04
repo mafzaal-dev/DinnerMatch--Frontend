@@ -25,29 +25,20 @@ const CitySelectionModal = ({ isOpen, onClose, onSelectCity }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-[#0F1123] md:bg-black/80 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
       <div className="bg-[#0F1123] text-white rounded-lg p-4 md:p-8 max-w-2xl w-full relative animate-fadeIn">
-        {/* Header row: spacer | title | close */}
-        <div className="flex items-start justify-between mb-8 gap-2">
-          {/* Left spacer keeps title centered */}
-          <div className="w-8 shrink-0" />
-
-          {/* Title */}
-          <div className="flex-1 text-center">
-            <h2 className="text-2xl font-bold text-[#F5F5F5] mb-1">Select Your City</h2>
-            <p className="text-sm text-[#E0E0E0]">Choose the city where you&apos;d like to have dinner:</p>
-          </div>
-
-          {/* Close button */}
-          <button
+      <button
             onClick={onClose}
-            className="w-8 shrink-0 text-[#D9D9D9] hover:text-[#F5F5F5] transition-colors mt-1"
+            className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors z-10"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
-        </div>
+          <div className="text-center mb-6 md:mb-10 mt-2">
+            <h2 className="text-xl md:text-2xl font-bold text-white mb-2 md:mb-4">Select Your City</h2>
+            <p className="text-gray-300 text-base md:text-lg">Choose the city where you'd like to have dinner:</p>
+          </div>
 
         <div className="space-y-3 md:space-y-4 mb-6 md:mb-8">
           {loading && (
