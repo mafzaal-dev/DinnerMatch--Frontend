@@ -30,17 +30,17 @@ const testimonials = [
 
 const Testimonials = () => {
     return (
-        <section className="bg-white pt-20 px-6 md:px-20 lg:px-60">
+        <section className="bg-white pt-8 md:pt-20 px-5 md:px-20 pb-12 lg:px-60">
             <div className="max-w-5xl mx-auto">
-                <h2 className="text-[2rem] md:text-[2rem] font-bold text-center text-[#212121]">
-                    REAL PEOPLE. UNREAL NIGHTS.
+                <h2 className="md:uppercase text-[2rem] md:text-[2rem] font-bold text-center text-[#212121]">
+                    Real People. Unreal Nights.
                 </h2>
 
-                <div className="flex flex-col gap-5 md:gap-5 relative max-w-4xl mx-auto">
+                <div className="flex flex-col gap-5 md:gap-5 relative max-w-4xl mt-10 mx-auto">
                     {testimonials.map((item, index) => (
                         <div
                             key={index}
-                            className={`w-full md:w-114.5 bg-white p-5 rounded-xl shadow-[0_15px_50px_rgba(0,0,0,0.05)] border border-gray-100/50 transition-all duration-500 hover:shadow-[0_20px_60px_rgba(0,0,0,0.08)] ${item.align === 'right' ? 'md:ml-auto' : 'md:mr-auto'} relative`}
+                            className={`w-full md:w-114.5 bg-white p-5 rounded-lg md:rounded-xl shadow-[0_0_16px_0_rgba(0,0,0,0.12)] border border-gray-100/50 transition-all duration-500 hover:shadow-[0_20px_60px_rgba(0,0,0,0.08)] ${item.align === 'right' ? 'rounded-br-none ml-5 md:ml-auto' : 'rounded-bl-none mr-5 md:mr-auto'} relative`}
                         >
                             <p className="text-base leading-[1.6] text-[#757575] mb-1 font-normal">
                                 "{item.text}"

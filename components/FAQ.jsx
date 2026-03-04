@@ -36,18 +36,18 @@ const FAQ = () => {
     };
 
     return (
-        <section id="faq" className="bg-[#F9FAFB] py-16 px-6">
+        <section id="faq" className="bg-[#F9FAFB] py-14 px-5">
             <div className="max-w-3xl mx-auto">
-                <div className="text-center mb-10">
-                    <h2 className="text-[32px] md:text-[32px] font-bold text-[#212121]">
+                <div className="text-center">
+                    <h2 className="text-3xl font-bold text-[#212121]">
                         Frequently Asked Questions
                     </h2>
-                    <p className="text-[#424242] text-lg">
+                    <p className="text-[#424242] text-lg mt-4">
                         Get answers to the most common questions about DinnerMatch
                     </p>
                 </div>
 
-                <div className="space-y-3">
+                <div className="space-y-3 mt-5 md:mt-10">
                     {faqData.map((item, index) => (
                         <div
                             key={index}

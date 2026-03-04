@@ -11,25 +11,25 @@ const Footer = () => {
 
     return (
         <div className="flex flex-col">
-            <section className="bg-[#FFFBF7] py-20 px-6">
-                <div className="max-w-5xl mx-auto bg-white rounded-3xl p-12 md:p-16 shadow-[0_20px_50px_rgba(0,0,0,0.04)] text-center border border-[#F3F4F6]">
-                    <div className="inline-block bg-[#FFFAE6] text-[#FFAA55] text-sm font-semibold py-3 px-4 rounded-full mb-8">
+            <section className="bg-[#FFFBF7] py-14 px-5">
+                <div className="max-w-5xl mx-auto bg-white rounded-lg md:rounded-xl p-12 md:p-16 shadow-[0_20px_50px_rgba(0,0,0,0.04)] text-center border border-[#F3F4F6]">
+                    <div className="inline-block bg-[#FFFAE6] text-[#FFAA55] text-sm font-semibold py-3 px-4 rounded-full">
                         Limited Spots Available
                     </div>
 
-                    <h2 className="text-[32px] md:text-4xl font-bold text-[#212121] mb-4 ">
+                    <h2 className="text-3xl md:text-4xl font-bold text-[#212121] mt-6">
                         Start Your Journey <span className="text-[#FFAA55]">Today</span>
                     </h2>
 
-                    <p className="text-[#757575] text-[1rem]  max-w-2xl mx-auto mb-4 ">
+                    <p className="text-[#757575] text-[1rem]  max-w-2xl mx-auto mt-6">
                         Imagine showing up to dinner every week with 5 interesting strangers who just get you. No awkward small talk — just good vibes, shared laughs, and food that fits your budget.
                     </p>
 
-                    <p className="font-semibold text-[#424242] mb-4 text-base">
+                    <p className="font-semibold text-[#424242] mt-6 text-base">
                         Spaces are limited — take the quiz to secure your spot.
                     </p>
 
-                    <div className="flex flex-wrap justify-center gap-4 md:gap-6 mb-6 ">
+                    <div className="flex flex-wrap justify-center gap-2 md:gap-4 mt-6">
                         <div className="flex items-center gap-2 text-sm text-[#757575]">
                             <span className="w-1.5 h-1.5 rounded-full bg-[#F97315]"></span>
                             Personality Matching
@@ -44,7 +44,7 @@ const Footer = () => {
                         </div>
                     </div>
 
-                    <button 
+                    <button
                         onClick={() => {
                             if (isAuthenticated) {
                                 router.push("/available-dinners");
@@ -54,21 +54,21 @@ const Footer = () => {
                                 }
                             }
                         }}
-                        className="bg-[#FFAA55] text-white px-3 py-3 rounded-xl text-sm transition-all flex items-center gap-2 mx-auto mb-4 uppercase"
+                        className="bg-[#FFAA55] text-white font-semibold p-4 rounded-lg md:rounded-xl text-sm transition-all flex items-center gap-2 mx-auto mt-6 uppercase"
                     >
-                        {isAuthenticated ? "Available Dinners" : "Take the Quiz"} 
+                        {isAuthenticated ? "Available Dinners" : "Take the Quiz"}
                     </button>
 
-                    <p className="text-xs text-[#757575]">
+                    <p className="text-xs text-[#757575] mt-6">
                         By joining, you agree to our <a href="/terms-conditions" className="underline">Terms</a> and <a href="/privacy-policy" className="underline">Privacy Policy</a>.
                     </p>
                 </div>
             </section>
 
-            <footer className="bg-white pt-20 pb-10 px-6 border-t border-gray-100">
+            <footer className="bg-white pt-14 px-5 border-t border-b border-gray-100">
                 <div className="max-w-7xl mx-auto">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-20">
-                        <div className="flex flex-col gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 mb-14">
+                        <div className="flex flex-col gap-4 text-center md:text-left">
                             <div className="text-2xl font-bold text-[#212121] ">
                                 DinnerMatch
                             </div>
@@ -77,32 +77,36 @@ const Footer = () => {
                             </p>
                         </div>
 
-                        <div className="flex flex-col gap-6">
-                            <h3 className="font-bold text-[#424242] text-lg  ">Get in Touch</h3>
-                            <div className="flex flex-col gap-5 text-sm  text-[#757575]">
+                        <div className="flex flex-col gap-6 max-w-md mx-auto">
+                            <h3 className="font-bold text-[#424242] text-lg">Get in Touch</h3>
+                            <div className="flex flex-col gap-4 text-sm  text-[#757575]">
                                 <a href="mailto:hello@dinnermatch.co.za" className="flex items-center gap-3 hover:text-[#F97315] transition-colors group">
-                                    <svg className="w-4 h-4 text-gray-400 group-hover:text-[#F97315] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M2 6L8.91302 9.91697C11.4616 11.361 12.5384 11.361 15.087 9.91697L22 6" stroke="#121212" stroke-width="1.5" stroke-linejoin="round" />
+                                        <path d="M2.01577 13.4756C2.08114 16.5412 2.11383 18.0739 3.24496 19.2094C4.37608 20.3448 5.95033 20.3843 9.09883 20.4634C11.0393 20.5122 12.9607 20.5122 14.9012 20.4634C18.0497 20.3843 19.6239 20.3448 20.7551 19.2094C21.8862 18.0739 21.9189 16.5412 21.9842 13.4756C22.0053 12.4899 22.0053 11.5101 21.9842 10.5244C21.9189 7.45886 21.8862 5.92609 20.7551 4.79066C19.6239 3.65523 18.0497 3.61568 14.9012 3.53657C12.9607 3.48781 11.0393 3.48781 9.09882 3.53656C5.95033 3.61566 4.37608 3.65521 3.24495 4.79065C2.11382 5.92608 2.08114 7.45885 2.01576 10.5244C1.99474 11.5101 1.99475 12.4899 2.01577 13.4756Z" stroke="#121212" stroke-width="1.5" stroke-linejoin="round" />
                                     </svg>
-                                    hello@dinnermatch.co.za
+                                    Hello@dinnermatch.co.za
                                 </a>
                                 <a href="#" className="flex items-center gap-3 hover:text-[#F97315] transition-colors group">
-                                    <svg className="w-4 h-4 text-gray-400 group-hover:text-[#F97315] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 9a2 2 0 012-2h.93a2 2 0 011.664.89l.812 1.22A2 2 0 0010.07 10H14a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 13V9a2 2 0 00-2-2H5" />
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M2.5 12C2.5 7.52166 2.5 5.28249 3.89124 3.89124C5.28249 2.5 7.52166 2.5 12 2.5C16.4783 2.5 18.7175 2.5 20.1088 3.89124C21.5 5.28249 21.5 7.52166 21.5 12C21.5 16.4783 21.5 18.7175 20.1088 20.1088C18.7175 21.5 16.4783 21.5 12 21.5C7.52166 21.5 5.28249 21.5 3.89124 20.1088C2.5 18.7175 2.5 16.4783 2.5 12Z" stroke="#121212" stroke-width="1.5" stroke-linejoin="round" />
+                                        <path d="M16.5 12C16.5 14.4853 14.4853 16.5 12 16.5C9.51472 16.5 7.5 14.4853 7.5 12C7.5 9.51472 9.51472 7.5 12 7.5C14.4853 7.5 16.5 9.51472 16.5 12Z" stroke="#121212" stroke-width="1.5" />
+                                        <path d="M17.5078 6.5H17.4988" stroke="#121212" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                                     </svg>
-                                    @dinnermatch
+                                    @Dinnermatch
                                 </a>
                                 <a href="#" className="flex items-center gap-3 hover:text-[#F97315] transition-colors group">
-                                    <svg className="w-4 h-4 text-gray-400 group-hover:text-[#F97315] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2z" />
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M2.5 12C2.5 7.52166 2.5 5.28249 3.89124 3.89124C5.28249 2.5 7.52166 2.5 12 2.5C16.4783 2.5 18.7175 2.5 20.1088 3.89124C21.5 5.28249 21.5 7.52166 21.5 12C21.5 16.4783 21.5 18.7175 20.1088 20.1088C18.7175 21.5 16.4783 21.5 12 21.5C7.52166 21.5 5.28249 21.5 3.89124 20.1088C2.5 18.7175 2.5 16.4783 2.5 12Z" stroke="#121212" stroke-width="1.5" stroke-linejoin="round" />
+                                        <path d="M10.5359 11.0075C9.71585 10.8916 7.84666 11.0834 6.93011 12.7782C6.01355 14.4729 6.9373 16.2368 7.51374 16.9069C8.08298 17.5338 9.89226 18.721 11.8114 17.5619C12.2871 17.2746 12.8797 17.0603 13.552 14.8153L13.4738 5.98145C13.3441 6.95419 14.4186 9.23575 17.478 9.5057" stroke="#121212" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
                                     </svg>
-                                    @dinnermatch
+                                    @Dinnermatch
                                 </a>
                                 <div className="flex items-center gap-3">
-                                    <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M18 18C19.2447 18.4244 20 18.9819 20 19.5925C20 20.9221 16.4183 22 12 22C7.58172 22 4 20.9221 4 19.5925C4 18.9819 4.75527 18.4244 6 18" stroke="#121212" stroke-width="1.5" stroke-linecap="round" />
+                                        <path d="M15 9.5C15 11.1569 13.6569 12.5 12 12.5C10.3431 12.5 9 11.1569 9 9.5C9 7.84315 10.3431 6.5 12 6.5C13.6569 6.5 15 7.84315 15 9.5Z" stroke="#121212" stroke-width="1.5" />
+                                        <path d="M12 2C16.0588 2 19.5 5.42803 19.5 9.5869C19.5 13.812 16.0028 16.777 12.7725 18.7932C12.5371 18.9287 12.2709 19 12 19C11.7291 19 11.4629 18.9287 11.2275 18.7932C8.00325 16.7573 4.5 13.8266 4.5 9.5869C4.5 5.42803 7.9412 2 12 2Z" stroke="#121212" stroke-width="1.5" />
                                     </svg>
                                     Cape Town, South Africa
                                 </div>
@@ -110,7 +114,7 @@ const Footer = () => {
                         </div>
                     </div>
 
-                    <div className="pt-8 border-t border-gray-100 flex flex-col md:flex-row justify-between items-center gap-6">
+                    <div className="py-4 border-t border-gray-100 flex flex-col md:flex-row justify-between items-center gap-6">
                         <div className="flex items-center gap-6 text-base  text-[#757575]">
                             <span>© 2025 DinnerMatch. All rights reserved.</span>
                             {/* <a href="#" className="hover:text-gray-600 transition-colors">Cancel Subscription</a> */}

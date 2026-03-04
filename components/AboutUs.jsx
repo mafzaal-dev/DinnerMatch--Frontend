@@ -2,11 +2,11 @@ import React from 'react';
 
 const AboutUs = () => {
     return (
-        <section id="about-us" className="bg-white py-10 px-6">
+        <section id="about-us" className="bg-white py-12 px-5">
             <div className="max-w-4xl mx-auto text-center">
-                <h2 className="text-[32px] md:text-[40px] font-bold mb-2 text-[#212121]">About Us</h2>
+                <h2 className="text-[32px] md:text-[40px] font-bold mb-4 text-[#212121]">About Us</h2>
 
-                <div className="space-y-5 text-[#646363] text-[1rem] md:text-base">
+                <div className="space-y-4 text-[#646363] text-[1rem] md:text-base">
                     <p>
                         We started DinnerMatch because we believe great conversations should be as regular as great meals.
                         In a world where real connection often takes a backseat to swipes and screens, we wanted to create
