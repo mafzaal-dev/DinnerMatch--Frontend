@@ -77,7 +77,7 @@ const Footer = () => {
                             </p>
                         </div>
 
-                        <div className="flex flex-col gap-6 max-w-md mx-auto">
+                        <div className="flex flex-col gap-6 max-w-md md:max-w-none mx-auto">
                             <h3 className="font-bold text-[#424242] text-lg">Get in Touch</h3>
                             <div className="flex flex-col gap-4 text-sm  text-[#757575]">
                                 <a href="mailto:hello@dinnermatch.co.za" className="flex items-center gap-3 hover:text-[#F97315] transition-colors group">
