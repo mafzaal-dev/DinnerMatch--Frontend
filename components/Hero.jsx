@@ -13,11 +13,11 @@ const Hero = () => {
     <section className="bg-[#F3F4F6] py-8 md:py-20 min-h-[45vh] flex items-center">
       <div className="max-w-7xl mx-auto px-5 md:px-6 grid md:grid-cols-2 gap-1 items-center">
         <div className="flex flex-col">
-          <h1 className="text-center md:text-left text-3xl md:text-5xl font-bold leading-[0.95] text-[#212121] max-w-xl tracking-tighter">
+          <h1 className="text-center leading-tight md:text-left text-3xl md:text-5xl font-bold text-[#212121] max-w-xl">
             WANT TO MEET YOUR PEOPLE?
           </h1>
 
-          <p className="text-center md:text-left text-[1.2rem] md:text-[1.2rem] text-[#424242] max-w-lg leading-tight mt-4">
+          <p className="text-center md:text-left text-[1.2rem] md:text-[1.2rem] text-[#424242] max-w-lg leading-tight mt-4 tracking-wide">
             Get matched by personality for a dinner you'll never forget.
           </p>
 
@@ -37,7 +37,7 @@ const Hero = () => {
               {isAuthenticated ? "Available Dinners" : "Take the Quiz"}
             </button>
             <p className="text-center md:text-left text-sm text-[#757575] font-normal">
-              14000+ people have taken the quiz. It only takes 2 minutes.
+              18000+ people have taken the quiz. It only takes 2 minutes.
             </p>
           </div>
 
@@ -103,7 +103,7 @@ const Hero = () => {
           </div>
         </div>
 
-        <div className="relative group mt-4 md:mt-0">
+        <div className="relative group mt-5 md:mt-0">
           <div className="relative overflow-hidden shadow-2xl duration-500 group-hover:scale-[1.01]">
             <Image
               src="/3f338432d1b44b50402ec4605b83d5bf77c831e3.png"
