@@ -6,7 +6,7 @@ const HowItWorksModal = ({ isOpen, onClose, onNext, onBack }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-[#0F1123] md:bg-black/80 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
       <div className="bg-[#080814] rounded-xl w-full max-w-154 p-10 relative shadow-2xl flex flex-col" style={{ gap: '40px' }}>
         {/* Top Row - Back and Close */}
         <div className="flex items-center justify-between">

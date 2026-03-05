@@ -314,14 +314,16 @@ const DemographicsFlow = ({ isOpen, onClose, onComplete, onBack }) => {
     const newAnswers = { ...answers, [key]: value };
     setAnswers(newAnswers);
 
-    if (currentStep < totalSteps - 1) {
-      setCurrentStep(currentStep + 1);
-      setSearchQuery('');
-      setShowDropdown(false);
-      setDateValue('');
-    } else {
-      onComplete(newAnswers);
-    }
+    setTimeout(() => {
+      if (currentStep < totalSteps - 1) {
+        setCurrentStep(currentStep + 1);
+        setSearchQuery('');
+        setShowDropdown(false);
+        setDateValue('');
+      } else {
+        onComplete(newAnswers);
+      }
+    }, 350);
   };
 
   const handleBack = () => {
@@ -352,7 +354,7 @@ const DemographicsFlow = ({ isOpen, onClose, onComplete, onBack }) => {
 
   return (
     <div className="fixed inset-0 z-50 bg-[#0F1123] overflow-y-auto md:bg-black/80 md:overflow-hidden md:flex md:items-center md:justify-center">
-      <div className="min-h-full w-full text-white flex flex-col p-4 pb-10 md:min-h-0 md:bg-[#0F1123] md:rounded-xl md:p-8 md:max-w-4xl md:mx-4 md:relative md:animate-fadeIn md:max-h-[85vh] md:overflow-y-auto">
+      <div className="h-full w-full text-white flex flex-col p-4 pb-10 md:min-h-0 md:bg-[#0F1123] md:rounded-xl md:p-8 md:max-w-4xl md:mx-4 md:relative md:animate-fadeIn md:max-h-[85vh] md:overflow-y-auto">
         <button
           onClick={onClose}
           className="absolute top-4 right-4 md:top-8 md:right-8 text-gray-400 hover:text-white transition-colors z-10"
@@ -389,9 +391,9 @@ const DemographicsFlow = ({ isOpen, onClose, onComplete, onBack }) => {
                       <button
                         key={option.value}
                         onClick={() => handleAnswer(currentQ.id, option.value)}
-                        className={`p-5 border-2 rounded-xl text-xl font-medium transition-all duration-300 ${isSelected
-                          ? 'border-white'
-                          : 'border-[#2F3A51] hover:border-[#FFAA55]'
+                        className={`p-5 border-2 rounded-xl text-xl font-medium transition-all duration-300 ease-out ${isSelected
+                          ? 'border-[#FFAA55] bg-[#FFAA55] text-[#111] shadow-[0_8px_24px_rgba(255,170,85,0.25)] -translate-y-1'
+                          : 'bg-transparent text-white border-white hover:border-white/30'
                           }`}
                       >
                         {option.label}

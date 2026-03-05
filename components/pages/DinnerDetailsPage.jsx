@@ -1154,7 +1154,7 @@ const DinnerDetailsPage = ({
 
       {/* Reschedule Confirmation Modal */}
       {rescheduleModalOpen && selectedRescheduleDinner && (
-        <div className="fixed inset-0 bg-[#0F1123] md:bg-black/80 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
           <div className="bg-[#111121] rounded-xl w-full max-w-md p-6 border border-[#2F3A51] shadow-2xl relative">
             <h3 className="text-xl font-bold text-[#F5F5F5] mb-4">
               Join Dinner

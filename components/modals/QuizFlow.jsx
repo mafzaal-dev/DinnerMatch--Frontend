@@ -56,7 +56,7 @@ const QuizFlow = ({ isOpen, onClose, onComplete, onBack }) => {
 
   if (loading) {
     return (
-      <div className="fixed inset-0 bg-[#0F1123] md:bg-black/80 z-50 flex items-center justify-center p-4">
+      <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
         <div className="bg-[#080814] rounded-xl w-full max-w-154 p-10 relative shadow-2xl">
           <div className="text-center text-[#F5F5F5]">Loading questions...</div>
         </div>
@@ -109,12 +109,14 @@ const QuizFlow = ({ isOpen, onClose, onComplete, onBack }) => {
     };
     setAnswers(newAnswers);
 
-    if (currentQuestion < totalQuestions - 1) {
-      setCurrentQuestion(currentQuestion + 1);
-      setSearchQuery('');
-    } else {
-      onComplete(newAnswers);
-    }
+    setTimeout(() => {
+      if (currentQuestion < totalQuestions - 1) {
+        setCurrentQuestion(currentQuestion + 1);
+        setSearchQuery('');
+      } else {
+        onComplete(newAnswers);
+      }
+    }, 350);
   };
 
   const handleSkip = () => {
@@ -185,7 +187,10 @@ const QuizFlow = ({ isOpen, onClose, onComplete, onBack }) => {
                       <button
                         key={option.id}
                         onClick={() => handleAnswer(option.value)}
-                        className="answer-button bg-transparent text-white border-white border-2 rounded-xl p-3 md:p-4 w-full transition-all duration-200"
+                        className={`answer-button group border-2 rounded-xl p-4 md:p-5 w-full transition-all duration-300 ease-out ${isSelected
+                          ? 'border-[#FFAA55] bg-[#FFAA55] text-[#111] shadow-[0_8px_24px_rgba(255,170,85,0.25)] -translate-y-1'
+                          : 'bg-transparent text-white border-white hover:border-white/30'
+                          }`}
                       >
                         {emojiChar && (
                           <div className="text-2xl md:text-4xl mb-2 md:mb-4">
@@ -205,7 +210,10 @@ const QuizFlow = ({ isOpen, onClose, onComplete, onBack }) => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-3xl mx-auto">
                   <button
                     onClick={() => handleAnswer('true')}
-                    className="answer-button bg-transparent text-white border-white border-2 rounded-xl p-3 md:p-4 w-full transition-all duration-200"
+                    className={`answer-button group border-2 rounded-xl p-4 md:p-5 w-full transition-all duration-300 ease-out ${currentAnswer?.value === 'true'
+                      ? 'border-[#FFAA55] bg-[#FFAA55] text-[#111] shadow-[0_8px_24px_rgba(255,170,85,0.25)] -translate-y-1'
+                      : 'bg-transparent text-white border-white hover:border-white/30'
+                      }`}
                   >
                     <div className="text-2xl md:text-4xl mb-2 md:mb-4">
                       👍
@@ -216,7 +224,10 @@ const QuizFlow = ({ isOpen, onClose, onComplete, onBack }) => {
                   </button>
                   <button
                     onClick={() => handleAnswer('false')}
-                    className="answer-button bg-transparent text-white border-white border-2 rounded-xl p-3 md:p-4 w-full transition-all duration-200"
+                    className={`answer-button group border-2 rounded-xl p-4 md:p-5 w-full transition-all duration-300 ease-out ${currentAnswer?.value === 'false'
+                      ? 'border-[#FFAA55] bg-[#FFAA55] text-[#111] shadow-[0_8px_24px_rgba(255,170,85,0.25)] -translate-y-1'
+                      : 'bg-transparent text-white border-white hover:border-white/30'
+                      }`}
                   >
                     <div className="text-2xl md:text-4xl mb-2 md:mb-4">
                       👎
@@ -245,7 +256,10 @@ const QuizFlow = ({ isOpen, onClose, onComplete, onBack }) => {
                         <button
                           key={value}
                           onClick={() => handleAnswer(value)}
-                          className="answer-button bg-transparent text-white border-white border-2 rounded-xl p-2 md:p-4 w-full aspect-square transition-all duration-200"
+                          className={`answer-button group border-2 rounded-xl p-3 md:p-4 w-full aspect-square transition-all duration-300 ease-out text-lg font-semibold ${isSelected
+                            ? 'border-[#FFAA55] bg-[#FFAA55] text-[#111] shadow-[0_8px_24px_rgba(255,170,85,0.25)] -translate-y-1'
+                            : 'bg-transparent text-white border-white hover:border-white/30'
+                            }`}
                         >
                           {value}
                         </button>
@@ -280,7 +294,7 @@ const QuizFlow = ({ isOpen, onClose, onComplete, onBack }) => {
           </div>
         </div>
       </div>
-    </div>
+    </div >
   );
 };
 

@@ -4,10 +4,23 @@ import { ArrowLeft } from 'lucide-react';
 import React, { useEffect } from 'react';
 
 const AreaSelectionModal = ({ isOpen, onClose, onSelectArea, selectedCity }) => {
+  const [selectedAreaId, setSelectedAreaId] = React.useState(null);
+
   useEffect(() => {
-    document.body.style.overflow = isOpen ? 'hidden' : '';
+    if (!isOpen) {
+      setSelectedAreaId(null);
+      return;
+    }
+    document.body.style.overflow = 'hidden';
     return () => { document.body.style.overflow = ''; };
   }, [isOpen]);
+
+  const handleSelect = (area) => {
+    setSelectedAreaId(area.id);
+    setTimeout(() => {
+      onSelectArea(area);
+    }, 350);
+  };
 
   if (!isOpen) return null;
 
@@ -35,35 +48,43 @@ const AreaSelectionModal = ({ isOpen, onClose, onSelectArea, selectedCity }) => 
           {areas.length === 0 && (
             <p className="text-center text-[#E0E0E0] py-4">No areas available for this city.</p>
           )}
-          {areas.map((area) => (
-            <button
-              key={area.id}
-              onClick={() => onSelectArea(area)}
-              className="w-full p-4 rounded-lg border-2 transition-all border-gray-700 hover:border-gray-600"
-            >
-              <div className="flex items-center gap-3">
-                <svg
-                  className="w-6 h-6 text-[#EEEEEE] shrink-0"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"
-                  />
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"
-                  />
-                </svg>
-                <p className="text-[#F5F5F5] font-normal text-base">{area.name}</p>
-              </div>
-            </button>
-          ))}
+          {areas.map((area) => {
+            const isSelected = selectedAreaId === area.id;
+            return (
+              <button
+                key={area.id}
+                onClick={() => handleSelect(area)}
+                className={`w-full p-4 rounded-xl border-2 transition-all duration-300 ease-out  ${isSelected
+                  ? 'border-[#FFAA55] bg-[#FFAA55] text-[#111] shadow-[0_8px_24px_rgba(255,170,85,0.25)] -translate-y-1'
+                  : 'bg-transparent text-white border-white hover:border-white/30 hover:bg-white/5'
+                  }`}
+              >
+                <div className="flex items-center gap-3">
+                  <svg
+                    className={`w-6 h-6 shrink-0 ${isSelected ? 'text-[#111]' : 'text-[#EEEEEE]'}`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"
+                    />
+                  </svg>
+                  <p className={`font-medium text-base ${isSelected ? 'text-[#111]' : 'text-[#F5F5F5]'}`}>
+                    {area.name}
+                  </p>
+                </div>
+              </button>
+            );
+          })}
         </div>
       </div>
     </div>

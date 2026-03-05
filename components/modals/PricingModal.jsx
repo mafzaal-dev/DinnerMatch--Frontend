@@ -56,7 +56,7 @@ const PricingModal = ({ isOpen, onClose, onSelectPlan }) => {
   ];
 
   return (
-    <div className="fixed inset-0 bg-[#0F1123] md:bg-black/80 z-50 flex items-center justify-center p-4 overflow-y-auto">
+    <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 overflow-y-auto">
       <div className="bg-[#080814] border border-white rounded-xl w-full max-w-6xl p-8 relative shadow-2xl my-8">
         {/* Close Button */}
         <button
