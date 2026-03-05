@@ -354,7 +354,7 @@ const DemographicsFlow = ({ isOpen, onClose, onComplete, onBack }) => {
 
   return (
     <div className="fixed inset-0 z-50 bg-[#0F1123] overflow-y-auto md:bg-black/80 md:overflow-hidden md:flex md:items-center md:justify-center">
-      <div className="h-full w-full text-white flex flex-col p-4 pb-10 md:min-h-0 md:bg-[#0F1123] md:rounded-xl md:p-8 md:max-w-4xl md:mx-4 md:relative md:animate-fadeIn md:max-h-[85vh] md:overflow-y-auto">
+      <div className="min-h-full md:h-full w-full text-white flex flex-col p-4 pb-10 md:min-h-0 md:bg-[#0F1123] md:rounded-xl md:p-8 md:max-w-4xl md:mx-4 md:relative md:animate-fadeIn md:max-h-[85vh] md:overflow-y-auto">
         <button
           onClick={onClose}
           className="absolute top-4 right-4 md:top-8 md:right-8 text-gray-400 hover:text-white transition-colors z-10"
