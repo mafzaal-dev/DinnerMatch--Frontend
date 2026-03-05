@@ -177,7 +177,7 @@ const QuizFlow = ({ isOpen, onClose, onComplete, onBack }) => {
                     let emojiChar = null;
                     if (option.emoji) {
                       try {
-                        emojiChar = String.fromCodePoint(parseInt(option.emoji, 16));
+                        emojiChar = String.fromCodePoint(...option.emoji.split('-').map(code => parseInt(code, 16)));
                       } catch (e) {
                         console.error("Invalid emoji code:", option.emoji);
                       }

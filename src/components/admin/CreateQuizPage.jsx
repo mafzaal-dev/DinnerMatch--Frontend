@@ -78,7 +78,7 @@ const SortableOption = ({
               {option?.emoji ? (
                 // Use default rendering if it fails
                 <span>
-                 {String.fromCodePoint(parseInt(option.emoji, 16))}
+                 {String.fromCodePoint(...option.emoji.split('-').map(code => parseInt(code, 16)))}
                 </span>
               ) : (
                 <span className="text-gray-400 text-sm">☺</span>
