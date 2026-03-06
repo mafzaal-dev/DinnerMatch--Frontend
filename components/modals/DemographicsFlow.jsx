@@ -308,6 +308,16 @@ const DemographicsFlow = ({ isOpen, onClose, onComplete, onBack }) => {
     }
   }, [currentStep, currentQ, answers, isOpen]);
 
+  // Restore search value when revisiting the step
+  React.useEffect(() => {
+    if (isOpen && currentQ.type === 'search' && answers[currentQ.id]) {
+      const option = currentQ.options?.find(o => o.value === answers[currentQ.id]);
+      if (option) {
+        setSearchQuery(option.label);
+      }
+    }
+  }, [currentStep, currentQ, answers, isOpen]);
+
   if (!isOpen) return null;
 
   const handleAnswer = (key, value) => {
@@ -420,15 +430,21 @@ const DemographicsFlow = ({ isOpen, onClose, onComplete, onBack }) => {
                   {showDropdown && (
                     <div className="w-full mt-2 bg-[#111121] border border-[#2F3A51] rounded-lg max-h-60 overflow-y-auto shadow-lg">
                       {filteredOptions.length > 0 ? (
-                        filteredOptions.map((option) => (
-                          <button
-                            key={option.value}
-                            onClick={() => handleAnswer(currentQ.id, option.value)}
-                            className="w-full text-left px-4 py-3 text-[#E0E0E0] hover:bg-[#2F3A51] hover:text-[#F5F5F5] transition-colors border-b border-[#2F3A51] last:border-0"
-                          >
-                            {option.label}
-                          </button>
-                        ))
+                        filteredOptions.map((option) => {
+                          const isSelected = answers[currentQ.id] === option.value;
+                          return (
+                            <button
+                              key={option.value}
+                              onClick={() => handleAnswer(currentQ.id, option.value)}
+                              className={`w-full text-left px-4 py-3 transition-all duration-300 ease-out border-b border-[#2F3A51] last:border-0 ${isSelected
+                                  ? 'bg-[#FFAA55] text-[#111] font-semibold'
+                                  : 'text-[#E0E0E0] hover:bg-[#2F3A51] hover:text-[#F5F5F5]'
+                                }`}
+                            >
+                              {option.label}
+                            </button>
+                          );
+                        })
                       ) : (
                         <div className="px-4 py-3 text-[#E0E0E0]">No results found</div>
                       )}

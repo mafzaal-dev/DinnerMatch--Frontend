@@ -39,6 +39,8 @@ const QuizFlow = ({ isOpen, onClose, onComplete, onBack }) => {
             answer_type: q.answer_type,
             min_value: q.min_value,
             max_value: q.max_value,
+            min_label: q.min_label,
+            max_label: q.max_label,
             options: (q.options || []).sort((a, b) => a.sort_order - b.sort_order)
           }));
 
@@ -243,10 +245,10 @@ const QuizFlow = ({ isOpen, onClose, onComplete, onBack }) => {
                 <div className="w-full max-w-3xl mx-auto">
                   <div className="flex justify-between mb-8 text-sm md:text-base font-medium text-[#E0E0E0]">
                     <span className='text-[#FFAA55] uppercase tracking-wide'>
-                      {currentQ.options.find(o => o.value === String(currentQ.min_value || 1))?.label || 'Very Low'}
+                      {currentQ.min_label || currentQ.options.find(o => o.value === String(currentQ.min_value || 1))?.label || 'Very Low'}
                     </span>
                     <span className='text-[#FFAA55] uppercase tracking-wide'>
-                      {currentQ.options.find(o => o.value === String(currentQ.max_value || 10))?.label || 'Very High'}
+                      {currentQ.max_label || currentQ.options.find(o => o.value === String(currentQ.max_value || 10))?.label || 'Very High'}
                     </span>
                   </div>
                   <div className="grid grid-cols-5 gap-3 md:gap-4">
