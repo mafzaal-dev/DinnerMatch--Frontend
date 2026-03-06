@@ -11,15 +11,17 @@ import HowItWorks from "../../components/HowItWorks";
 import AboutUs from "../../components/AboutUs";
 import FAQ from "../../components/FAQ";
 import Footer from "../../components/Footer";
-import { 
-  CitySelectionModal, 
-  AreaSelectionModal, 
+import {
+  CitySelectionModal,
+  AreaSelectionModal,
   QuizFlow,
   QuizResultsModal,
   DemographicsFlow,
   SignupModal,
   WelcomeModal,
-  BookDinnerModal
+  BookDinnerModal,
+  HowItWorksModal,
+  PreferencesModal
 } from "../../components/modals";
 import { api, API_ENDPOINTS } from '../utils/api';
 
@@ -76,24 +78,24 @@ export default function Home() {
     };
 
     window.addEventListener('openQuiz', handleOpenQuiz);
-    
+
     if (typeof window !== 'undefined') {
       const showBookDinner = localStorage.getItem('show_book_dinner');
       if (showBookDinner === 'true') {
         const city = JSON.parse(localStorage.getItem('quiz_city') || 'null');
         const place = JSON.parse(localStorage.getItem('quiz_place') || 'null');
-        
+
         if (city && place) {
           setSelectedCity(city);
           setSelectedPlace(place);
           setQuizStep('book-dinner');
         }
-        
+
         localStorage.removeItem('show_book_dinner');
         localStorage.removeItem('quiz_answers');
       }
     }
-    
+
     return () => {
       window.removeEventListener('openQuiz', handleOpenQuiz);
     };
@@ -106,7 +108,7 @@ export default function Home() {
     setQuizAnswers(null);
     setDemographics(null);
     setError('');
-    
+
     if (typeof window !== 'undefined') {
       localStorage.removeItem('quiz_answers');
       localStorage.removeItem('quiz_city');
@@ -134,11 +136,11 @@ export default function Home() {
   const handleQuizComplete = (answers) => {
     const validAnswers = Array.isArray(answers) ? answers.filter(a => a && a.question_id) : [];
     setQuizAnswers(validAnswers);
-    
+
     if (typeof window !== 'undefined') {
       localStorage.setItem('quiz_answers', JSON.stringify(validAnswers));
     }
-    
+
     setQuizStep('results');
   };
 
@@ -147,9 +149,9 @@ export default function Home() {
     if (typeof window !== 'undefined') {
       localStorage.setItem('quiz_demographics', JSON.stringify(data));
     }
-    
+
     const accessToken = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
-    
+
     if (accessToken) {
       setQuizStep('book-dinner');
     } else {
@@ -189,7 +191,7 @@ export default function Home() {
         city_id: selectedCity?.id,
         area_id: selectedPlace?.id
       };
-      
+
       if (formData.mobileNumber) {
         registrationData.phone_number = formData.mobileNumber;
       }
@@ -199,21 +201,21 @@ export default function Home() {
       if (response.success) {
         const accessToken = response.data?.access || response.data?.tokens?.access || response.access;
         const refreshToken = response.data?.refresh || response.data?.tokens?.refresh || response.refresh;
-        
+
         if (!accessToken || !refreshToken) {
           try {
             const loginResponse = await api.post(API_ENDPOINTS.LOGIN, {
               email: formData.email,
               password: formData.password
             });
-            
+
             if (loginResponse.success && loginResponse.data) {
               const loginAccessToken = loginResponse.data.access;
               const loginRefreshToken = loginResponse.data.refresh;
-              
+
               if (loginAccessToken) localStorage.setItem('access_token', loginAccessToken);
               if (loginRefreshToken) localStorage.setItem('refresh_token', loginRefreshToken);
-              
+
               if (loginResponse.data) {
                 localStorage.setItem('user_data', JSON.stringify(loginResponse.data));
               }
@@ -225,7 +227,7 @@ export default function Home() {
         } else {
           localStorage.setItem('access_token', accessToken);
           localStorage.setItem('refresh_token', refreshToken);
-          
+
           if (response.data?.user || response.data) {
             const userData = response.data.user || {
               id: response.data.id,
@@ -268,19 +270,15 @@ export default function Home() {
 
 
   const handleWelcomeNext = () => {
-    refreshUserFromStorage();
-    router.push("/dinner-details");
+    setQuizStep('how-it-works');
   };
 
-  const handleBookDinnerSuccess = (data) => {
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('quiz_city');
-      localStorage.removeItem('quiz_place');
-      localStorage.removeItem('quiz_answers');
-      localStorage.removeItem('quiz_demographics');
-    }
-    resetQuizFlow();
-    router.push('/your-dinner');
+  const handlePreferencesConfirm = (prefs) => {
+    router.push('/subscription');
+  };
+
+  const handleBookDinnerSuccess = (slotId) => {
+    setQuizStep('preferences');
   };
 
   return (
@@ -292,34 +290,34 @@ export default function Home() {
       <AboutUs />
       <FAQ />
       <Footer />
-      
+
       <CitySelectionModal
         isOpen={quizStep === 'city'}
         onClose={resetQuizFlow}
         onSelectCity={handleCitySelect}
       />
-      
+
       <AreaSelectionModal
         isOpen={quizStep === 'place'}
         onClose={() => setQuizStep('city')}
         onSelectArea={handlePlaceSelect}
         selectedCity={selectedCity}
       />
-      
+
       <QuizFlow
         isOpen={quizStep === 'quiz'}
         onClose={resetQuizFlow}
         onBack={() => setQuizStep('place')}
         onComplete={handleQuizComplete}
       />
-      
+
       <QuizResultsModal
         isOpen={quizStep === 'results'}
-        onClose={resetQuizFlow}
+        onClose={() => setQuizStep('quiz')}
         onContinue={handleResultsContinue}
         compatibilityScore={90}
       />
-      
+
       <DemographicsFlow
         isOpen={quizStep === 'demographics'}
         onClose={resetQuizFlow}
@@ -335,7 +333,7 @@ export default function Home() {
         loading={loading}
         error={error}
       />
-      
+
       <WelcomeModal
         isOpen={quizStep === 'welcome'}
         onClose={() => {
@@ -344,13 +342,28 @@ export default function Home() {
         }}
         onNext={handleWelcomeNext}
       />
-      
+
       <BookDinnerModal
         isOpen={quizStep === 'book-dinner'}
         onClose={resetQuizFlow}
+        onBack={() => setQuizStep('how-it-works')}
         onSuccess={handleBookDinnerSuccess}
         selectedCity={selectedCity}
         selectedPlace={selectedPlace}
+      />
+
+      <HowItWorksModal
+        isOpen={quizStep === 'how-it-works'}
+        onClose={resetQuizFlow}
+        onBack={() => setQuizStep('welcome')}
+        onNext={() => setQuizStep('book-dinner')}
+      />
+
+      <PreferencesModal
+        isOpen={quizStep === 'preferences'}
+        onClose={resetQuizFlow}
+        onBack={() => setQuizStep('book-dinner')}
+        onConfirm={handlePreferencesConfirm}
       />
 
       {loading && (

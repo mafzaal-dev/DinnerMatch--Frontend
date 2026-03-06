@@ -11,8 +11,8 @@ const STEPS = [
     question: 'How do you define yourself?',
     type: 'choice',
     options: [
-      { value: 'woman', label: 'Women' },
-      { value: 'man', label: 'Men' },
+      { value: 'woman', label: 'Woman' },
+      { value: 'man', label: 'Man' },
       { value: 'non_binary', label: 'Non-Binary' }
     ]
   },
@@ -274,6 +274,120 @@ const STEPS = [
   }
 ];
 
+const CustomSelect = ({ label, options, value, onChange, isOpen, onToggle }) => {
+  return (
+    <div className="flex-1 space-y-1 relative">
+      <label className="text-gray-400 text-[10px] md:text-xs font-medium block uppercase tracking-wider">{label}</label>
+      <button
+        onClick={onToggle}
+        className={`w-full bg-[#1A1D35] border rounded-xl py-2.5 text-base md:text-lg transition-all duration-300 ${isOpen ? 'border-[#FFAA55] ring-2 ring-[#FFAA55]/20' : 'border-gray-700 hover:border-gray-500'
+          }`}
+      >
+        {value}
+      </button>
+
+      {isOpen && (
+        <div className="absolute z-100 w-full mt-2 bg-[#1A1D35] border border-[#2F3A51] rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.5)] overflow-hidden animate-fadeIn backdrop-blur-xl">
+          <div className="max-h-52 overflow-y-auto scrollbar-hide py-1">
+            {options.map((opt) => (
+              <button
+                key={opt}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onChange(opt);
+                  onToggle();
+                }}
+                className={`w-full py-2.5 px-4 text-left text-sm transition-colors hover:bg-[#FFAA55] hover:text-[#111] ${value === opt ? 'bg-[#FFAA55]/10 text-[#FFAA55] font-bold' : 'text-gray-300'
+                  }`}
+              >
+                {opt}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+const DatePartSelector = ({ dateValue, onDateChange, isDateInFuture, handleDateConfirm }) => {
+  const [activeDropdown, setActiveDropdown] = useState(null);
+
+  const months = Array.from({ length: 12 }, (_, i) => (i + 1).toString().padStart(2, '0'));
+  const days = Array.from({ length: 31 }, (_, i) => (i + 1).toString().padStart(2, '0'));
+  const currentYear = new Date().getFullYear();
+  const years = Array.from({ length: 80 }, (_, i) => (currentYear - i).toString());
+
+  const d = dateValue ? new Date(dateValue) : new Date(2000, 0, 1);
+  const currentMonth = (d.getMonth() + 1).toString().padStart(2, '0');
+  const currentDay = d.getDate().toString().padStart(2, '0');
+  const currentYearVal = d.getFullYear().toString();
+
+  const handleUpdate = (type, val) => {
+    const newDate = new Date(d);
+    if (type === 'month') newDate.setMonth(parseInt(val) - 1);
+    if (type === 'day') newDate.setDate(parseInt(val));
+    if (type === 'year') newDate.setFullYear(parseInt(val));
+    onDateChange(format(newDate, "yyyy-MM-dd"));
+  };
+
+  return (
+    <div className="space-y-8 max-w-md mx-auto">
+      {/* Selected Date Display */}
+      <div className="w-full bg-[#111121] border-2 border-[#FFAA55] rounded-2xl py-3.5 px-4 text-center shadow-[0_0_15px_rgba(255,170,85,0.1)]">
+        <span className="text-xl font-bold tracking-[0.2em] text-[#F5F5F5]">
+          {dateValue ? format(new Date(dateValue), "dd/MM/yyyy") : "01/01/2000"}
+        </span>
+      </div>
+
+      {/* 3-Field Custom Select Group */}
+      <div className="bg-[#111121]/50 border border-[#2F3A51] rounded-2xl p-5 md:p-6 backdrop-blur-sm">
+        <div className="flex gap-3 md:gap-4">
+          <CustomSelect
+            label="Month"
+            options={months}
+            value={currentMonth}
+            isOpen={activeDropdown === 'month'}
+            onToggle={() => setActiveDropdown(activeDropdown === 'month' ? null : 'month')}
+            onChange={(val) => handleUpdate('month', val)}
+          />
+          <CustomSelect
+            label="Day"
+            options={days}
+            value={currentDay}
+            isOpen={activeDropdown === 'day'}
+            onToggle={() => setActiveDropdown(activeDropdown === 'day' ? null : 'day')}
+            onChange={(val) => handleUpdate('day', val)}
+          />
+          <CustomSelect
+            label="Year"
+            options={years}
+            value={currentYearVal}
+            isOpen={activeDropdown === 'year'}
+            onToggle={() => setActiveDropdown(activeDropdown === 'year' ? null : 'year')}
+            onChange={(val) => handleUpdate('year', val)}
+          />
+        </div>
+      </div>
+
+      {isDateInFuture && (
+        <p className="text-sm text-red-400 text-center animate-shake">Please select a valid date.</p>
+      )}
+
+      <button
+        onClick={handleDateConfirm}
+        disabled={!dateValue || isDateInFuture}
+        className={`w-full py-4 rounded-xl font-bold text-base uppercase tracking-widest transition-all duration-300 ${dateValue && !isDateInFuture
+          ? 'bg-[#FFAA55] text-white hover:bg-[#FF9955] shadow-lg hover:shadow-[0_0_20px_rgba(255,170,85,0.3)]'
+          : 'bg-[#2F3A51] text-[#757575] cursor-not-allowed'
+          }`}
+      >
+        Confirm
+      </button>
+    </div>
+  );
+};
+
 const DemographicsFlow = ({ isOpen, onClose, onComplete, onBack }) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [answers, setAnswers] = useState({});
@@ -437,8 +551,8 @@ const DemographicsFlow = ({ isOpen, onClose, onComplete, onBack }) => {
                               key={option.value}
                               onClick={() => handleAnswer(currentQ.id, option.value)}
                               className={`w-full text-left px-4 py-3 transition-all duration-300 ease-out border-b border-[#2F3A51] last:border-0 ${isSelected
-                                  ? 'bg-[#FFAA55] text-[#111] font-semibold'
-                                  : 'text-[#E0E0E0] hover:bg-[#2F3A51] hover:text-[#F5F5F5]'
+                                ? 'bg-[#FFAA55] text-[#111] font-semibold'
+                                : 'text-[#E0E0E0] hover:bg-[#2F3A51] hover:text-[#F5F5F5]'
                                 }`}
                             >
                               {option.label}
@@ -454,31 +568,12 @@ const DemographicsFlow = ({ isOpen, onClose, onComplete, onBack }) => {
               )}
 
               {currentQ.type === 'date' && (
-                <div className="space-y-4 max-w-md mx-auto">
-                  <DatePicker
-                    date={dateValue ? new Date(dateValue) : undefined}
-                    onSelect={(date) => setDateValue(date ? format(date, "yyyy-MM-dd") : "")}
-                    disabled={{ after: new Date() }}
-                    placeholder={currentQ.placeholder}
-                    className={`w-full justify-start text-left font-normal bg-[#111121] hover:bg-[#1A1A2E] text-[#F5F5F5] ${isDateInFuture ? 'border-red-500' : 'border-[#2F3A51]'
-                      }`}
-                    popoverClassName="bg-[#111121] border-[#2F3A51]"
-                    isDark={true}
-                  />
-                  {isDateInFuture && (
-                    <p className="text-sm text-red-400">Please select a date that is not in the future.</p>
-                  )}
-                  <button
-                    onClick={handleDateConfirm}
-                    disabled={!dateValue || isDateInFuture}
-                    className={`w-full py-3 rounded-lg font-bold text-sm uppercase tracking-wide transition-colors ${dateValue && !isDateInFuture
-                      ? 'bg-[#FFAA55] text-white hover:bg-[#FF9955]'
-                      : 'bg-[#2F3A51] text-[#757575] cursor-not-allowed'
-                      }`}
-                  >
-                    Confirm
-                  </button>
-                </div>
+                <DatePartSelector
+                  dateValue={dateValue}
+                  onDateChange={(newDate) => setDateValue(newDate)}
+                  isDateInFuture={isDateInFuture}
+                  handleDateConfirm={handleDateConfirm}
+                />
               )}
             </div>
           </div>

@@ -29,29 +29,29 @@ const formatPrice = (price) => {
   return isNaN(p) ? String(price) : `ZAR ${p.toFixed(2).replace(/\.00$/, "")}`;
 };
 
-  const mapPlanToCardProps = (plan, index) => {
-    const isSubscription = plan.plan_type === "Subscription";
-    const isAnnual = plan.duration_days >= 365;
-  
-    let period = "/month";
-    let features = monthlyFeatures;
-    let badge = "most-popular";
-    let isHighlighted = false;
-    let savings = null;
-    let originalPrice = null;
-    let buttonText = plan.name?.startsWith("Annual")
-      ? "Get Annual Pass"
-      : "Start Monthly Pass";
-  
-    if (isAnnual) {
-      period = "/year";
-      features = annualFeatures;
-      badge = "best-value";
-      isHighlighted = true;
-      savings = "Save when you pay upfront";
-    } else {
-      savings = "You're saving per dinner when you attend more than one.";
-    }
+const mapPlanToCardProps = (plan, index) => {
+  const isSubscription = plan.plan_type === "Subscription";
+  const isAnnual = plan.duration_days >= 365;
+
+  let period = "/month";
+  let features = monthlyFeatures;
+  let badge = "most-popular";
+  let isHighlighted = false;
+  let savings = null;
+  let originalPrice = null;
+  let buttonText = plan.name?.startsWith("Annual")
+    ? "Get Annual Pass"
+    : "Start Monthly Pass";
+
+  if (isAnnual) {
+    period = "/year";
+    features = annualFeatures;
+    badge = "best-value";
+    isHighlighted = true;
+    savings = "Save when you pay upfront";
+  } else {
+    savings = "You're saving per dinner when you attend more than one.";
+  }
 
   return {
     title: plan.name,
@@ -74,7 +74,7 @@ const PricingSection = ({ onSelectPlan, plans, activePlanId }) => {
   return (
     <section className="flex relative flex-col gap-10 px-6 py-10 bg-gray-950 max-md:px-5">
       <header className="flex z-0 flex-col gap-4 p-0 w-full leading-none text-center max-md:max-w-full">
-        <div className="flex justify-between items-center p-0 w-full text-4xl font-bold text-neutral-100 max-md:max-w-full">
+        <div className="flex justify-between items-center p-0 w-full text-2xl md:text-4xl font-bold text-neutral-100 max-md:max-w-full">
           <h1 className="flex-1 shrink self-stretch my-auto basis-0 max-md:max-w-full">
             <span
               style={{

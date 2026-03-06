@@ -13,3 +13,4 @@ export { default as WelcomeModal } from './WelcomeModal';
 export { default as HowItWorksModal } from './HowItWorksModal';
 export { default as BookDinnerModal } from './BookDinnerModal';
 export { default as AccessDeniedModal } from './AccessDeniedModal';
+export { default as PreferencesModal } from './PreferencesModal';

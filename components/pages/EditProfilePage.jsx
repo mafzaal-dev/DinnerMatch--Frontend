@@ -17,8 +17,8 @@ const IDENTITY_QUESTIONS = [
     question: "How do you define yourself?",
     type: "choice",
     options: [
-      { value: "woman", label: "Women" },
-      { value: "man", label: "Men" },
+      { value: "woman", label: "Woman" },
+      { value: "man", label: "Man" },
       { value: "non_binary", label: "Non-Binary" },
     ],
   },
@@ -196,8 +196,8 @@ const EditProfilePage = ({
       setValue(
         "fullName",
         initialData.full_name ||
-          `${initialData.first_name || ""} ${initialData.last_name || ""}`.trim() ||
-          "",
+        `${initialData.first_name || ""} ${initialData.last_name || ""}`.trim() ||
+        "",
       );
       setValue("email", initialData.email || "");
       const rawPhone = initialData.phone || initialData.phone_number || initialData.phoneNumber || "";
@@ -545,11 +545,10 @@ const EditProfilePage = ({
                     key={lang}
                     onClick={() => toggleLanguage(lang)}
                     type="button"
-                    className={`px-6 py-2.5 rounded-lg border transition-all text-sm font-bold ${
-                      watchedLanguages?.includes(lang)
+                    className={`px-6 py-2.5 rounded-lg border transition-all text-sm font-bold ${watchedLanguages?.includes(lang)
                         ? "bg-[#FFAA55] border-[#FFAA55] text-[#212121]"
                         : "bg-[#111121] border-[#2F3A51] text-[#F5F5F5] hover:border-[#FFAA55]"
-                    }`}
+                      }`}
                   >
                     {lang}
                   </button>
@@ -573,11 +572,10 @@ const EditProfilePage = ({
                     key={option}
                     onClick={() => toggleMenuPreference(option)}
                     type="button"
-                    className={`w-full px-4 py-3 rounded-lg border text-left transition-all text-sm font-semibold ${
-                      watchedMenuPreferences?.includes(option)
+                    className={`w-full px-4 py-3 rounded-lg border text-left transition-all text-sm font-semibold ${watchedMenuPreferences?.includes(option)
                         ? "bg-[#FFAA55] border-[#FFAA55] text-[#212121]"
                         : "bg-[#111121] border-[#2F3A51] text-[#F5F5F5] hover:border-[#FFAA55]"
-                    }`}
+                      }`}
                   >
                     {option}
                   </button>
@@ -600,11 +598,10 @@ const EditProfilePage = ({
                       })
                     }
                     type="button"
-                    className={`w-full px-4 py-3 rounded-lg border text-left transition-all text-sm font-semibold ${
-                      watchedPriceRange === option.id
+                    className={`w-full px-4 py-3 rounded-lg border text-left transition-all text-sm font-semibold ${watchedPriceRange === option.id
                         ? "bg-[#FFAA55] border-[#FFAA55] text-[#212121]"
                         : "bg-[#111121] border-[#2F3A51] text-[#F5F5F5] hover:border-[#FFAA55]"
-                    }`}
+                      }`}
                   >
                     {option.label}
                   </button>

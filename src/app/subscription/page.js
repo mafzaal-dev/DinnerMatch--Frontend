@@ -11,20 +11,11 @@ function SubscriptionContent() {
   const from = searchParams.get("from");
 
   const handleSelectPlan = (plan) => {
-    if (from === "signup") {
-      if (typeof window !== "undefined") {
-        localStorage.setItem("show_book_dinner", "true");
-      }
-      router.push("/edit-profile");
-    } else {
-      router.back();
-    }
+    router.push("/dinner-details");
   };
 
   const handleBack = () => {
-    if (from === "dinner-details") {
-      router.back();
-    }
+    router.push("/dinner-details");
   };
 
   return (
@@ -43,15 +34,15 @@ function SubscriptionContent() {
               <span>Back</span>
             </button>
           ) : (
-            <Link
-              href="/"
+            <button
+              onClick={handleBack}
               className="flex items-center gap-2 text-[#E0E0E0] hover:text-[#F5F5F5] transition-colors"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
               <span>Back</span>
-            </Link>
+            </button>
           )}
         </div>
       </div>

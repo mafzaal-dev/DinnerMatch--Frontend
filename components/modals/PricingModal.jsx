@@ -81,7 +81,7 @@ const PricingModal = ({ isOpen, onClose, onSelectPlan }) => {
 
         {/* Header */}
         <div className="text-center mb-8">
-          <h2 className="text-4xl font-bold text-[#F5F5F5] mb-2">
+          <h2 className="text-2xl md:text-4xl font-bold text-[#F5F5F5] mb-2">
             Choose Your DinnerMatch Pass
           </h2>
           <p className="text-[#E0E0E0]">
@@ -125,14 +125,14 @@ const PricingModal = ({ isOpen, onClose, onSelectPlan }) => {
               {plan.billing && (
                 <p className="text-[#E0E0E0] text-sm mb-4">{plan.billing}</p>
               )}
-              <ul className="space-y-3 mb-6 flex-grow">
+              <ul className="space-y-3 mb-6 grow">
                 {plan.features.map((feature, index) => (
                   <li
                     key={index}
                     className="flex items-start text-[#E0E0E0] text-sm"
                   >
                     <svg
-                      className="w-5 h-5 text-[#FFAA55] mr-2 flex-shrink-0 mt-0.5"
+                      className="w-5 h-5 text-[#FFAA55] mr-2 shrink-0 mt-0.5"
                       fill="currentColor"
                       viewBox="0 0 20 20"
                     >
