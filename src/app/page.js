@@ -274,7 +274,7 @@ export default function Home() {
   };
 
   const handlePreferencesConfirm = (prefs) => {
-    router.push('/subscription');
+    router.push('/manage-subscription');
   };
 
   const handleBookDinnerSuccess = (slotId) => {

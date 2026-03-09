@@ -110,50 +110,52 @@ const PricingSection = ({ onSelectPlan, plans, activePlanId }) => {
         </p>
       </header>
 
-      <main className="flex z-0 flex-wrap gap-4 content-start items-start mt-10 w-full max-md:max-w-full">
-        {hasPlans ? (
-          plans
-            .filter((p) => p.is_active !== false && p.plan_type !== "Ticket")
-            .map((plan, i) => {
-              const props = mapPlanToCardProps(plan, i);
-              return (
-                <PricingCard
-                  key={plan.id}
-                  {...props}
-                  onSelect={onSelectPlan}
-                  isActivePlan={activePlanId === plan.id}
-                />
-              );
-            })
-        ) : (
-          <>
-            <PricingCard
-              title="Annual Pass"
-              price="R2000"
-              originalPrice="R2500"
-              period="/year"
-              savings="Save R500 when you pay upfront"
-              features={annualFeatures}
-              buttonText="Get Annual Pass "
-              buttonColor="#EAB308"
-              badge="best-value"
-              isHighlighted={true}
-              onSelect={onSelectPlan}
-            />
+      <main className="flex z-0 flex-col gap-4 mt-10 w-full max-md:max-w-full">
+        <div className="flex flex-wrap gap-8 md:gap-4 items-stretch w-full">
+          {hasPlans ? (
+            plans
+              .filter((p) => p.is_active !== false && p.plan_type !== "Ticket")
+              .map((plan, i) => {
+                const props = mapPlanToCardProps(plan, i);
+                return (
+                  <PricingCard
+                    key={plan.id}
+                    {...props}
+                    onSelect={onSelectPlan}
+                    isActivePlan={activePlanId === plan.id}
+                  />
+                );
+              })
+          ) : (
+            <>
+              <PricingCard
+                title="Annual Pass"
+                price="R2000"
+                originalPrice="R2500"
+                period="/year"
+                savings="Save R500 when you pay upfront"
+                features={annualFeatures}
+                buttonText="Get Annual Pass "
+                buttonColor="#EAB308"
+                badge="best-value"
+                isHighlighted={true}
+                onSelect={onSelectPlan}
+              />
 
-            <PricingCard
-              title="Monthly Pass"
-              price="R250"
-              period="/month"
-              savings="You're saving R75 per dinner when you attend more than one."
-              features={monthlyFeatures}
-              buttonText="Start Monthly Pass"
-              buttonColor="#FFAA55"
-              badge="most-popular"
-              onSelect={onSelectPlan}
-            />
-          </>
-        )}
+              <PricingCard
+                title="Monthly Pass"
+                price="R250"
+                period="/month"
+                savings="You're saving R75 per dinner when you attend more than one."
+                features={monthlyFeatures}
+                buttonText="Start Monthly Pass"
+                buttonColor="#FFAA55"
+                badge="most-popular"
+                onSelect={onSelectPlan}
+              />
+            </>
+          )}
+        </div>
 
         <WhySubscription />
       </main>

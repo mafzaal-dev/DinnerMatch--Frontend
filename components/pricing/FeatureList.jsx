@@ -2,7 +2,7 @@ import React from "react";
 
 const FeatureList = ({ features }) => {
   return (
-    <div className="z-0 gap-4 mt-2 w-full text-sm leading-5 text-neutral-200">
+    <div className="z-0 flex flex-col gap-4 mt-2 w-full text-sm leading-5 text-neutral-200 grow">
       {features.map((feature, index) => (
         <div
           key={index}

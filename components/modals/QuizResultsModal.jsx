@@ -103,12 +103,12 @@ const QuizResultsModal = ({ isOpen, onClose, onContinue }) => {
         "
       >
 
-        <button
+        {/* <button
           onClick={onClose}
           className="absolute top-4 md:top-5 left-4 md:left-5 text-white/50 hover:text-white transition-colors z-50 flex items-center justify-center bg-black/20 md:bg-white/5 p-2 rounded-full backdrop-blur-md"
         >
           <ArrowLeft className="w-6 h-6" />
-        </button>
+        </button> */}
 
         <div className="flex-1 relative overflow-hidden bg-[#0A0C1A]">
 

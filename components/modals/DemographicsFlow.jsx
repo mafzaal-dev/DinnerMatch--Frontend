@@ -310,7 +310,7 @@ const CustomSelect = ({ label, options, value, onChange, isOpen, onToggle }) => 
   );
 };
 
-const DatePartSelector = ({ dateValue, onDateChange, isDateInFuture, handleDateConfirm }) => {
+const DatePartSelector = ({ dateValue, onDateChange, isDateInFuture, isUnder18, handleDateConfirm }) => {
   const [activeDropdown, setActiveDropdown] = useState(null);
 
   const months = Array.from({ length: 12 }, (_, i) => (i + 1).toString().padStart(2, '0'));
@@ -374,10 +374,14 @@ const DatePartSelector = ({ dateValue, onDateChange, isDateInFuture, handleDateC
         <p className="text-sm text-red-400 text-center animate-shake">Please select a valid date.</p>
       )}
 
+      {isUnder18 && !isDateInFuture && (
+        <p className="text-sm text-red-400 text-center animate-shake">You must be 18 or older to continue.</p>
+      )}
+
       <button
         onClick={handleDateConfirm}
-        disabled={!dateValue || isDateInFuture}
-        className={`w-full py-4 rounded-xl font-bold text-base uppercase tracking-widest transition-all duration-300 ${dateValue && !isDateInFuture
+        disabled={!dateValue || isDateInFuture || isUnder18}
+        className={`w-full py-4 rounded-xl font-bold text-base uppercase tracking-widest transition-all duration-300 ${dateValue && !isDateInFuture && !isUnder18
           ? 'bg-[#FFAA55] text-white hover:bg-[#FF9955] shadow-lg hover:shadow-[0_0_20px_rgba(255,170,85,0.3)]'
           : 'bg-[#2F3A51] text-[#757575] cursor-not-allowed'
           }`}
@@ -470,11 +474,19 @@ const DemographicsFlow = ({ isOpen, onClose, onComplete, onBack }) => {
   const handleDateConfirm = () => {
     if (!dateValue) return;
     const selected = new Date(dateValue);
-    if (selected > new Date()) return; // reject future dates
+    if (selected > new Date()) return;
+    if (isUnder18) return;
     handleAnswer(currentQ.id, dateValue);
   };
 
   const isDateInFuture = dateValue ? new Date(dateValue) > new Date() : false;
+
+  const isUnder18 = dateValue ? (() => {
+    const dob = new Date(dateValue);
+    const today = new Date();
+    const eighteenthBirthday = new Date(dob.getFullYear() + 18, dob.getMonth(), dob.getDate());
+    return eighteenthBirthday > today;
+  })() : false;
 
   return (
     <div className="fixed inset-0 z-50 bg-[#0F1123] overflow-y-auto md:bg-black/80 md:overflow-hidden md:flex md:items-center md:justify-center">
@@ -572,6 +584,7 @@ const DemographicsFlow = ({ isOpen, onClose, onComplete, onBack }) => {
                   dateValue={dateValue}
                   onDateChange={(newDate) => setDateValue(newDate)}
                   isDateInFuture={isDateInFuture}
+                  isUnder18={isUnder18}
                   handleDateConfirm={handleDateConfirm}
                 />
               )}

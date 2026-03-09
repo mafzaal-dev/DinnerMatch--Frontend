@@ -18,8 +18,8 @@ const PricingCard = ({
   isActivePlan = false,
 }) => {
   const cardClasses = isHighlighted
-    ? "flex relative flex-col grow shrink gap-3 px-4 pt-8 pb-4 font-bold rounded-lg border border-yellow-900 border-solid min-w-60 w-[251px]"
-    : "flex relative flex-col grow shrink gap-3 px-4 pt-8 pb-4 bg-gray-900 rounded-lg border border-gray-800 border-solid min-h-[356px] min-w-60 w-[251px]";
+    ? "flex relative flex-col grow shrink self-stretch gap-3 px-4 pt-8 pb-4 font-bold rounded-lg border border-yellow-900 border-solid min-w-60 w-[251px]"
+    : "flex relative flex-col grow shrink self-stretch gap-3 px-4 pt-8 pb-4 bg-gray-900 rounded-lg border border-gray-800 border-solid min-h-[356px] min-w-60 w-[251px]";
 
   const titleClasses = isHighlighted
     ? "z-0 text-2xl leading-none text-center text-yellow-400"
