@@ -330,6 +330,7 @@ export default function Home() {
         onClose={resetQuizFlow}
         onBack={() => setQuizStep('demographics')}
         onSignup={handleSignup}
+        onShowLogin={resetQuizFlow}
         loading={loading}
         error={error}
       />
