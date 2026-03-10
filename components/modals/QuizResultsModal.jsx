@@ -12,7 +12,7 @@ const SparkleIcon = ({ className }) => (
 const QuizResultsModal = ({ isOpen, onClose, onContinue }) => {
   const [displayedScore, setDisplayedScore] = useState(0);
   const [animationDone, setAnimationDone] = useState(false);
-  const [targetScore] = useState(() => Math.floor(Math.random() * 5) + 94); // Range 94-98
+  const [targetScore] = useState(93);
 
   useEffect(() => {
     document.body.style.overflow = isOpen ? 'hidden' : '';
