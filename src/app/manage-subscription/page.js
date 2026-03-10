@@ -126,19 +126,31 @@ function ManageSubscriptionContent() {
 
   return (
     <div className="min-h-screen bg-[#080714] p-4 md:p-8">
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-4xl mx-auto">
         {/* Header row: back | title | spacer — no overlap on mobile */}
         <div className="mb-8 flex items-center gap-2">
           <button
-            onClick={() => router.push('/account')}
+            onClick={() => router.push("/account")}
             className="shrink-0 text-[#F5F5F5] hover:text-[#FFAA55] transition-colors flex items-center gap-1"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
+              />
             </svg>
             <span className="text-sm font-medium">Back</span>
           </button>
-          <h1 className="flex-1 text-center text-2xl md:text-[32px] font-bold text-[#FFAA55] leading-tight">Manage Subscription</h1>
+          <h1 className="flex-1 text-center text-2xl md:text-[32px] font-bold text-[#FFAA55] leading-tight">
+            Manage Subscription
+          </h1>
           {/* Mirror spacer so title stays perfectly centered */}
           <div className="shrink-0 w-14" />
         </div>
@@ -160,8 +172,15 @@ function ManageSubscriptionContent() {
             <div className="flex flex-col gap-6">
               <div className="flex items-center justify-between border-b border-[#2F3A51] pb-6">
                 <div>
-                  <h2 className="text-2xl font-bold text-[#F5F5F5]">{activeSubscription.plan?.name || "Active Subscription"}</h2>
-                  <p className="text-[#757575] mt-1">Status: <span className="text-green-500 font-semibold capitalize">{activeSubscription.status}</span></p>
+                  <h2 className="text-2xl font-bold text-[#F5F5F5]">
+                    {activeSubscription.plan?.name || "Active Subscription"}
+                  </h2>
+                  <p className="text-[#757575] mt-1">
+                    Status:{" "}
+                    <span className="text-green-500 font-semibold capitalize">
+                      {activeSubscription.status}
+                    </span>
+                  </p>
                 </div>
                 <div className="bg-[#FFAA55] text-[#080714] px-4 py-1 rounded-full text-sm font-bold">
                   Current Plan
@@ -172,19 +191,29 @@ function ManageSubscriptionContent() {
                 {activeSubscription.start_date && (
                   <div className="flex justify-between">
                     <span className="text-[#9CA3AF]">Start Date</span>
-                    <span className="text-[#F5F5F5]">{new Date(activeSubscription.start_date).toLocaleDateString()}</span>
+                    <span className="text-[#F5F5F5]">
+                      {new Date(
+                        activeSubscription.start_date,
+                      ).toLocaleDateString()}
+                    </span>
                   </div>
                 )}
                 {activeSubscription.end_date && (
                   <div className="flex justify-between">
                     <span className="text-[#9CA3AF]">End Date</span>
-                    <span className="text-[#F5F5F5]">{new Date(activeSubscription.end_date).toLocaleDateString()}</span>
+                    <span className="text-[#F5F5F5]">
+                      {new Date(
+                        activeSubscription.end_date,
+                      ).toLocaleDateString()}
+                    </span>
                   </div>
                 )}
                 {activeSubscription.plan?.price && (
                   <div className="flex justify-between">
                     <span className="text-[#9CA3AF]">Price</span>
-                    <span className="text-[#F5F5F5]">ZAR {activeSubscription.plan.price}</span>
+                    <span className="text-[#F5F5F5]">
+                      ZAR {activeSubscription.plan.price}
+                    </span>
                   </div>
                 )}
               </div>
@@ -205,13 +234,18 @@ function ManageSubscriptionContent() {
                   )}
                 </button>
                 <p className="text-[#757575] text-sm mt-4 text-center">
-                  Cancelling will stop future payments. You will retain access until the end of your current billing period.
+                  Cancelling will stop future payments. You will retain access
+                  until the end of your current billing period.
                 </p>
               </div>
             </div>
           </div>
         ) : (
-          <PricingSection plans={plans} onSelectPlan={handleSelectPlan} activePlanId={null} />
+          <PricingSection
+            plans={plans}
+            onSelectPlan={handleSelectPlan}
+            activePlanId={null}
+          />
         )}
       </div>
 
@@ -219,9 +253,12 @@ function ManageSubscriptionContent() {
       {showCancelModal && (
         <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
           <div className="bg-[#111121] rounded-xl w-full max-w-md p-6 border border-[#2F3A51] shadow-2xl relative">
-            <h3 className="text-xl font-bold text-[#F5F5F5] mb-4">Cancel Subscription?</h3>
+            <h3 className="text-xl font-bold text-[#F5F5F5] mb-4">
+              Cancel Subscription?
+            </h3>
             <p className="text-[#E0E0E0] mb-6">
-              Are you sure you want to cancel your subscription? This action cannot be undone.
+              Are you sure you want to cancel your subscription? This action
+              cannot be undone.
             </p>
 
             <div className="flex gap-3 justify-end">

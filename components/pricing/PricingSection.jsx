@@ -8,19 +8,19 @@ import Disclaimer from "./Disclaimer";
 const tickIcon = "/yellow-tick.svg";
 
 const annualFeatures = [
-  { icon: tickIcon, text: "Unlimited DinnerMatch Dinner for 12 months." },
+  { icon: tickIcon, text: "Unlimited DinnerMatch dinners for 12 months" },
   { icon: tickIcon, text: "First access to every dinner" },
   {
     icon: tickIcon,
-    text: "Discount + First access to exclusive DinnerMatch parties",
+    text: "Discounts + first access to exclusive DinnerMatch parties",
   },
   { icon: tickIcon, text: "Community member perks" },
 ];
 
 const monthlyFeatures = [
-  { icon: tickIcon, text: "Access to all Dinners - build your social rhythm." },
+  { icon: tickIcon, text: "Access to all dinners — build your social rhythm." },
   { icon: tickIcon, text: "Early access to exclusive DinnerMatch parties" },
-  { icon: tickIcon, text: "Cancel anytime - no question asked." },
+  { icon: tickIcon, text: "Cancel anytime — no questions asked." },
 ];
 
 const formatPrice = (price) => {
@@ -72,8 +72,8 @@ const PricingSection = ({ onSelectPlan, plans, activePlanId }) => {
   const hasPlans = plans && Array.isArray(plans) && plans.length > 0;
 
   return (
-    <section className="flex relative flex-col gap-10 px-6 py-10 bg-gray-950 max-md:px-5">
-      <header className="flex z-0 flex-col gap-4 p-0 w-full leading-none text-center max-md:max-w-full">
+    <section className="flex relative flex-col gap-6 px-6 pt-5 py-10 bg-gray-950 max-md:px-5">
+      <header className="flex z-0 flex-col gap-2 p-0 w-full leading-none text-center max-md:max-w-full">
         <div className="flex justify-between items-center p-0 w-full text-2xl md:text-4xl font-bold text-neutral-100 max-md:max-w-full">
           <h1 className="flex-1 shrink self-stretch my-auto basis-0 max-md:max-w-full">
             <span
@@ -104,13 +104,13 @@ const PricingSection = ({ onSelectPlan, plans, activePlanId }) => {
             </span>
           </h1>
         </div>
-        <p className="self-center mt-4 text-center text-xl text-neutral-200 max-md:max-w-full">
+        <p className="text-lg md:text-xl text-gray-300">
           No more waiting for plans. Join Cape Town most exciting social
           community.
         </p>
       </header>
 
-      <main className="flex z-0 flex-col gap-4 mt-10 w-full max-md:max-w-full">
+      <main className="flex z-0 flex-col gap-4 mt-4 w-full max-md:max-w-full">
         <div className="flex flex-wrap gap-8 md:gap-4 items-stretch w-full">
           {hasPlans ? (
             plans
