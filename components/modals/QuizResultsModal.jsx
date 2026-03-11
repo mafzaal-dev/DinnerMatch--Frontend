@@ -125,7 +125,7 @@ const QuizResultsModal = ({ isOpen, onClose, onContinue }) => {
           </div>
 
           <div className="absolute bottom-[-5%] right-[-10%] md:bottom-[-10%] md:right-[6%] w-[55%] md:w-[300px] lg:w-[360px] aspect-4/5 rounded-3xl overflow-hidden shadow-2xl anim-img-br" style={{ '--rotation': '12deg' }}>
-            <img src="/quiz-result2.png" alt="" className="w-full h-full object-cover pointer-events-none" />
+            <img src="/quiz-result4.png" alt="" className="w-full h-full object-cover pointer-events-none" />
           </div>
 
           <div className="absolute inset-0 bg-black/10 md:bg-black/5 pointer-events-none z-10" />
