@@ -42,15 +42,16 @@ const mapPlanToCardProps = (plan, index) => {
   let buttonText = plan.name?.startsWith("Annual")
     ? "Get Annual Pass"
     : "Start Monthly Pass";
+  let saveAmount = 500;
 
   if (isAnnual) {
     period = "/year";
     features = annualFeatures;
     badge = "best-value";
     isHighlighted = true;
-    savings = "Save when you pay upfront";
+    savings = "Save R500 when you pay upfront";
   } else {
-    savings = "You're saving per dinner when you attend more than one.";
+    savings = "Full flexibility — cancel anytime.";
   }
 
   return {
@@ -65,6 +66,7 @@ const mapPlanToCardProps = (plan, index) => {
     badge,
     isHighlighted,
     plan,
+    saveAmount,
   };
 };
 
@@ -105,8 +107,7 @@ const PricingSection = ({ onSelectPlan, plans, activePlanId }) => {
           </h1>
         </div>
         <p className="text-lg md:text-xl text-gray-300">
-          No more waiting for plans. Join Cape Town most exciting social
-          community.
+        No more waiting for plans. Join Cape Town's most exciting social community.
         </p>
       </header>
 
@@ -139,6 +140,7 @@ const PricingSection = ({ onSelectPlan, plans, activePlanId }) => {
                 buttonColor="#EAB308"
                 badge="best-value"
                 isHighlighted={true}
+                saveAmount={500}
                 onSelect={onSelectPlan}
               />
 

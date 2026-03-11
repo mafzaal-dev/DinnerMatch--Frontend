@@ -16,6 +16,7 @@ const PricingCard = ({
   onSelect,
   plan,
   isActivePlan = false,
+  saveAmount = 0,
 }) => {
   const cardClasses = isHighlighted
     ? "flex relative flex-col grow shrink self-stretch gap-3 px-4 pt-8 pb-4 font-bold rounded-lg border-2 border-yellow-500/50 min-w-60 w-[251px]"
@@ -59,6 +60,7 @@ const PricingCard = ({
               {originalPrice}
             </div>
           )}
+          {isHighlighted && <span class="text-xl text-gray-500 line-through">R{saveAmount}</span>}
           <div className={`text-4xl font-bold leading-none ${priceColor}`}>
             {price}
           </div>
