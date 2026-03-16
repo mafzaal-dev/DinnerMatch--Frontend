@@ -397,6 +397,7 @@ const DemographicsFlow = ({ isOpen, onClose, onComplete, onBack }) => {
   const [answers, setAnswers] = useState({});
   const [searchQuery, setSearchQuery] = useState('');
   const [showDropdown, setShowDropdown] = useState(false);
+  const [selectedSearchValue, setSelectedSearchValue] = useState('');
 
   // Date state
   const [dateValue, setDateValue] = useState('');
@@ -426,13 +427,13 @@ const DemographicsFlow = ({ isOpen, onClose, onComplete, onBack }) => {
     }
   }, [currentStep, currentQ, answers, isOpen]);
 
-  // Restore search value when revisiting the step
+  // Restore selected search option when revisiting the step
   React.useEffect(() => {
     if (isOpen && currentQ.type === 'search' && answers[currentQ.id]) {
-      const option = currentQ.options?.find(o => o.value === answers[currentQ.id]);
-      if (option) {
-        setSearchQuery(option.label);
-      }
+      setSelectedSearchValue(answers[currentQ.id]);
+      // Show all options by default when returning
+      setSearchQuery('');
+      setShowDropdown(false);
     }
   }, [currentStep, currentQ, answers, isOpen]);
 
@@ -540,7 +541,7 @@ const DemographicsFlow = ({ isOpen, onClose, onComplete, onBack }) => {
               )}
 
               {currentQ.type === 'search' && (
-                <div className="relative max-w-md mx-auto">
+                <div className="relative max-w-md mx-auto space-y-4">
                   <input
                     type="text"
                     value={searchQuery}
@@ -557,11 +558,16 @@ const DemographicsFlow = ({ isOpen, onClose, onComplete, onBack }) => {
                     <div className="w-full mt-2 bg-[#111121] border border-[#2F3A51] rounded-lg max-h-60 overflow-y-auto shadow-lg">
                       {filteredOptions.length > 0 ? (
                         filteredOptions.map((option) => {
-                          const isSelected = answers[currentQ.id] === option.value;
+                          const isSelected =
+                            selectedSearchValue === option.value || answers[currentQ.id] === option.value;
                           return (
                             <button
                               key={option.value}
-                              onClick={() => handleAnswer(currentQ.id, option.value)}
+                              onClick={() => {
+                                setSelectedSearchValue(option.value);
+                                setSearchQuery(option.label);
+                                setShowDropdown(false);
+                              }}
                               className={`w-full text-left px-4 py-3 transition-all duration-300 ease-out border-b border-[#2F3A51] last:border-0 ${isSelected
                                 ? 'bg-[#FFAA55] text-[#111] font-semibold'
                                 : 'text-[#E0E0E0] hover:bg-[#2F3A51] hover:text-[#F5F5F5]'
@@ -576,6 +582,21 @@ const DemographicsFlow = ({ isOpen, onClose, onComplete, onBack }) => {
                       )}
                     </div>
                   )}
+
+                  <button
+                    onClick={() => {
+                      const valueToConfirm = selectedSearchValue || answers[currentQ.id];
+                      if (!valueToConfirm) return;
+                      handleAnswer(currentQ.id, valueToConfirm);
+                    }}
+                    disabled={!selectedSearchValue && !answers[currentQ.id]}
+                    className={`w-full py-4 rounded-xl font-bold text-base uppercase tracking-widest transition-all duration-300 ${selectedSearchValue || answers[currentQ.id]
+                      ? 'bg-[#FFAA55] text-white hover:bg-[#FF9955] shadow-lg hover:shadow-[0_0_20px_rgba(255,170,85,0.3)]'
+                      : 'bg-[#2F3A51] text-[#757575] cursor-not-allowed'
+                      }`}
+                  >
+                    Confirm
+                  </button>
                 </div>
               )}
 

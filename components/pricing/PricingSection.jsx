@@ -42,7 +42,7 @@ const mapPlanToCardProps = (plan, index) => {
   let buttonText = plan.name?.startsWith("Annual")
     ? "Get Annual Pass"
     : "Start Monthly Pass";
-  let saveAmount = 500;
+  let initialPrice = 2500;
 
   if (isAnnual) {
     period = "/year";
@@ -66,7 +66,7 @@ const mapPlanToCardProps = (plan, index) => {
     badge,
     isHighlighted,
     plan,
-    saveAmount,
+    initialPrice,
   };
 };
 
@@ -140,7 +140,7 @@ const PricingSection = ({ onSelectPlan, plans, activePlanId }) => {
                 buttonColor="#EAB308"
                 badge="best-value"
                 isHighlighted={true}
-                saveAmount={500}
+                initialPrice={2500}
                 onSelect={onSelectPlan}
               />
 

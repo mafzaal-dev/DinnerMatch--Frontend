@@ -128,7 +128,7 @@ function ManageSubscriptionContent() {
     <div className="min-h-screen bg-[#080714] p-4 md:p-8">
       <div className="max-w-4xl mx-auto">
         {/* Header row: back | title | spacer — no overlap on mobile */}
-        <div className="mb-8 flex items-center gap-2">
+        <div className="flex items-center gap-2">
           <button
             onClick={() => router.push("/account")}
             className="shrink-0 text-[#F5F5F5] hover:text-[#FFAA55] transition-colors flex items-center gap-1"
@@ -148,9 +148,9 @@ function ManageSubscriptionContent() {
             </svg>
             <span className="text-sm font-medium">Back</span>
           </button>
-          <h1 className="flex-1 text-center text-2xl md:text-[32px] font-bold text-[#FFAA55] leading-tight">
+          {/* <h1 className="flex-1 text-center text-2xl md:text-[32px] font-bold text-[#FFAA55] leading-tight">
             Manage Subscription
-          </h1>
+          </h1> */}
           {/* Mirror spacer so title stays perfectly centered */}
           <div className="shrink-0 w-14" />
         </div>
