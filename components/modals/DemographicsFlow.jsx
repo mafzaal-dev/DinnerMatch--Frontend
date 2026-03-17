@@ -245,27 +245,6 @@ const STEPS = [
     ]
   },
   {
-    id: 'language',
-    title: 'Identity',
-    question: 'What is your primary language?',
-    type: 'search',
-    placeholder: 'Search your language',
-    options: [
-      { value: 'english', label: 'English' },
-      { value: 'spanish', label: 'Spanish' },
-      { value: 'mandarin', label: 'Mandarin Chinese' },
-      { value: 'hindi', label: 'Hindi' },
-      { value: 'french', label: 'French' },
-      { value: 'arabic', label: 'Arabic' },
-      { value: 'bengali', label: 'Bengali' },
-      { value: 'portuguese', label: 'Portuguese' },
-      { value: 'russian', label: 'Russian' },
-      { value: 'japanese', label: 'Japanese' },
-      { value: 'german', label: 'German' },
-      { value: 'other', label: 'Other' }
-    ]
-  },
-  {
     id: 'date_of_birth',
     title: 'Identity',
     question: 'When is your birthday?',

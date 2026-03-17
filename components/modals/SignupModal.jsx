@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { api, API_ENDPOINTS } from "@/utils/api";
 
 const INPUT_CLASS =
   "flex h-10 w-full border text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-[#1E1E2E] border-[#333] text-white py-6 px-4 rounded-lg focus:border-[#FFAA55] focus:ring-[#FFAA55] transition-all";
@@ -126,9 +127,32 @@ const SignupModal = ({
     return Object.keys(errs).length === 0;
   };
 
-  const handleStep1Continue = (e) => {
+  const handleStep1Continue = async (e) => {
     e.preventDefault();
-    if (validateStep1()) { setStepErrors({}); setStep(2); }
+    if (!validateStep1()) return;
+
+    try {
+      const response = await api.post(API_ENDPOINTS.PROFILE_CHECK, { email });
+
+      if (response?.success && response.code === "DMU-001-245") {
+        setStepErrors({
+          email: "This email is already registered. Please sign in instead.",
+        });
+        return;
+      }
+
+      setStepErrors({});
+      setStep(2);
+    } catch (err) {
+      if (err?.status === 404 || err?.data?.code === "DMU-001-244") {
+        setStepErrors({});
+        setStep(2);
+      } else {
+        setStepErrors({
+          email: "We could not verify this email right now. Please try again.",
+        });
+      }
+    }
   };
 
   const handleStep2Continue = (e) => {

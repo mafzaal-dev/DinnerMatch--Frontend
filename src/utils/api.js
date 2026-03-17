@@ -145,6 +145,7 @@ export const API_ENDPOINTS = {
   // User
   USER_PROFILE: "/profile/me/",
   PROFILE_UPDATE: "/profile/update/",
+  PROFILE_CHECK: "/profile/check/",
   USER_LIST: "/auth/users/list/",
   USER_EXPORT_CSV: "/auth/users/export-csv/",
 
