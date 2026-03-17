@@ -163,6 +163,15 @@ export default function Home() {
     setQuizStep('demographics');
   };
 
+  const redirectToDashboardIfLoggedIn = () => {
+    if (typeof window !== 'undefined') {
+      const hasToken = !!localStorage.getItem('access_token');
+      if (hasToken || (!isLoading && isAuthenticated)) {
+        router.push(ROUTES.DINNER_DETAILS);
+      }
+    }
+  };
+
   const handleSignup = async (formData) => {
     try {
       setLoading(true);
@@ -340,13 +349,17 @@ export default function Home() {
         onClose={() => {
           refreshUserFromStorage();
           resetQuizFlow();
+          redirectToDashboardIfLoggedIn();
         }}
         onNext={handleWelcomeNext}
       />
 
       <BookDinnerModal
         isOpen={quizStep === 'book-dinner'}
-        onClose={resetQuizFlow}
+        onClose={() => {
+          resetQuizFlow();
+          redirectToDashboardIfLoggedIn();
+        }}
         onBack={() => setQuizStep('how-it-works')}
         onSuccess={handleBookDinnerSuccess}
         selectedCity={selectedCity}
@@ -355,14 +368,20 @@ export default function Home() {
 
       <HowItWorksModal
         isOpen={quizStep === 'how-it-works'}
-        onClose={resetQuizFlow}
+        onClose={() => {
+          resetQuizFlow();
+          redirectToDashboardIfLoggedIn();
+        }}
         onBack={() => setQuizStep('welcome')}
         onNext={() => setQuizStep('book-dinner')}
       />
 
       <PreferencesModal
         isOpen={quizStep === 'preferences'}
-        onClose={resetQuizFlow}
+        onClose={() => {
+          resetQuizFlow();
+          redirectToDashboardIfLoggedIn();
+        }}
         onBack={() => setQuizStep('book-dinner')}
         onConfirm={handlePreferencesConfirm}
       />
