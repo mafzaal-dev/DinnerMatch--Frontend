@@ -114,7 +114,7 @@ const CreateEditDinnerPage = ({ dinnerId = null, isEdit = false }) => {
         dinner_type: formData.dinner_type,
         is_published: formData.is_published,
         // Also send as dinner_status for backwards compatibility
-        dinner_status: formData.is_published ? "Upcoming" : "Draft",
+        dinner_status: formData.is_published ? "published" : "draft",
       };
 
       if (isEdit && dinnerId) {
