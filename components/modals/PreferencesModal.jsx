@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'react-hot-toast';
 
@@ -18,6 +18,11 @@ const PreferencesModal = ({ isOpen, onClose, onConfirm, onBack }) => {
     const languages = ['English', 'Afrikaans', 'Xhosa'];
     const budgets = ['$', '$$', '$$$'];
     const dietaryOptions = ['Vegetarian', 'Meat', 'Fish', 'Vegan', 'Halaal'];
+
+    useEffect(() => {
+        document.body.style.overflow = isOpen ? 'hidden' : '';
+        return () => { document.body.style.overflow = ''; };
+    }, [isOpen]);
 
     if (!isOpen) return null;
 
@@ -62,7 +67,7 @@ const PreferencesModal = ({ isOpen, onClose, onConfirm, onBack }) => {
     };
 
     return (
-        <div className="fixed inset-0 z-50 bg-[#0F1123] md:bg-black/80 md:flex md:items-center md:justify-center overflow-y-auto">
+        <div className="fixed inset-0 z-50 bg-[#0F1123] md:bg-black/80 md:flex md:items-center md:justify-center overflow-y-auto overscroll-none">
             <div className="min-h-full h-full w-full text-white md:bg-[#0F1123] md:rounded-xl md:p-8 md:max-w-4xl md:mx-4 md:relative md:animate-fadeIn md:max-h-[85vh] md:overflow-y-auto md:min-h-0 flex flex-col p-4">
                 <button
                     onClick={onClose}

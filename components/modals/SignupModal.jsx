@@ -185,7 +185,7 @@ const SignupModal = ({
           </svg>
         </button>
 
-        <div className="h-screen overflow-y-auto scroll-smooth flex flex-col md:block p-3 md:p-0">
+        <div className="h-screen overflow-y-auto overscroll-none scroll-smooth flex flex-col md:block p-3 md:p-0">
           {/* Header */}
           <div className="text-center pt-12 pb-4 md:mb-10 md:mt-6 md:pt-0 md:pb-0 relative">
             <button

@@ -1,9 +1,14 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 const PricingModal = ({ isOpen, onClose, onSelectPlan }) => {
   const [loadingPlanId, setLoadingPlanId] = useState(null);
+
+  useEffect(() => {
+    document.body.style.overflow = isOpen ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -56,7 +61,7 @@ const PricingModal = ({ isOpen, onClose, onSelectPlan }) => {
   ];
 
   return (
-    <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 overflow-y-auto">
+    <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 overflow-y-auto overscroll-none">
       <div className="bg-[#080814] border border-white rounded-xl w-full max-w-6xl p-8 relative shadow-2xl my-8">
         {/* Close Button */}
         <button

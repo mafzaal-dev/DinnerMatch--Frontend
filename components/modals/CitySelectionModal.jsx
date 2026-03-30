@@ -10,6 +10,11 @@ const CitySelectionModal = ({ isOpen, onClose, onSelectCity }) => {
   const [selectedCityId, setSelectedCityId] = useState(null);
 
   useEffect(() => {
+    document.body.style.overflow = isOpen ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [isOpen]);
+
+  useEffect(() => {
     if (!isOpen) {
       setSelectedCityId(null);
       return;

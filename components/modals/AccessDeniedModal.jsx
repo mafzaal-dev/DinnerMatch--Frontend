@@ -1,6 +1,6 @@
 "use client";
 
-import React from 'react';
+import React, { useEffect } from 'react';
 
 const AccessDeniedModal = ({
   isOpen,
@@ -9,6 +9,11 @@ const AccessDeniedModal = ({
   message = "You don't have permission to access the admin area. Please use the main site or contact support if you believe this is an error.",
   buttonText = 'Go to Home',
 }) => {
+  useEffect(() => {
+    document.body.style.overflow = isOpen ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   return (

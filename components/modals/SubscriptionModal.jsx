@@ -130,7 +130,7 @@ const SubscriptionModal = ({ isOpen, onClose, onContinue, onBack }) => {
 
   return (
     <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 overflow-hidden">
-      <div className="bg-[#080814] rounded-xl w-full max-w-6xl p-10 relative shadow-2xl max-h-[90vh] overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+      <div className="bg-[#080814] rounded-xl w-full max-w-6xl p-10 relative shadow-2xl max-h-[90vh] overflow-y-auto overscroll-none [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
         {/* Header row: back | close — no title needed here since PricingSection has its own */}
         <div className="flex items-center justify-between mb-6 gap-2">
           {/* Back button */}

@@ -148,7 +148,7 @@ const PricingSection = ({ onSelectPlan, plans, activePlanId }) => {
                 title="Monthly Pass"
                 price="R250"
                 period="/month"
-                savings="You're saving R75 per dinner when you attend more than one."
+                savings="Full flexibility - cancel anytime."
                 features={monthlyFeatures}
                 buttonText="Start Monthly Pass"
                 buttonColor="#FFAA55"

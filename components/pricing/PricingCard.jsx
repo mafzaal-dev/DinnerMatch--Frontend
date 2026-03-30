@@ -55,12 +55,14 @@ const PricingCard = ({
 
       <div className="flex z-0 flex-col gap-3 mt-2 w-full text-center">
         <div className="flex gap-1 justify-center items-end self-center leading-none whitespace-nowrap text-neutral-200">
-          {originalPrice && (
+          {isHighlighted && initialPrice > 0 && (
+            <span className="text-xl text-gray-500 line-through">R{initialPrice}</span>
+          )}
+          {!isHighlighted && originalPrice && (
             <div className="text-xl line-through text-neutral-200">
               {originalPrice}
             </div>
           )}
-          {isHighlighted && <span class="text-xl text-gray-500 line-through">R{initialPrice}</span>}
           <div className={`text-4xl font-bold leading-none ${priceColor}`}>
             {price}
           </div>
