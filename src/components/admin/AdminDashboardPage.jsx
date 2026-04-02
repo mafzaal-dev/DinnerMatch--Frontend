@@ -892,6 +892,7 @@ const AdminDashboardPage = () => {
           onClose={() => setShowEmailModal(false)}
           contextText="All Users"
           recipientCount={parseInt(totalUsers)}
+          userIds={users.map((u) => u.id).filter(Boolean)}
         />
       )}
     </div>
