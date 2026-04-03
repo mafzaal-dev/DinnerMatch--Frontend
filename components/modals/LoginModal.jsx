@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { loginSchema } from '@/constants/validationSchemas';
 
-const LoginModal = ({ isOpen, onClose, onLogin }) => { // Added onLogin prop if it was missing or implied
+const LoginModal = ({ isOpen, onClose, onLogin, isLoading = false }) => {
   const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
@@ -65,7 +65,8 @@ const LoginModal = ({ isOpen, onClose, onLogin }) => { // Added onLogin prop if 
               id="email"
               {...register('email')}
               placeholder="Enter your email"
-              className={`w-full h-12 px-3 bg-white border rounded-lg text-white placeholder-[#bdbdbd] focus:outline-none focus:border-[#F97315] focus:ring-1 focus:ring-[#F97315] transition-colors ${errors.email ? 'border-red-500' : 'border-gray-500'}`}
+              disabled={isLoading}
+              className={`w-full h-12 px-3 bg-white border rounded-lg text-white placeholder-[#bdbdbd] focus:outline-none focus:border-[#F97315] focus:ring-1 focus:ring-[#F97315] transition-colors disabled:opacity-60 ${errors.email ? 'border-red-500' : 'border-gray-500'}`}
             />
             {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
           </div>
@@ -81,7 +82,8 @@ const LoginModal = ({ isOpen, onClose, onLogin }) => { // Added onLogin prop if 
                 id="password"
                 {...register('password')}
                 placeholder="Enter your password"
-                className={`w-full h-12 px-3 bg-white border rounded-lg placeholder-[#bdbdbd] focus:outline-none focus:border-[#F97315] focus:ring-1 focus:ring-[#F97315] transition-colors pr-12 ${errors.password ? 'border-red-500' : 'border-gray-700'}`}
+                disabled={isLoading}
+                className={`w-full h-12 px-3 bg-white border rounded-lg placeholder-[#bdbdbd] focus:outline-none focus:border-[#F97315] focus:ring-1 focus:ring-[#F97315] transition-colors pr-12 disabled:opacity-60 ${errors.password ? 'border-red-500' : 'border-gray-700'}`}
               />
               <button
                 type="button"
@@ -121,11 +123,16 @@ const LoginModal = ({ isOpen, onClose, onLogin }) => { // Added onLogin prop if 
           {/* Sign In Button */}
           <button
             type="submit"
-            className="w-full bg-[#FFAA55]  text-white h-12 rounded-lg
-             font-normal text-sm  tracking-wide flex justify-center
-              items-center hover:bg-[#EA580C] transition-colors"
+            disabled={isLoading}
+            className="w-full bg-[#FFAA55] text-white h-12 rounded-lg font-normal text-sm tracking-wide flex justify-center items-center gap-2 hover:bg-[#EA580C] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            Sign In
+            {isLoading && (
+              <svg className="h-4 w-4 shrink-0 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden>
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+              </svg>
+            )}
+            {isLoading ? "Signing in…" : "Sign In"}
           </button>
 
           {/* Terms */}

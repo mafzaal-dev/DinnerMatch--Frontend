@@ -47,8 +47,12 @@ const CustomDropdown = ({
   const openUpward =
     placement === "auto" ? autoOpenUpward : placement === "top";
 
-  // Find the selected option label
-  const selectedOption = options.find((opt) => opt.value === value);
+  // Find the selected option label (loose match so string/number/UUID ids from APIs align)
+  const selectedOption = options.find((opt) => {
+    if (opt.value === value) return true;
+    if (value === "" || value == null) return opt.value === "" || opt.value == null;
+    return String(opt.value) === String(value);
+  });
   const displayText = selectedOption ? selectedOption.label : "";
 
   // Filter options based on search term

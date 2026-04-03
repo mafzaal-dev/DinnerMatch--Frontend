@@ -6,7 +6,7 @@ import { DatePicker } from "@/components/ui/date-picker";
 import { format } from "date-fns";
 import { toast } from 'react-hot-toast';
 import { debounce, formatDisplayValue, isValidSearchQuery, capitalizeWords } from '../../utils/searchHelper';
-import { CustomDropdown } from '@/components/common';
+import { CustomDropdown, InlineSpinner } from '@/components/common';
 import { TablePagination } from '@/components/ui/Pagination';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -106,6 +106,7 @@ const GroupAttendeesPage = () => {
   const [groups, setGroups] = useState([]);
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [exportingCsv, setExportingCsv] = useState(false);
   const [error, setError] = useState('');
   
   // Modals
@@ -194,10 +195,18 @@ const GroupAttendeesPage = () => {
   ];
 
   useEffect(() => {
-    if (selectedDinner) {
-      fetchDinnerRequests();
-    }
-  }, [selectedDinner, requestsPage, requestsPageSize, filterRequestCity, filterRequestDinner, filterRequestDateFrom, filterRequestDateTo]); // eslint-disable-line
+    if (activeTab !== "users") return;
+    fetchDinnerRequests();
+  }, [
+    activeTab,
+    selectedDinner,
+    requestsPage,
+    requestsPageSize,
+    filterRequestCity,
+    filterRequestDinner,
+    filterRequestDateFrom,
+    filterRequestDateTo,
+  ]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (activeTab === 'groups') {
@@ -221,24 +230,26 @@ const GroupAttendeesPage = () => {
 
   const fetchGroupsRef = useRef(null);
   const fetchDinnerRequestsRef = useRef(null);
+  const activeTabRef = useRef(activeTab);
+  activeTabRef.current = activeTab;
 
-  // Debounced search for both tabs
-  const debouncedSearch = useCallback(
-    debounce((query) => {
-        if (activeTab === 'groups') {
-          setGroupsPage(0);
-          setGroups([]);
-          setHasMoreGroups(true);
-          // fetchGroups is async, but we don't await here.
-          // passing query to ensure latest is used
-          if (fetchGroupsRef.current) fetchGroupsRef.current(false, query);
-        } else {
-          setRequestsPage(0);
-          if (fetchDinnerRequestsRef.current) fetchDinnerRequestsRef.current(query);
+  const debouncedSearchRef = useRef(null);
+  if (!debouncedSearchRef.current) {
+    debouncedSearchRef.current = debounce((query) => {
+      if (activeTabRef.current === 'groups') {
+        setGroupsPage(0);
+        setGroups([]);
+        setHasMoreGroups(true);
+        if (fetchGroupsRef.current) fetchGroupsRef.current(false, query);
+      } else {
+        setRequestsPage(0);
+        if (fetchDinnerRequestsRef.current) {
+          fetchDinnerRequestsRef.current(query);
         }
-    }, 500),
-    [activeTab] // eslint-disable-line react-hooks/exhaustive-deps
-  );
+      }
+    }, 500);
+  }
+  const debouncedSearch = debouncedSearchRef.current;
 
   const handleSearchChange = (e) => {
     const value = e.target.value;
@@ -258,10 +269,11 @@ const GroupAttendeesPage = () => {
     try {
       const response = await api.get(`${API_ENDPOINTS.DINNER_LIST}?index=0&offset=100`);
       if (response.success) {
-        setDinners(response.data || []);
-        if (response.data && response.data.length > 0) {
-          setSelectedDinner(response.data[0].id);
-        }
+        const list = response.data || [];
+        setDinners(list);
+        setSelectedDinner((prev) =>
+          prev === "" && list.length > 0 ? String(list[0].id) : prev,
+        );
       }
     } catch (err) {
       console.error('Error fetching dinners:', err);
@@ -290,7 +302,11 @@ const GroupAttendeesPage = () => {
       const startIndex = requestsPage * requestsPageSize;
       params.append('index', startIndex);
       params.append('offset', requestsPageSize);
-      if (selectedDinner) params.append('dinner_id', selectedDinner);
+      if (selectedDinner) {
+        const did = String(selectedDinner);
+        params.append("dinner_id", did);
+        params.append("dinner", did);
+      }
       
       const term = query !== null ? query : searchQuery;
 
@@ -597,6 +613,7 @@ const GroupAttendeesPage = () => {
   };
 
   const handleExportCSV = async () => {
+    setExportingCsv(true);
     try {
       if (activeTab === 'groups') {
         const params = new URLSearchParams();
@@ -658,7 +675,11 @@ const GroupAttendeesPage = () => {
         // Users Tab (Dinner Requests)
         const params = new URLSearchParams();
         params.append("export", "true");
-        if (selectedDinner) params.append('dinner_id', selectedDinner);
+        if (selectedDinner) {
+          const did = String(selectedDinner);
+          params.append("dinner_id", did);
+          params.append("dinner", did);
+        }
         
         if (isValidSearchQuery(searchQuery)) {
           params.append('search', searchQuery);
@@ -716,6 +737,8 @@ const GroupAttendeesPage = () => {
     } catch (err) {
       console.error('Error exporting CSV:', err);
       toast.error('Failed to export CSV');
+    } finally {
+      setExportingCsv(false);
     }
   };
 
@@ -935,13 +958,19 @@ const GroupAttendeesPage = () => {
                     </div>
                   </div>
                   <button 
+                    type="button"
                     onClick={handleExportCSV}
-                    className="px-4 py-2 bg-white border border-[#E5E7EB] text-[#374151] rounded-lg text-sm font-medium hover:bg-gray-50 flex items-center gap-2 whitespace-nowrap"
+                    disabled={exportingCsv}
+                    className="px-4 py-2 bg-white border border-[#E5E7EB] text-[#374151] rounded-lg text-sm font-medium hover:bg-gray-50 flex items-center gap-2 whitespace-nowrap disabled:opacity-60 disabled:cursor-not-allowed"
                   >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                    </svg>
-                    Export All CSV
+                    {exportingCsv ? (
+                      <InlineSpinner className="h-4 w-4 text-[#374151]" label="Exporting" />
+                    ) : (
+                      <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                      </svg>
+                    )}
+                    {exportingCsv ? 'Exporting…' : 'Export All CSV'}
                   </button>
                   <button 
                     onClick={() => {
@@ -975,13 +1004,19 @@ const GroupAttendeesPage = () => {
                     </div>
                   </div>
                   <button 
+                    type="button"
                     onClick={handleExportCSV}
-                    className="px-4 py-2 bg-white border border-[#E5E7EB] text-[#374151] rounded-lg text-sm font-medium hover:bg-gray-50 flex items-center gap-2 whitespace-nowrap"
+                    disabled={exportingCsv}
+                    className="px-4 py-2 bg-white border border-[#E5E7EB] text-[#374151] rounded-lg text-sm font-medium hover:bg-gray-50 flex items-center gap-2 whitespace-nowrap disabled:opacity-60 disabled:cursor-not-allowed"
                   >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                    </svg>
-                    Export All CSV
+                    {exportingCsv ? (
+                      <InlineSpinner className="h-4 w-4 text-[#374151]" label="Exporting" />
+                    ) : (
+                      <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                      </svg>
+                    )}
+                    {exportingCsv ? 'Exporting…' : 'Export All CSV'}
                   </button>
                 </>
               )}
@@ -997,15 +1032,19 @@ const GroupAttendeesPage = () => {
           {activeTab === 'users' ? (
              <CustomDropdown
                value={selectedDinner}
-               onChange={(e) => setSelectedDinner(e.target.value)}
+               onChange={(e) => {
+                 setRequestsPage(0);
+                 const v = e.target.value;
+                 setSelectedDinner(v === "" || v == null ? "" : String(v));
+               }}
                options={[
-                 { value: '', label: 'Select Dinner Event' },
-                 ...dinners.map(dinner => ({
-                   value: dinner.id,
+                 { value: '', label: 'All dinner events' },
+                 ...dinners.map((dinner) => ({
+                   value: String(dinner.id),
                    label: `${dinner.title} - ${new Date(dinner.date).toLocaleDateString()}`,
                  })),
                ]}
-               placeholder="Select Dinner Event"
+               placeholder="All dinner events"
              />
           ) : (
             <div className="hidden">
@@ -1020,22 +1059,23 @@ const GroupAttendeesPage = () => {
           
           {/* Second Filter */}
           {activeTab === 'users' ? (
-             <div className="hidden">
-               <CustomDropdown
-                 value={filterRequestCity}
-                 onChange={(e) => setFilterRequestCity(e.target.value)}
-                 options={cityOptions}
-                 placeholder="All Cities"
-               />
-             </div>
+            <CustomDropdown
+              value={filterRequestCity}
+              onChange={(e) => {
+                setRequestsPage(0);
+                setFilterRequestCity(e.target.value);
+              }}
+              options={cityOptions}
+              placeholder="All Cities"
+            />
           ) : (
             <CustomDropdown
               value={filterDinner}
               onChange={(e) => setFilterDinner(e.target.value)}
               options={[
                 { value: '', label: 'All Dinners' },
-                ...dinners.map(dinner => ({
-                  value: dinner.id,
+                ...dinners.map((dinner) => ({
+                  value: String(dinner.id),
                   label: dinner.title,
                 })),
               ]}
@@ -1051,6 +1091,7 @@ const GroupAttendeesPage = () => {
             }
             onSelect={(date) => {
                 const val = date ? format(date, "yyyy-MM-dd") : "";
+                if (activeTab === "users") setRequestsPage(0);
                 activeTab === 'groups' ? setFilterDateFrom(val) : setFilterRequestDateFrom(val);
             }}
             placeholder="From Date"
@@ -1065,34 +1106,53 @@ const GroupAttendeesPage = () => {
             }
             onSelect={(date) => {
                 const val = date ? format(date, "yyyy-MM-dd") : "";
+                if (activeTab === "users") setRequestsPage(0);
                 activeTab === 'groups' ? setFilterDateTo(val) : setFilterRequestDateTo(val);
             }}
             placeholder="To Date"
             className="w-full"
           />
           
-          {((activeTab === 'groups' && (filterCity || filterDinner || filterDateFrom || filterDateTo)) ||
-            (activeTab === 'users' && (selectedDinner || filterRequestCity || filterRequestDateFrom || filterRequestDateTo))) && (
+          {((activeTab === 'groups' &&
+            (filterCity ||
+              filterDinner ||
+              filterDateFrom ||
+              filterDateTo ||
+              isValidSearchQuery(searchQuery))) ||
+            (activeTab === 'users' &&
+              (filterRequestCity ||
+                filterRequestDinner ||
+                filterRequestDateFrom ||
+                filterRequestDateTo ||
+                isValidSearchQuery(searchQuery)))) && (
             <div className="sm:col-span-2 lg:col-span-4 flex justify-end">
-                <button
+              <button
+                type="button"
                 onClick={() => {
-                    if (activeTab === 'groups') {
+                  debouncedSearchRef.current?.cancel?.();
+                  setSearchQuery('');
+                  if (activeTab === 'groups') {
                     setFilterCity('');
                     setFilterDinner('');
                     setFilterDateFrom('');
                     setFilterDateTo('');
-                    } else {
-                    setSelectedDinner(''); // Also clear selected dinner if user wants to reset all? Or maybe keep it.
+                    setGroupsPage(0);
+                    setGroups([]);
+                    setHasMoreGroups(true);
+                    setTimeout(() => fetchGroupsRef.current?.(false, ''), 0);
+                  } else {
                     setFilterRequestCity('');
                     setFilterRequestDinner('');
                     setFilterRequestDateFrom('');
                     setFilterRequestDateTo('');
-                    }
+                    setRequestsPage(0);
+                    setTimeout(() => fetchDinnerRequestsRef.current?.(''), 0);
+                  }
                 }}
                 className="text-sm text-[#F97316] hover:text-[#EA580C] font-medium transition-colors"
-                >
+              >
                 Clear Filters
-                </button>
+              </button>
             </div>
           )}
         </div>

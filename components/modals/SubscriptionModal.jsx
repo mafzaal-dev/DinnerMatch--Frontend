@@ -9,6 +9,7 @@ const SubscriptionModal = ({ isOpen, onClose, onContinue, onBack }) => {
   const [activePlanId, setActivePlanId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const [checkoutLoadingPlanId, setCheckoutLoadingPlanId] = useState(null);
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -86,6 +87,7 @@ const SubscriptionModal = ({ isOpen, onClose, onContinue, onBack }) => {
     }
 
     setCheckoutLoading(true);
+    setCheckoutLoadingPlanId(plan.id);
     setError(null);
     try {
       const checkoutRes = await api.post(API_ENDPOINTS.PAYMENTS_CHECKOUT, {
@@ -123,6 +125,7 @@ const SubscriptionModal = ({ isOpen, onClose, onContinue, onBack }) => {
       );
     } finally {
       setCheckoutLoading(false);
+      setCheckoutLoadingPlanId(null);
     }
   };
 
@@ -158,7 +161,8 @@ const SubscriptionModal = ({ isOpen, onClose, onContinue, onBack }) => {
             <button
               type="button"
               onClick={() => onClose?.()}
-              className="text-[#D9D9D9] hover:text-[#F5F5F5] transition-colors"
+              disabled={checkoutLoading}
+              className="text-[#D9D9D9] hover:text-[#F5F5F5] transition-colors disabled:opacity-40"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -184,7 +188,12 @@ const SubscriptionModal = ({ isOpen, onClose, onContinue, onBack }) => {
                 checkoutLoading ? "pointer-events-none opacity-70" : ""
               }
             >
-              <PricingSection plans={plans} onSelectPlan={handleSelectPlan} activePlanId={activePlanId} />
+              <PricingSection
+                plans={plans}
+                onSelectPlan={handleSelectPlan}
+                activePlanId={activePlanId}
+                loadingPlanId={checkoutLoadingPlanId}
+              />
             </div>
             {checkoutLoading && (
               <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center">

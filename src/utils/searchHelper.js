@@ -1,14 +1,22 @@
 // Debounce helper for search functionality
 export const debounce = (func, wait = 500) => {
   let timeout;
-  return function executedFunction(...args) {
+  const executedFunction = function executedFunction(...args) {
     const later = () => {
       clearTimeout(timeout);
+      timeout = undefined;
       func(...args);
     };
     clearTimeout(timeout);
     timeout = setTimeout(later, wait);
   };
+  executedFunction.cancel = () => {
+    if (timeout !== undefined) {
+      clearTimeout(timeout);
+      timeout = undefined;
+    }
+  };
+  return executedFunction;
 };
 
 // Format display value - replace N/A with dash

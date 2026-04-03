@@ -55,7 +55,8 @@ axiosInstance.interceptors.response.use(
       error.response?.status === 401 &&
       !originalRequest._retry &&
       !originalRequest.url.includes("/auth/login") &&
-      !originalRequest.url.includes("/register")
+      !originalRequest.url.includes("/register") &&
+      !originalRequest.url.includes("/auth/forgot-password")
     ) {
       originalRequest._retry = true;
 
@@ -136,6 +137,7 @@ export const api = {
 export const API_ENDPOINTS = {
   // Auth
   LOGIN: "/auth/login/",
+  FORGOT_PASSWORD: "/auth/forgot-password",
   REGISTER: "/auth/register/",
   REGISTER_WITH_QUIZ: "/auth/register-with-quiz/",
   REFRESH: "/auth/refresh/",

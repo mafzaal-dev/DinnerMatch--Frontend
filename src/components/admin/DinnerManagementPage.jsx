@@ -1,12 +1,13 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useDinner } from '@/hooks/useDinner';
 import { DatePicker } from '@/components/ui/date-picker';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
 import { debounce, isValidSearchQuery } from '@/utils/searchHelper';
+import { isDinnerPublished } from '@/utils/dinnerStatus';
 import { CustomDropdown } from '@/components/common';
 import { TablePagination } from '@/components/ui/Pagination';
 
@@ -75,14 +76,14 @@ const DinnerManagementPage = () => {
     fetchDinnersRef.current = fetchDinners;
   });
 
-  // Debounced search function
-  const debouncedSearch = useCallback(
-    debounce((query) => {
-        setCurrentPage(0);
-        fetchDinnersRef.current(query);
-    }, 500),
-    [] // eslint-disable-line react-hooks/exhaustive-deps
-  );
+  const debouncedSearchRef = React.useRef(null);
+  if (!debouncedSearchRef.current) {
+    debouncedSearchRef.current = debounce((query) => {
+      setCurrentPage(0);
+      fetchDinnersRef.current(query);
+    }, 500);
+  }
+  const debouncedSearch = debouncedSearchRef.current;
 
   useEffect(() => {
     fetchDinners();
@@ -239,14 +240,23 @@ const DinnerManagementPage = () => {
                 placeholder="All Publish Status"
               />
 
-              {(filterLocation || startDate || endDate || filterStatus || filterPublish) && (
+              {(filterLocation ||
+                startDate ||
+                endDate ||
+                filterStatus ||
+                filterPublish ||
+                isValidSearchQuery(searchQuery)) && (
                 <button
                   onClick={() => {
+                    debouncedSearchRef.current?.cancel?.();
+                    setSearchQuery('');
+                    setCurrentPage(0);
                     setFilterLocation('');
                     setStartDate('');
                     setEndDate('');
                     setFilterStatus('');
                     setFilterPublish('');
+                    setTimeout(() => fetchDinnersRef.current(''), 0);
                   }}
                   className="w-full px-4 py-2 text-sm text-[#6B7280] hover:text-[#374151] hover:bg-gray-50 rounded-lg transition-colors"
                 >
@@ -309,11 +319,11 @@ const DinnerManagementPage = () => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm">
                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          dinner.is_published || dinner.dinner_status === 'Upcoming' || dinner.dinner_status === 'Published'
+                          isDinnerPublished(dinner)
                             ? 'bg-green-100 text-green-800' 
                             : 'bg-yellow-100 text-yellow-800'
                         }`}>
-                          {dinner.is_published || dinner.dinner_status === 'Upcoming' || dinner.dinner_status === 'Published' ? 'Published' : 'Draft'}
+                          {isDinnerPublished(dinner) ? 'Published' : 'Draft'}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right">

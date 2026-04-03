@@ -17,6 +17,7 @@ const PricingCard = ({
   plan,
   isActivePlan = false,
   initialPrice = 0,
+  loadingPlanId = null,
 }) => {
   const cardClasses = isHighlighted
     ? "flex relative flex-col grow shrink self-stretch gap-3 px-4 pt-8 pb-4 font-bold rounded-lg border-2 border-yellow-500/50 min-w-60 w-[251px]"
@@ -42,6 +43,13 @@ const PricingCard = ({
   const cardStyle = isHighlighted
     ? { background: "linear-gradient(180deg, #281914 0%, #111121 75%)" }
     : undefined;
+
+  const planId = plan?.id;
+  const isThisCheckoutLoading =
+    loadingPlanId != null &&
+    planId != null &&
+    String(loadingPlanId) === String(planId);
+  const checkoutBusy = loadingPlanId != null;
 
   return (
     <article className={cardClasses} style={cardStyle}>
@@ -80,14 +88,29 @@ const PricingCard = ({
       <button
         type="button"
         onClick={() => onSelect && onSelect({ title, price, period, plan })}
-        className={`${buttonClasses} ${buttonBgClass}`}
+        className={`${buttonClasses} ${buttonBgClass} ${checkoutBusy ? "opacity-70 cursor-wait" : ""}`}
         style={buttonStyle}
+        disabled={checkoutBusy}
       >
-        <div className="self-stretch my-auto text-neutral-800">
-          {buttonText}
-          {isActivePlan && (
-            <span className="ml-1.5 opacity-90 text-xs">(Current Plan)</span>
+        <div className="self-stretch my-auto text-neutral-800 flex items-center justify-center gap-2">
+          {isThisCheckoutLoading && (
+            <svg
+              className="h-4 w-4 shrink-0 animate-spin text-neutral-800"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              aria-hidden
+            >
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+            </svg>
           )}
+          <span>
+            {isThisCheckoutLoading ? "Redirecting…" : buttonText}
+            {isActivePlan && (
+              <span className="ml-1.5 opacity-90 text-xs">(Current Plan)</span>
+            )}
+          </span>
         </div>
       </button>
     </article>

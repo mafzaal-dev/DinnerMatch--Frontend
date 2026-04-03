@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useQuiz } from "@/hooks/useQuiz";
 import { toast } from "react-hot-toast";
@@ -252,14 +252,17 @@ const QuizListPage = () => {
     }
   };
 
-  // Debounced search function
-  const debouncedSearch = useCallback(
-    debounce((query) => {
-      setCurrentPage(0); // Reset to first page on new search
-      fetchQuestions(query);
-    }, 500),
-    [], // eslint-disable-line react-hooks/exhaustive-deps
-  );
+  const fetchQuestionsRef = useRef(fetchQuestions);
+  fetchQuestionsRef.current = fetchQuestions;
+
+  const debouncedSearchRef = useRef(null);
+  if (!debouncedSearchRef.current) {
+    debouncedSearchRef.current = debounce((query) => {
+      setCurrentPage(0);
+      fetchQuestionsRef.current(query);
+    }, 500);
+  }
+  const debouncedSearch = debouncedSearchRef.current;
 
   const handleSearchChange = (e) => {
     const value = e.target.value;
@@ -444,6 +447,25 @@ const QuizListPage = () => {
                 placeholder="Sort by"
                 className=""
               />
+
+              {(filterSection ||
+                filterType ||
+                isValidSearchQuery(searchQuery)) && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    debouncedSearchRef.current?.cancel?.();
+                    setFilterSection("");
+                    setFilterType("");
+                    setSearchQuery("");
+                    setCurrentPage(0);
+                    setTimeout(() => fetchQuestionsRef.current(""), 0);
+                  }}
+                  className="px-3 py-2 text-sm font-medium text-[#6B7280] hover:text-[#374151] transition-colors whitespace-nowrap"
+                >
+                  Clear filters
+                </button>
+              )}
 
               {/* Create Button */}
               <button

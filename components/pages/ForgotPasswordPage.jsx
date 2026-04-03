@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { forgotPasswordSchema } from '@/constants/validationSchemas';
 
-const ForgotPasswordPage = ({ onSubmit, onBack, onSignIn }) => {
+const ForgotPasswordPage = ({ onSubmit, onBack, onSignIn, isSubmitting = false }) => {
   const {
     register,
     handleSubmit,
@@ -57,9 +57,10 @@ const ForgotPasswordPage = ({ onSubmit, onBack, onSignIn }) => {
             {/* Submit Button */}
             <button
               type="submit"
-              className="w-full bg-[#FFAA55] text-[#F5F5F5] py-4 rounded-lg font-bold text-sm uppercase tracking-wide hover:bg-[#FF9955] transition-colors"
+              disabled={isSubmitting}
+              className="w-full bg-[#FFAA55] text-[#F5F5F5] py-4 rounded-lg font-bold text-sm uppercase tracking-wide hover:bg-[#FF9955] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              Send Reset Link
+              {isSubmitting ? 'Sending…' : 'Send Reset Link'}
             </button>
 
             {/* Back to Sign In */}

@@ -13,6 +13,7 @@ export default function EditProfile() {
   const [initialData, setInitialData] = useState({});
   const [profileApiResponse, setProfileApiResponse] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -57,6 +58,7 @@ export default function EditProfile() {
   }, [user]);
 
   const handleSave = async (formData) => {
+    setSaving(true);
     try {
       await updateProfile(formData);
       toast.success(
@@ -74,6 +76,8 @@ export default function EditProfile() {
     } catch (error) {
       console.error("Failed to update profile", error);
       toast.error(error.message || "Failed to update profile");
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -95,6 +99,7 @@ export default function EditProfile() {
       onBack={handleBack}
       initialData={initialData}
       profileApiResponse={profileApiResponse}
+      isSaving={saving}
     />
   );
 }

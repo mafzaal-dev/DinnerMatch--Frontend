@@ -95,8 +95,17 @@ const EmailModal = ({ onClose, contextText, totalUsers, recipientCount, userIds 
         </div>
 
         {/* Content */}
-        <div className="p-6 overflow-y-auto">
-          <div className="space-y-4">
+        <div className="p-6 overflow-y-auto relative min-h-[200px]">
+          {loading && templates.length === 0 ? (
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-white/80 z-[1] rounded-lg">
+              <svg className="h-8 w-8 animate-spin text-[#F97316]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden>
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+              </svg>
+              <p className="text-sm text-gray-600">Loading templates…</p>
+            </div>
+          ) : null}
+          <div className={`space-y-4 ${loading && templates.length === 0 ? "opacity-40 pointer-events-none" : ""}`}>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Email Template
@@ -115,7 +124,6 @@ const EmailModal = ({ onClose, contextText, totalUsers, recipientCount, userIds 
                 disabled={loading}
                 placement="top"
               />
-              {loading && <p className="text-xs text-gray-500 mt-1">Loading templates...</p>}
             </div>
 
             <div>

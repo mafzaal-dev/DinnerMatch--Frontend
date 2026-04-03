@@ -10,7 +10,7 @@ import {
   formatDisplayValue,
   isValidSearchQuery,
 } from "../../utils/searchHelper";
-import { CustomDropdown } from "@/components/common";
+import { CustomDropdown, InlineSpinner } from "@/components/common";
 import { TablePagination } from "@/components/ui/Pagination";
 import { Tooltip } from "@/components/ui/Tooltip";
 import EmailModal from "./EmailModal";
@@ -34,6 +34,7 @@ const AdminDashboardPage = () => {
   const [users, setUsers] = useState([]);
   const [totalUsers, setTotalUsers] = useState("0");
   const [loading, setLoading] = useState(false);
+  const [exportingCsv, setExportingCsv] = useState(false);
   const [error, setError] = useState(null);
 
   const [showEmailModal, setShowEmailModal] = useState(false);
@@ -113,16 +114,19 @@ const AdminDashboardPage = () => {
     ],
   );
 
-  // Debounced search function
-  const debouncedFetchUsers = useCallback(
-    debounce((query) => {
+  const fetchUsersRef = useRef(fetchUsers);
+  fetchUsersRef.current = fetchUsers;
+
+  const debouncedFetchUsersRef = useRef(null);
+  if (!debouncedFetchUsersRef.current) {
+    debouncedFetchUsersRef.current = debounce((query) => {
       if (isValidSearchQuery(query) || query.length === 0) {
-        setCurrentPage(0); // Reset to first page on new search
-        fetchUsers(query);
+        setCurrentPage(0);
+        fetchUsersRef.current(query);
       }
-    }, 500),
-    [], // eslint-disable-line react-hooks/exhaustive-deps
-  );
+    }, 500);
+  }
+  const debouncedFetchUsers = debouncedFetchUsersRef.current;
 
   useEffect(() => {
     api
@@ -247,6 +251,7 @@ const AdminDashboardPage = () => {
     searchQuery !== "";
 
   const handleResetFilters = () => {
+    debouncedFetchUsersRef.current?.cancel?.();
     setSelectedUserType("All Users");
     setSelectedCity("All Cities");
     setSelectedUpcomingDinner("Any Upcoming Dinner");
@@ -260,6 +265,7 @@ const AdminDashboardPage = () => {
   };
 
   const handleExportCSV = async () => {
+    setExportingCsv(true);
     try {
       const params = new URLSearchParams();
 
@@ -362,6 +368,8 @@ const AdminDashboardPage = () => {
     } catch (err) {
       console.error("Error exporting CSV:", err);
       toast.error("Failed to export CSV. Please try again.");
+    } finally {
+      setExportingCsv(false);
     }
   };
 
@@ -403,23 +411,29 @@ const AdminDashboardPage = () => {
               </button>
             )}
             <button
+              type="button"
               onClick={handleExportCSV}
-              className="w-full sm:w-auto px-5 py-2.5 bg-white border border-[#D1D5DB] text-[#374151] rounded-lg text-sm font-medium hover:bg-[#F9FAFB] transition-colors flex items-center gap-2 justify-center whitespace-nowrap"
+              disabled={exportingCsv || loading}
+              className="w-full sm:w-auto px-5 py-2.5 bg-white border border-[#D1D5DB] text-[#374151] rounded-lg text-sm font-medium hover:bg-[#F9FAFB] transition-colors flex items-center gap-2 justify-center whitespace-nowrap disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-                />
-              </svg>
-              Export CSV
+              {exportingCsv ? (
+                <InlineSpinner className="h-4 w-4 text-[#374151]" label="Exporting" />
+              ) : (
+                <svg
+                  className="w-4 h-4 shrink-0"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                  />
+                </svg>
+              )}
+              {exportingCsv ? "Exporting…" : "Export CSV"}
             </button>
           </div>
 

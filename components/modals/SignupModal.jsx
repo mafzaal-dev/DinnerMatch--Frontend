@@ -46,6 +46,7 @@ const SignupModal = ({
   const [mobileNumber, setMobileNumber] = useState("");
 
   const [stepErrors, setStepErrors] = useState({});
+  const [checkingEmail, setCheckingEmail] = useState(false);
 
   useEffect(() => {
     document.body.style.overflow = isOpen ? "hidden" : "";
@@ -131,6 +132,7 @@ const SignupModal = ({
     e.preventDefault();
     if (!validateStep1()) return;
 
+    setCheckingEmail(true);
     try {
       const response = await api.post(API_ENDPOINTS.PROFILE_CHECK, { email });
 
@@ -152,6 +154,8 @@ const SignupModal = ({
           email: "We could not verify this email right now. Please try again.",
         });
       }
+    } finally {
+      setCheckingEmail(false);
     }
   };
 
@@ -226,7 +230,7 @@ const SignupModal = ({
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="Enter your email"
                     className={`${INPUT_CLASS} ${stepErrors.email ? "border-red-500" : ""}`}
-                    disabled={loading}
+                    disabled={loading || checkingEmail}
                     autoFocus
                   />
                   {stepErrors.email && (
@@ -241,7 +245,7 @@ const SignupModal = ({
                     onChange={(e) => setConfirmEmail(e.target.value)}
                     placeholder="Confirm your email"
                     className={`${INPUT_CLASS} ${stepErrors.confirmEmail ? "border-red-500" : ""}`}
-                    disabled={loading}
+                    disabled={loading || checkingEmail}
                   />
                   {stepErrors.confirmEmail && (
                     <p className="text-red-400 text-xs mt-1">{stepErrors.confirmEmail}</p>
@@ -250,24 +254,32 @@ const SignupModal = ({
 
                 <button
                   type="submit"
-                  disabled={loading}
-                  className="w-full py-4 rounded-lg font-medium text-sm uppercase tracking-wide bg-[#FFAA55] text-white hover:bg-[#FF9955] transition-colors"
+                  disabled={loading || checkingEmail}
+                  className="w-full py-4 rounded-lg font-medium text-sm uppercase tracking-wide bg-[#FFAA55] text-white hover:bg-[#FF9955] transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
-                  Continue
+                  {checkingEmail && (
+                    <svg className="animate-spin h-4 w-4 shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden>
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                    </svg>
+                  )}
+                  {checkingEmail ? "Checking…" : "Continue"}
                 </button>
 
                 <div className="flex flex-col items-center gap-3 pt-1">
                   <button
                     type="button"
                     onClick={onBack}
-                    className="text-sm text-[#A0A0A0] hover:text-white transition-colors"
+                    disabled={checkingEmail}
+                    className="text-sm text-[#A0A0A0] hover:text-white transition-colors disabled:opacity-50"
                   >
                     Back to options
                   </button>
                   <button
                     type="button"
                     onClick={onShowLogin ?? onClose}
-                    className="text-sm text-[#A0A0A0] hover:text-white transition-colors"
+                    disabled={checkingEmail}
+                    className="text-sm text-[#A0A0A0] hover:text-white transition-colors disabled:opacity-50"
                   >
                     Already have an account?{" "}
                     <span className="text-[#FFAA55]">Sign in</span>

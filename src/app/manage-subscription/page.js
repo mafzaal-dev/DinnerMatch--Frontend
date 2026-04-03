@@ -11,7 +11,8 @@ function ManageSubscriptionContent() {
   const [plans, setPlans] = useState([]);
   const [activeSubscription, setActiveSubscription] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [cancelling, setCancelling] = useState(false);
+  const [checkoutLoadingPlanId, setCheckoutLoadingPlanId] = useState(null);
+  const [cancelInProgress, setCancelInProgress] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
@@ -65,6 +66,8 @@ function ManageSubscriptionContent() {
       return;
     }
 
+    setCheckoutLoadingPlanId(plan.id);
+    setError(null);
     try {
       const checkoutRes = await api.post(API_ENDPOINTS.PAYMENTS_CHECKOUT, {
         plan_id: plan.id,
@@ -92,6 +95,8 @@ function ManageSubscriptionContent() {
     } catch (err) {
       console.error("Checkout failed", err);
       setError(err.message || "Payment initialization failed");
+    } finally {
+      setCheckoutLoadingPlanId(null);
     }
   };
 
@@ -100,11 +105,11 @@ function ManageSubscriptionContent() {
   };
 
   const confirmCancellation = async () => {
-    setShowCancelModal(false);
-    setCancelling(true);
+    setCancelInProgress(true);
     setError(null);
     try {
       await api.post(API_ENDPOINTS.CANCEL_SUBSCRIPTION);
+      setShowCancelModal(false);
       setSuccessMessage("Subscription cancelled successfully.");
       setActiveSubscription(null);
       fetchData();
@@ -112,7 +117,7 @@ function ManageSubscriptionContent() {
       console.error("Cancellation failed:", err);
       setError(err?.message || "Failed to cancel subscription.");
     } finally {
-      setCancelling(false);
+      setCancelInProgress(false);
     }
   };
 
@@ -220,13 +225,14 @@ function ManageSubscriptionContent() {
 
               <div className="pt-6 border-t border-[#2F3A51]">
                 <button
+                  type="button"
                   onClick={handleCancelSubscriptionClick}
-                  disabled={cancelling}
+                  disabled={cancelInProgress}
                   className="w-full py-3 px-4 bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/50 rounded-lg font-semibold transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
                 >
-                  {cancelling ? (
+                  {cancelInProgress ? (
                     <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current" />
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current shrink-0" />
                       Cancelling...
                     </>
                   ) : (
@@ -245,6 +251,7 @@ function ManageSubscriptionContent() {
             plans={plans}
             onSelectPlan={handleSelectPlan}
             activePlanId={null}
+            loadingPlanId={checkoutLoadingPlanId}
           />
         )}
       </div>
@@ -263,16 +270,23 @@ function ManageSubscriptionContent() {
 
             <div className="flex gap-3 justify-end">
               <button
-                onClick={() => setShowCancelModal(false)}
-                className="px-4 py-2 rounded-lg text-[#E0E0E0] hover:bg-[#1A1A1E] transition-colors"
+                type="button"
+                onClick={() => !cancelInProgress && setShowCancelModal(false)}
+                disabled={cancelInProgress}
+                className="px-4 py-2 rounded-lg text-[#E0E0E0] hover:bg-[#1A1A1E] transition-colors disabled:opacity-50"
               >
                 No, Keep It
               </button>
               <button
+                type="button"
                 onClick={confirmCancellation}
-                className="px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/50 font-bold rounded-lg transition-colors"
+                disabled={cancelInProgress}
+                className="px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/50 font-bold rounded-lg transition-colors disabled:opacity-60 flex items-center gap-2"
               >
-                Yes, Cancel
+                {cancelInProgress && (
+                  <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-red-500 border-t-transparent" aria-hidden />
+                )}
+                {cancelInProgress ? "Cancelling…" : "Yes, Cancel"}
               </button>
             </div>
           </div>
@@ -284,7 +298,13 @@ function ManageSubscriptionContent() {
 
 export default function ManageSubscriptionPage() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-[#080714] flex items-center justify-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#FFAA55]" />
+        </div>
+      }
+    >
       <ManageSubscriptionContent />
     </Suspense>
   );

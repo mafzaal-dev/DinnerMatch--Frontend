@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useRestaurant } from '@/hooks/useRestaurant';
 import toast from 'react-hot-toast';
@@ -63,14 +63,14 @@ const RestaurantManagementPage = () => {
     fetchRestaurantsRef.current = fetchRestaurants;
   });
 
-  // Debounced search function
-  const debouncedSearch = useCallback(
-    debounce((query) => {
-        setCurrentPage(0);
-        fetchRestaurantsRef.current(query);
-    }, 500),
-    [] // eslint-disable-line react-hooks/exhaustive-deps
-  );
+  const debouncedSearchRef = React.useRef(null);
+  if (!debouncedSearchRef.current) {
+    debouncedSearchRef.current = debounce((query) => {
+      setCurrentPage(0);
+      fetchRestaurantsRef.current(query);
+    }, 500);
+  }
+  const debouncedSearch = debouncedSearchRef.current;
 
   useEffect(() => {
     fetchRestaurants();
@@ -221,13 +221,20 @@ const RestaurantManagementPage = () => {
                   placeholder="All Locations"
                 />
               </div>
-              {(filterRating || filterBudget || filterLocation) && (
+              {(filterRating ||
+                filterBudget ||
+                filterLocation ||
+                isValidSearchQuery(searchQuery)) && (
                 <div className="flex items-end">
                   <button
                     onClick={() => {
+                      debouncedSearchRef.current?.cancel?.();
+                      setSearchQuery('');
+                      setCurrentPage(0);
                       setFilterRating('');
                       setFilterBudget('');
                       setFilterLocation('');
+                      setTimeout(() => fetchRestaurantsRef.current(''), 0);
                     }}
                     className="w-full px-3 py-2 text-sm text-[#6B7280] hover:text-[#374151] hover:bg-gray-50 rounded-lg transition-colors whitespace-nowrap"
                   >

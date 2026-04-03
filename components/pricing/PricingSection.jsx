@@ -70,7 +70,7 @@ const mapPlanToCardProps = (plan, index) => {
   };
 };
 
-const PricingSection = ({ onSelectPlan, plans, activePlanId }) => {
+const PricingSection = ({ onSelectPlan, plans, activePlanId, loadingPlanId = null }) => {
   const hasPlans = plans && Array.isArray(plans) && plans.length > 0;
 
   return (
@@ -124,6 +124,7 @@ const PricingSection = ({ onSelectPlan, plans, activePlanId }) => {
                     {...props}
                     onSelect={onSelectPlan}
                     isActivePlan={activePlanId === plan.id}
+                    loadingPlanId={loadingPlanId}
                   />
                 );
               })
@@ -142,6 +143,7 @@ const PricingSection = ({ onSelectPlan, plans, activePlanId }) => {
                 isHighlighted={true}
                 initialPrice={2500}
                 onSelect={onSelectPlan}
+                loadingPlanId={loadingPlanId}
               />
 
               <PricingCard
@@ -154,6 +156,7 @@ const PricingSection = ({ onSelectPlan, plans, activePlanId }) => {
                 buttonColor="#FFAA55"
                 badge="most-popular"
                 onSelect={onSelectPlan}
+                loadingPlanId={loadingPlanId}
               />
             </>
           )}

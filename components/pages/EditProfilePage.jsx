@@ -117,6 +117,7 @@ const EditProfilePage = ({
   onBack,
   initialData = {},
   profileApiResponse = null,
+  isSaving = false,
 }) => {
   const {
     register,
@@ -619,10 +620,18 @@ const EditProfilePage = ({
         {/* Save Button */}
         <div className="mt-10">
           <button
+            type="button"
             onClick={handleSubmit(onSubmit)}
-            className="w-full bg-[#FFAA55] text-[#212121] py-4 rounded-lg font-bold text-base uppercase tracking-wide hover:bg-[#FF9955] transition-colors shadow-lg"
+            disabled={isSaving}
+            className="w-full bg-[#FFAA55] text-[#212121] py-4 rounded-lg font-bold text-base uppercase tracking-wide hover:bg-[#FF9955] transition-colors shadow-lg disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
-            Save Changes
+            {isSaving && (
+              <svg className="h-5 w-5 shrink-0 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden>
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+              </svg>
+            )}
+            {isSaving ? "Saving…" : "Save Changes"}
           </button>
         </div>
       </div>

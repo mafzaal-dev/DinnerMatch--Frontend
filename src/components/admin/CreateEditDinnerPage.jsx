@@ -9,6 +9,7 @@ import { api, API_ENDPOINTS } from "@/utils/api";
 import { CustomDropdown } from "@/components/common";
 import { DateTimePicker } from "@/components/ui/date-time-picker";
 import { format } from "date-fns";
+import { isDinnerPublished } from "@/utils/dinnerStatus";
 
 const CreateEditDinnerPage = ({ dinnerId = null, isEdit = false }) => {
   const router = useRouter();
@@ -54,11 +55,7 @@ const CreateEditDinnerPage = ({ dinnerId = null, isEdit = false }) => {
       const dinner = await getDinner(dinnerId);
 
       if (dinner) {
-        // Check if dinner_status indicates published state
-        const isPublished =
-          dinner.is_published ||
-          dinner.dinner_status === "Upcoming" ||
-          dinner.dinner_status === "Published";
+        const isPublished = isDinnerPublished(dinner);
 
         setFormData({
           title: dinner.title || "",
