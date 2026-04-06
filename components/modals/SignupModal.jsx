@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { api, API_ENDPOINTS } from "@/utils/api";
+import { formatSAPhone } from "@/utils/format";
 
 const INPUT_CLASS =
   "flex h-10 w-full border text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-[#1E1E2E] border-[#333] text-white py-6 px-4 rounded-lg focus:border-[#FFAA55] focus:ring-[#FFAA55] transition-all";
@@ -74,22 +75,6 @@ const SignupModal = ({
     } else {
       onBack?.();
     }
-  };
-
-  // Phone formatting
-  const formatSAPhone = (input) => {
-    const hasPlus = input.startsWith("+");
-    const digits = input.replace(/\D/g, "");
-    if (hasPlus || digits.startsWith("27")) {
-      const local = digits.startsWith("27") ? digits.slice(2) : digits;
-      if (local.length === 0) return "+27";
-      if (local.length <= 2) return `+27 ${local}`;
-      if (local.length <= 5) return `+27 ${local.slice(0, 2)} ${local.slice(2)}`;
-      return `+27 ${local.slice(0, 2)} ${local.slice(2, 5)} ${local.slice(5, 9)}`;
-    }
-    if (digits.length <= 3) return digits;
-    if (digits.length <= 6) return `${digits.slice(0, 3)} ${digits.slice(3)}`;
-    return `${digits.slice(0, 3)} ${digits.slice(3, 6)} ${digits.slice(6, 10)}`;
   };
 
   const handlePhoneChange = (e) => {

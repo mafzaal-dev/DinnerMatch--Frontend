@@ -17,6 +17,7 @@ export const useRestaurant = () => {
       if (params.rating) queryParams.append('rating', params.rating);
       if (params.budget) queryParams.append('budget', params.budget);
       if (params.location) queryParams.append('location', params.location);
+      if (params.city) queryParams.append('city', params.city);
 
       const response = await api.get(`${API_ENDPOINTS.RESTAURANT_LIST}?${queryParams}`);
       if (response.success) {

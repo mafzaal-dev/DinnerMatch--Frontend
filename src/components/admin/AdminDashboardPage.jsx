@@ -16,6 +16,11 @@ import { Tooltip } from "@/components/ui/Tooltip";
 import EmailModal from "./EmailModal";
 import toast from "react-hot-toast";
 import { useAuth } from "@/hooks/useAuth";
+import {
+  disabledBeforeYmd,
+  disabledAfterYmd,
+  compareYmd,
+} from "@/utils/dateRangeFilters";
 
 const AdminDashboardPage = () => {
   const { user: currentUser } = useAuth();
@@ -47,6 +52,8 @@ const AdminDashboardPage = () => {
   // Pagination
   const [currentPage, setCurrentPage] = useState(0);
   const [pageSize, setPageSize] = useState(10);
+  /** Bumped on "Reset filters" so we refetch when only search (or page) changed — fetchUsers identity may be unchanged. */
+  const [listRefreshKey, setListRefreshKey] = useState(0);
 
   const fetchUsers = useCallback(
     async (query = "") => {
@@ -182,10 +189,12 @@ const AdminDashboardPage = () => {
     return { cityName, areaName: "—" };
   };
 
-  // Refetch when pagination or any filter changes (fetchUsers updates when those deps change)
+  // Refetch when pagination, filters, or listRefreshKey changes (search typing uses debouncedFetchUsers)
   useEffect(() => {
     fetchUsers(searchQuery);
-  }, [fetchUsers]);
+    // searchQuery omitted on purpose — keystrokes are handled by debouncedFetchUsers; listRefreshKey covers reset.
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- see above
+  }, [fetchUsers, listRefreshKey]);
 
   // Close row menu on click outside
   useEffect(() => {
@@ -261,6 +270,7 @@ const AdminDashboardPage = () => {
     setEndDate("");
     setSearchQuery("");
     setCurrentPage(0);
+    setListRefreshKey((k) => k + 1);
     toast.success("Filters reset");
   };
 
@@ -534,11 +544,16 @@ const AdminDashboardPage = () => {
               <DatePicker
                 date={startDate ? new Date(startDate) : undefined}
                 onSelect={(date) => {
-                  setStartDate(date ? format(date, "yyyy-MM-dd") : "");
+                  const val = date ? format(date, "yyyy-MM-dd") : "";
+                  setStartDate(val);
+                  setEndDate((prev) =>
+                    val && prev && compareYmd(prev, val) < 0 ? "" : prev,
+                  );
                   setCurrentPage(0);
                 }}
                 placeholder="Start date"
                 className="w-full"
+                disabled={disabledAfterYmd(endDate)}
               />
             </div>
             <div className="flex flex-col gap-1">
@@ -548,11 +563,17 @@ const AdminDashboardPage = () => {
               <DatePicker
                 date={endDate ? new Date(endDate) : undefined}
                 onSelect={(date) => {
-                  setEndDate(date ? format(date, "yyyy-MM-dd") : "");
+                  const val = date ? format(date, "yyyy-MM-dd") : "";
+                  if (val && startDate && compareYmd(val, startDate) < 0) {
+                    toast.error("End date cannot be before start date");
+                    return;
+                  }
+                  setEndDate(val);
                   setCurrentPage(0);
                 }}
                 placeholder="End date"
                 className="w-full"
+                disabled={disabledBeforeYmd(startDate)}
               />
             </div>
           </div>

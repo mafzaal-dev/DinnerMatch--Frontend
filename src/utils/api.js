@@ -28,9 +28,35 @@ const getRefreshToken = () => {
   return null;
 };
 
+/** These endpoints must not send a stored JWT (stale tokens break password reset / login / register). */
+const isPublicAuthPath = (url) => {
+  if (!url || typeof url !== "string") return false;
+  return (
+    url.includes("/auth/login") ||
+    url.includes("/auth/register") ||
+    url.includes("/register-with-quiz") ||
+    url.includes("/auth/forgot-password") ||
+    url.includes("/auth/reset-password/")
+  );
+};
+
+const clearAuthorizationHeader = (config) => {
+  if (!config.headers) return;
+  if (typeof config.headers.delete === "function") {
+    config.headers.delete("Authorization");
+  } else {
+    delete config.headers.Authorization;
+  }
+};
+
 // Request interceptor
 axiosInstance.interceptors.request.use(
   (config) => {
+    const path = config.url || "";
+    if (isPublicAuthPath(path)) {
+      clearAuthorizationHeader(config);
+      return config;
+    }
     const token = getAccessToken();
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -56,7 +82,8 @@ axiosInstance.interceptors.response.use(
       !originalRequest._retry &&
       !originalRequest.url.includes("/auth/login") &&
       !originalRequest.url.includes("/register") &&
-      !originalRequest.url.includes("/auth/forgot-password")
+      !originalRequest.url.includes("/auth/forgot-password") &&
+      !originalRequest.url.includes("/auth/reset-password/")
     ) {
       originalRequest._retry = true;
 
@@ -138,6 +165,8 @@ export const API_ENDPOINTS = {
   // Auth
   LOGIN: "/auth/login/",
   FORGOT_PASSWORD: "/auth/forgot-password",
+  RESET_PASSWORD: (uidb64, token) =>
+    `/auth/reset-password/${encodeURIComponent(uidb64)}/${encodeURIComponent(token)}/`,
   REGISTER: "/auth/register/",
   REGISTER_WITH_QUIZ: "/auth/register-with-quiz/",
   REFRESH: "/auth/refresh/",

@@ -17,7 +17,9 @@ export const useDinner = () => {
       if (params.start_date) queryParams.append('start_date', params.start_date);
       if (params.end_date) queryParams.append('end_date', params.end_date);
       if (params.location) queryParams.append('location', params.location);
-      if (params.status) queryParams.append('status', params.status);
+      if (params.dinner_status) {
+        queryParams.append('dinner_status', params.dinner_status);
+      }
       if (params.publish) queryParams.append('publish', params.publish);
 
       const response = await api.get(`${API_ENDPOINTS.DINNER_LIST}?${queryParams}`);

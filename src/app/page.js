@@ -24,6 +24,7 @@ import {
   PreferencesModal
 } from "../../components/modals";
 import { api, API_ENDPOINTS } from '../utils/api';
+import { normalizeSAPhoneForApi } from '@/constants/validationSchemas';
 
 // Format demographic value for profile API (snake_case -> Title Case)
 const formatProfileValue = (value) => {
@@ -49,6 +50,10 @@ function buildProfileUpdatePayload(formData, demographicsData, selectedCity, sel
     nationality: formatProfileValue(d.nationality),
     language: formatProfileValue(d.language),
   };
+  const phoneApi = normalizeSAPhoneForApi(formData?.mobileNumber);
+  if (phoneApi) {
+    payload.phone_number = phoneApi;
+  }
   // API expects city and area as UUIDs; only include when valid (modals may use slugs until backend provides UUIDs)
   if (isValidUUID(selectedCity?.id)) payload.city = selectedCity.id;
   if (isValidUUID(selectedPlace?.id)) payload.area = selectedPlace.id;
@@ -201,8 +206,10 @@ export default function Home() {
         area_id: selectedPlace?.id
       };
 
-      if (formData.mobileNumber) {
-        registrationData.phone_number = formData.mobileNumber;
+      const phoneApi = normalizeSAPhoneForApi(formData.mobileNumber);
+      if (phoneApi) {
+        registrationData.mobile_number = phoneApi;
+        registrationData.phone_number = phoneApi;
       }
 
       const response = await api.post(API_ENDPOINTS.REGISTER_WITH_QUIZ, registrationData);

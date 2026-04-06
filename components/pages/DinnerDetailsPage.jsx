@@ -60,6 +60,7 @@ const DinnerDetailsPage = ({
   const [rsvpStatus, setRsvpStatus] = useState(null);
   const [rescheduleModalOpen, setRescheduleModalOpen] = useState(false);
   const [selectedRescheduleDinner, setSelectedRescheduleDinner] = useState(null);
+  const [isJoiningDinner, setIsJoiningDinner] = useState(false);
   
   // Feedback state
   const [memberRatings, setMemberRatings] = useState({});
@@ -128,12 +129,18 @@ const DinnerDetailsPage = ({
     setRescheduleModalOpen(true);
   };
 
-  const confirmReschedule = () => {
-    if (selectedRescheduleDinner && onReschedule) {
-      onReschedule(selectedRescheduleDinner.id);
+  const confirmReschedule = async () => {
+    if (!selectedRescheduleDinner?.id || !onReschedule) return;
+    setIsJoiningDinner(true);
+    try {
+      await onReschedule(selectedRescheduleDinner.id);
+      setRescheduleModalOpen(false);
+      setSelectedRescheduleDinner(null);
+    } catch {
+      // Error feedback handled by parent (e.g. toast)
+    } finally {
+      setIsJoiningDinner(false);
     }
-    setRescheduleModalOpen(false);
-    setSelectedRescheduleDinner(null);
   };
 
   // Determine if we should show details based on status
@@ -1156,6 +1163,22 @@ const DinnerDetailsPage = ({
       {rescheduleModalOpen && selectedRescheduleDinner && (
         <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
           <div className="bg-[#111121] rounded-xl w-full max-w-md p-6 border border-[#2F3A51] shadow-2xl relative">
+            {isJoiningDinner && (
+              <div
+                className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 rounded-xl bg-[#111121]/90"
+                aria-live="polite"
+                aria-busy="true"
+              >
+                <div
+                  className="h-10 w-10 animate-spin rounded-full border-2 border-[#2F3A51] border-t-[#FFAA55]"
+                  role="status"
+                  aria-label="Switching dinner"
+                />
+                <p className="text-sm font-medium text-[#E0E0E0]">
+                  Switching your dinner…
+                </p>
+              </div>
+            )}
             <h3 className="text-xl font-bold text-[#F5F5F5] mb-4">
               Join Dinner
             </h3>
@@ -1167,19 +1190,33 @@ const DinnerDetailsPage = ({
 
             <div className="flex gap-3 justify-end">
               <button
+                type="button"
+                disabled={isJoiningDinner}
                 onClick={() => {
                   setRescheduleModalOpen(false);
                   setSelectedRescheduleDinner(null);
                 }}
-                className="px-4 py-2 rounded-lg text-[#E0E0E0] hover:bg-[#1A1A1E] transition-colors"
+                className="px-4 py-2 rounded-lg text-[#E0E0E0] hover:bg-[#1A1A1E] transition-colors disabled:pointer-events-none disabled:opacity-40"
               >
                 Close
               </button>
               <button
+                type="button"
+                disabled={isJoiningDinner}
                 onClick={confirmReschedule}
-                className="px-4 py-2 bg-[#FFAA55] text-[#212121] font-bold rounded-lg hover:bg-[#FF9955] transition-colors"
+                className="inline-flex items-center justify-center gap-2 min-w-[7rem] px-4 py-2 bg-[#FFAA55] text-[#212121] font-bold rounded-lg hover:bg-[#FF9955] transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
               >
-                Confirm
+                {isJoiningDinner ? (
+                  <>
+                    <span
+                      className="h-4 w-4 shrink-0 animate-spin rounded-full border-2 border-[#212121]/30 border-t-[#212121]"
+                      aria-hidden
+                    />
+                    <span>Joining</span>
+                  </>
+                ) : (
+                  "Confirm"
+                )}
               </button>
             </div>
           </div>

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { api, API_ENDPOINTS } from '@/utils/api';
+import { plainTextToEmailHtml } from '@/utils/emailTemplateHtml';
 import { toast } from 'react-hot-toast';
 import { CustomDropdown } from '@/components/common';
 import { useForm, Controller } from 'react-hook-form';
@@ -72,6 +73,14 @@ const EmailManagerPage = () => {
 
   const onSubmit = async (data) => {
     try {
+      const trimmedCustomHtml =
+        typeof data.html_body === 'string' ? data.html_body.trim() : '';
+      const htmlFromPlain = plainTextToEmailHtml(data.plain_text_body);
+      const htmlForApi =
+        !data.is_plain_text_only && trimmedCustomHtml
+          ? trimmedCustomHtml
+          : htmlFromPlain;
+
       // Construct payload to match API expectation (nested content object)
       const payload = {
         name: data.name,
@@ -79,11 +88,11 @@ const EmailManagerPage = () => {
         description: data.subject, // Fallback/map subject to description if needed
         type: data.type,
         content: {
-            html: data.is_plain_text_only ? null : data.html_body,
-            plain: data.plain_text_body
+          html: htmlForApi,
+          plain: data.plain_text_body,
         },
         include_unsubscribe: data.include_unsubscribe,
-        is_plain_text_only: data.is_plain_text_only
+        is_plain_text_only: data.is_plain_text_only,
       };
 
       let response;
@@ -304,7 +313,7 @@ const EmailManagerPage = () => {
             
             <div className="p-6 overflow-y-auto">
               <p className="text-sm text-gray-500 mb-6">
-                Create a new email template. Plain text is required. Use placeholders like {'{{First Name}}'} and {'{{Dinner Date}}'}.
+                Plain text is required and is always sent as the text part. HTML is auto-generated from plain text for the backend; if you turn off &quot;plain text only&quot;, you can supply custom HTML instead.
               </p>
               
               <form id="templateForm" onSubmit={handleSubmit(onSubmit)} className="space-y-4">

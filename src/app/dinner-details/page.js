@@ -147,8 +147,8 @@ function DinnerDetailsContent() {
   };
 
   const { mutate: updateAttendance } = useUpdateAttendance();
-  const { mutate: requestDinner } = useRequestDinner();
-  const { mutate: swipeDinner } = useSwipeDinner();
+  const { mutateAsync: requestDinnerAsync } = useRequestDinner();
+  const { mutateAsync: swipeDinnerAsync } = useSwipeDinner();
   const { mutate: rateGroup } = useRateGroup();
   const { mutate: rateRestaurant } = useRateRestaurant();
 
@@ -206,30 +206,20 @@ function DinnerDetailsContent() {
     console.log('Address copied:', address);
   };
 
-  const handleReschedule = (newDinnerId) => {
-    // If we have a current dinner, we use the swipe API
-    if (currentDinnerId) {
-      swipeDinner({ 
-        currentDinnerId: currentDinnerId, 
-        newDinnerId: newDinnerId 
-      }, {
-        onSuccess: () => {
-          toast.success("Successfully Joined!");
-        },
-        onError: (err) => {
-          toast.error(err.message || "Failed to join dinner");
-        }
-      });
-    } else {
-      // Otherwise fallback to normal request (join)
-      requestDinner({ dinnerId: newDinnerId }, {
-        onSuccess: () => {
-          toast.success("Successfully joined!");
-        },
-        onError: (err) => {
-          toast.error(err.message || "Failed to join dinner");
-        }
-      });
+  const handleReschedule = async (newDinnerId) => {
+    try {
+      if (currentDinnerId) {
+        await swipeDinnerAsync({
+          currentDinnerId: currentDinnerId,
+          newDinnerId: newDinnerId,
+        });
+      } else {
+        await requestDinnerAsync({ dinnerId: newDinnerId });
+      }
+      toast.success("Successfully joined!");
+    } catch (err) {
+      toast.error(err.message || "Failed to join dinner");
+      throw err;
     }
   };
 

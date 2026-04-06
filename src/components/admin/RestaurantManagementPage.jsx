@@ -22,7 +22,7 @@ const RestaurantManagementPage = () => {
   // Filters
   const [filterRating, setFilterRating] = useState('');
   const [filterBudget, setFilterBudget] = useState('');
-  const [filterLocation, setFilterLocation] = useState('');
+  const [filterCity, setFilterCity] = useState('');
 
   // Fetch restaurants from API
   const fetchRestaurants = async (query = null) => {
@@ -45,8 +45,8 @@ const RestaurantManagementPage = () => {
       if (filterBudget) {
         params.budget = filterBudget;
       }
-      if (filterLocation) {
-        params.location = filterLocation;
+      if (filterCity) {
+        params.city = filterCity;
       }
 
       const result = await getRestaurants(params);
@@ -74,7 +74,7 @@ const RestaurantManagementPage = () => {
 
   useEffect(() => {
     fetchRestaurants();
-  }, [currentPage, filterRating, filterBudget, filterLocation]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [currentPage, filterRating, filterBudget, filterCity]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSearchChange = (e) => {
     const value = e.target.value;
@@ -208,22 +208,21 @@ const RestaurantManagementPage = () => {
                 />
               </div>
               <div className="flex-1">
-                <label className="block text-xs text-[#6B7280] mb-1">Location</label>
+                <label className="block text-xs text-[#6B7280] mb-1">City</label>
                 <CustomDropdown
-                  value={filterLocation}
-                  onChange={(e) => setFilterLocation(e.target.value)}
+                  value={filterCity}
+                  onChange={(e) => setFilterCity(e.target.value)}
                   options={[
-                    { value: '', label: 'All Locations' },
-                    { value: 'City Centre', label: 'City Centre' },
-                    { value: 'Waterfront', label: 'Waterfront' },
-                    { value: 'Suburbs', label: 'Suburbs' },
+                    { value: '', label: 'All Cities' },
+                    { value: 'Cape Town', label: 'Cape Town' },
+                    { value: 'Johannesburg', label: 'Johannesburg' },
                   ]}
-                  placeholder="All Locations"
+                  placeholder="All Cities"
                 />
               </div>
               {(filterRating ||
                 filterBudget ||
-                filterLocation ||
+                filterCity ||
                 isValidSearchQuery(searchQuery)) && (
                 <div className="flex items-end">
                   <button
@@ -233,7 +232,7 @@ const RestaurantManagementPage = () => {
                       setCurrentPage(0);
                       setFilterRating('');
                       setFilterBudget('');
-                      setFilterLocation('');
+                      setFilterCity('');
                       setTimeout(() => fetchRestaurantsRef.current(''), 0);
                     }}
                     className="w-full px-3 py-2 text-sm text-[#6B7280] hover:text-[#374151] hover:bg-gray-50 rounded-lg transition-colors whitespace-nowrap"

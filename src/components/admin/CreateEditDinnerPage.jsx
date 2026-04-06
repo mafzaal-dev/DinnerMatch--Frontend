@@ -9,7 +9,11 @@ import { api, API_ENDPOINTS } from "@/utils/api";
 import { CustomDropdown } from "@/components/common";
 import { DateTimePicker } from "@/components/ui/date-time-picker";
 import { format } from "date-fns";
-import { isDinnerPublished } from "@/utils/dinnerStatus";
+import {
+  isDinnerPublished,
+  formatDinnerTypeForDisplay,
+  formatDinnerTypeForApi,
+} from "@/utils/dinnerStatus";
 
 const CreateEditDinnerPage = ({ dinnerId = null, isEdit = false }) => {
   const router = useRouter();
@@ -32,17 +36,13 @@ const CreateEditDinnerPage = ({ dinnerId = null, isEdit = false }) => {
     if (isEdit && dinnerId) {
       fetchDinner();
     }
-  }, [isEdit, dinnerId]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [isEdit, dinnerId]);
 
   const fetchLocations = async () => {
     try {
-      // TODO: Replace with actual API endpoint when backend is ready
       setLocations([
         { id: "cape-town", name: "Cape Town" },
         { id: "johannesburg", name: "Johannesburg" },
-        { id: "durban", name: "Durban" },
-        { id: "pretoria", name: "Pretoria" },
-        { id: "lahore", name: "Lahore" },
       ]);
     } catch (err) {
       console.error("Error fetching locations:", err);
@@ -61,7 +61,7 @@ const CreateEditDinnerPage = ({ dinnerId = null, isEdit = false }) => {
           title: dinner.title || "",
           date: dinner.date || "",
           location: dinner.location || "",
-          dinner_type: dinner.dinner_type || "Open",
+          dinner_type: formatDinnerTypeForDisplay(dinner.dinner_type),
           is_published: isPublished,
         });
       } else {
@@ -108,7 +108,7 @@ const CreateEditDinnerPage = ({ dinnerId = null, isEdit = false }) => {
         title: formData.title,
         date: dateToSend,
         location: formData.location,
-        dinner_type: formData.dinner_type,
+        dinner_type: formatDinnerTypeForApi(formData.dinner_type),
         is_published: formData.is_published,
         // Also send as dinner_status for backwards compatibility
         dinner_status: formData.is_published ? "published" : "draft",
@@ -266,12 +266,12 @@ const CreateEditDinnerPage = ({ dinnerId = null, isEdit = false }) => {
                 onChange={handleChange}
                 options={[
                   { value: "Open", label: "Open" },
-                  { value: "Upcoming", label: "Upcoming" },
+                  { value: "Close", label: "Close" },
                 ]}
                 placeholder="Select status"
               />
               <p className="mt-1 text-xs text-[#6B7280]">
-                Select whether this is an open or upcoming dinner event
+                Open dinners accept bookings; close when the dinner should no longer accept new sign-ups.
               </p>
             </div>
 

@@ -2,7 +2,11 @@
 
 import React, { useState, useEffect } from 'react';
 import { api, API_ENDPOINTS } from '../../src/utils/api';
-import { isDinnerPublished } from '@/utils/dinnerStatus';
+import {
+  isDinnerPublished,
+  formatDinnerTypeForDisplay,
+  isDinnerTypeOpen,
+} from '@/utils/dinnerStatus';
 import { toast } from 'react-hot-toast';
 import { useSubscription } from '../../src/hooks/useDinners';
 
@@ -234,12 +238,12 @@ const AvailableDinnersPage = ({ onMyAccount, onViewDetails }) => {
                       <div className="mt-3">
                         <span
                           className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-                            dinner.dinner_type === "Open"
+                            isDinnerTypeOpen(dinner.dinner_type)
                               ? "bg-green-500/20 text-green-400"
                               : "bg-blue-500/20 text-blue-400"
                           }`}
                         >
-                          {dinner.dinner_type}
+                          {formatDinnerTypeForDisplay(dinner.dinner_type)}
                         </span>
                         <span
                           className={`ml-2 inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${

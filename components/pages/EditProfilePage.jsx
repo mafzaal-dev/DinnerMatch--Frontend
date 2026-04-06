@@ -7,6 +7,7 @@ import { format } from "date-fns";
 import { editProfileSchema } from "@/constants/validationSchemas";
 import { DatePicker } from "@/components/ui/date-picker";
 import { api, API_ENDPOINTS } from "@/utils/api";
+import { formatSAPhone } from "@/utils/format";
 import CitySelectionModal from "../modals/CitySelectionModal";
 import AreaSelectionModal from "../modals/AreaSelectionModal";
 
@@ -144,21 +145,6 @@ const EditProfilePage = ({
   });
 
   const [phoneDisplay, setPhoneDisplay] = useState('');
-
-  const formatSAPhone = (input) => {
-    const hasPlus = input.startsWith('+');
-    const digits = input.replace(/\D/g, '');
-    if (hasPlus || digits.startsWith('27')) {
-      const local = digits.startsWith('27') ? digits.slice(2) : digits;
-      if (local.length === 0) return '+27';
-      if (local.length <= 2) return `+27 ${local}`;
-      if (local.length <= 5) return `+27 ${local.slice(0, 2)} ${local.slice(2)}`;
-      return `+27 ${local.slice(0, 2)} ${local.slice(2, 5)} ${local.slice(5, 9)}`;
-    }
-    if (digits.length <= 3) return digits;
-    if (digits.length <= 6) return `${digits.slice(0, 3)} ${digits.slice(3)}`;
-    return `${digits.slice(0, 3)} ${digits.slice(3, 6)} ${digits.slice(6, 10)}`;
-  };
 
   const handlePhoneChange = (e) => {
     const formatted = formatSAPhone(e.target.value);

@@ -9,6 +9,26 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { restaurantSchema } from "@/constants/validationSchemas";
 import { useRestaurant } from "@/hooks/useRestaurant";
 import { CustomDropdown } from "@/components/common";
+import { api, API_ENDPOINTS } from "@/utils/api";
+import { formatSAPhone } from "@/utils/format";
+
+function resolveCityId(cityValue, cityList) {
+  if (!cityValue || !cityList?.length) return "";
+  const byId = cityList.find((c) => c.id === cityValue);
+  if (byId) return byId.id;
+  const byName = cityList.find((c) => c.name === cityValue);
+  return byName?.id ?? "";
+}
+
+function resolveAreaId(areaValue, cityList, cityId) {
+  if (!areaValue || !cityId || !cityList?.length) return "";
+  const city = cityList.find((c) => c.id === cityId);
+  if (!city?.area?.length) return "";
+  const byId = city.area.find((a) => a.id === areaValue);
+  if (byId) return byId.id;
+  const byName = city.area.find((a) => a.name === areaValue);
+  return byName?.id ?? "";
+}
 
 const CreateEditRestaurantPage = ({ restaurantId = null, isEdit = false }) => {
   const router = useRouter();
@@ -48,17 +68,42 @@ const CreateEditRestaurantPage = ({ restaurantId = null, isEdit = false }) => {
     },
   });
 
-  const watchedCity = watch("city");
+  const [cityAreaList, setCityAreaList] = useState([]);
+  const [cityAreaLoading, setCityAreaLoading] = useState(true);
+
+  const loadCityArea = async () => {
+    const res = await api.get(API_ENDPOINTS.GET_CITY_AREA);
+    const raw = Array.isArray(res?.data)
+      ? res.data
+      : Array.isArray(res)
+        ? res
+        : [];
+    setCityAreaList(raw);
+    return raw;
+  };
+
+  useEffect(() => {
+    setCityAreaLoading(true);
+    loadCityArea()
+      .catch(() => setCityAreaList([]))
+      .finally(() => setCityAreaLoading(false));
+  }, []);
+
+  const watchedCityId = watch("city");
+  const selectedCityData = cityAreaList.find((c) => c.id === watchedCityId);
+  const areaOptions = [
+    { value: "", label: "Select location" },
+    ...(selectedCityData?.area?.map((a) => ({
+      value: a.id,
+      label: a.name,
+    })) ?? []),
+  ];
   const watchedIsMeat = watch("is_meat");
   const watchedIsVegetarian = watch("is_vegetarian");
   const watchedIsVegan = watch("is_vegan");
   const watchedIsFish = watch("is_fish");
   const watchedIsHalal = watch("is_halal");
   const watchedIsOthers = watch("is_others");
-
-  // TODO: Fetch cities and locations from backend API
-  const [cities, setCities] = useState([]);
-  const [locations, setLocations] = useState([]);
 
   useEffect(() => {
     if (isEdit && restaurantId) {
@@ -69,13 +114,26 @@ const CreateEditRestaurantPage = ({ restaurantId = null, isEdit = false }) => {
   const fetchRestaurant = async () => {
     try {
       setInitialLoading(true);
+      let list = cityAreaList;
+      if (!list.length) {
+        list = await loadCityArea();
+      }
+
       const restaurant = await getRestaurant(restaurantId);
 
       if (restaurant) {
+        const cityId = resolveCityId(restaurant.city, list);
+        const areaId = resolveAreaId(restaurant.location, list, cityId);
+
         setValue("name", restaurant.name || "");
-        setValue("city", restaurant.city || "");
-        setValue("location", restaurant.location || "");
-        setValue("number", restaurant.number || "");
+        setValue("city", cityId);
+        setValue("location", areaId);
+        setValue(
+          "number",
+          restaurant.number
+            ? formatSAPhone(String(restaurant.number))
+            : "",
+        );
         setValue("price", restaurant.price != null && restaurant.price !== "" ? restaurant.price : "");
         setValue("budget", restaurant.budget != null ? String(restaurant.budget) : "");
         setValue("is_meat", restaurant.is_meat || false);
@@ -99,10 +157,22 @@ const CreateEditRestaurantPage = ({ restaurantId = null, isEdit = false }) => {
 
   const onSubmit = async (data) => {
     try {
+      const cityObj = cityAreaList.find((c) => c.id === data.city);
+      const areaObj = cityObj?.area?.find((a) => a.id === data.location);
+
+      if (!cityObj?.name) {
+        toast.error("Please select a valid city");
+        return;
+      }
+      if (!areaObj?.name) {
+        toast.error("Please select a valid area / location");
+        return;
+      }
+
       const payload = {
         name: data.name,
-        city: data.city,
-        location: data.location,
+        city: cityObj.name,
+        location: areaObj.name,
         number: data.number,
         price: data.price !== "" && data.price != null && !isNaN(Number(data.price)) ? parseFloat(data.price).toFixed(2) : null,
         budget: data.budget,
@@ -212,6 +282,13 @@ const CreateEditRestaurantPage = ({ restaurantId = null, isEdit = false }) => {
             </div>
 
             {/* City and Location - Backend Driven */}
+            <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950">
+              <p className="font-medium text-amber-900">Select City first, then Location</p>
+              <p className="mt-1 text-amber-800/90 leading-relaxed">
+                You need to <strong>select a city</strong> before the location list is available. Locations are areas within the city you chose.
+              </p>
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-[#374151] mb-2">
@@ -223,16 +300,22 @@ const CreateEditRestaurantPage = ({ restaurantId = null, isEdit = false }) => {
                   render={({ field }) => (
                     <CustomDropdown
                       value={field.value}
-                      onChange={(e) => field.onChange(e.target.value)}
+                      onChange={(e) => {
+                        field.onChange(e.target.value);
+                        setValue("location", "", { shouldValidate: true });
+                      }}
                       options={[
                         { value: "", label: "Select city" },
-                        { value: "Cape Town", label: "Cape Town" },
-                        { value: "Johannesburg", label: "Johannesburg" },
-                        { value: "Durban", label: "Durban" },
-                        { value: "Pretoria", label: "Pretoria" },
+                        ...cityAreaList.map((c) => ({
+                          value: c.id,
+                          label: c.name,
+                        })),
                       ]}
-                      placeholder="Select city"
+                      placeholder={
+                        cityAreaLoading ? "Loading cities…" : "Select city"
+                      }
                       required
+                      disabled={cityAreaLoading}
                       className={errors.city ? "border-red-500" : ""}
                     />
                   )}
@@ -243,7 +326,7 @@ const CreateEditRestaurantPage = ({ restaurantId = null, isEdit = false }) => {
                   </p>
                 )}
                 <p className="mt-1 text-xs text-[#6B7280]">
-                  Note: Cities will be fetched from backend API
+                  Pick the city first — the location field below depends on this.
                 </p>
               </div>
 
@@ -258,19 +341,20 @@ const CreateEditRestaurantPage = ({ restaurantId = null, isEdit = false }) => {
                     <CustomDropdown
                       value={field.value}
                       onChange={(e) => field.onChange(e.target.value)}
-                      options={[
-                        { value: "", label: "Select location" },
-                        ...(watchedCity
-                          ? [
-                              { value: "City Centre", label: "City Centre" },
-                              { value: "Waterfront", label: "Waterfront" },
-                              { value: "Suburbs", label: "Suburbs" },
-                            ]
-                          : []),
-                      ]}
-                      placeholder="Select location"
+                      options={areaOptions}
+                      placeholder={
+                        !watchedCityId
+                          ? "Select a city first"
+                          : areaOptions.length <= 1
+                            ? "No areas for this city"
+                            : "Select location"
+                      }
                       required
-                      disabled={!watchedCity}
+                      disabled={
+                        cityAreaLoading ||
+                        !watchedCityId ||
+                        areaOptions.length <= 1
+                      }
                       className={errors.location ? "border-red-500" : ""}
                     />
                   )}
@@ -280,10 +364,19 @@ const CreateEditRestaurantPage = ({ restaurantId = null, isEdit = false }) => {
                     {errors.location.message}
                   </p>
                 )}
-                <p className="mt-1 text-xs text-[#6B7280]">
-                  Note: Locations will be fetched from backend API based on
-                  selected city
-                </p>
+                {!watchedCityId ? (
+                  <p className="mt-1 text-xs font-medium text-amber-700">
+                    Select a city above to load locations for that city.
+                  </p>
+                ) : areaOptions.length <= 1 ? (
+                  <p className="mt-1 text-xs text-[#6B7280]">
+                    No areas are configured for this city in the directory yet.
+                  </p>
+                ) : (
+                  <p className="mt-1 text-xs text-[#6B7280]">
+                    Area or neighbourhood within the selected city.
+                  </p>
+                )}
               </div>
             </div>
 
@@ -293,11 +386,26 @@ const CreateEditRestaurantPage = ({ restaurantId = null, isEdit = false }) => {
                 <label className="block text-sm font-medium text-[#374151] mb-2">
                   Contact Number <span className="text-red-500">*</span>
                 </label>
-                <input
-                  type="tel"
-                  {...register("number")}
-                  placeholder="Enter contact number"
-                  className={`w-full px-4 py-2.5 border rounded-lg text-sm focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316] outline-none ${errors.number ? "border-red-500" : "border-[#D1D5DB]"}`}
+                <Controller
+                  name="number"
+                  control={control}
+                  render={({ field }) => (
+                    <input
+                      type="tel"
+                      inputMode="tel"
+                      autoComplete="tel"
+                      value={field.value}
+                      onChange={(e) =>
+                        field.onChange(formatSAPhone(e.target.value))
+                      }
+                      onBlur={field.onBlur}
+                      name={field.name}
+                      ref={field.ref}
+                      maxLength={17}
+                      placeholder="e.g. 082 123 4567 or +27 82 123 4567"
+                      className={`w-full px-4 py-2.5 border rounded-lg text-sm focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316] outline-none ${errors.number ? "border-red-500" : "border-[#D1D5DB]"}`}
+                    />
+                  )}
                 />
                 {errors.number && (
                   <p className="text-red-500 text-xs mt-1">

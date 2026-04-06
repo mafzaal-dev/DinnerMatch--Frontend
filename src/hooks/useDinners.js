@@ -4,6 +4,17 @@ import { api, API_ENDPOINTS } from '../utils/api';
 const hasAccessToken = () =>
   typeof window !== 'undefined' && !!localStorage.getItem('access_token');
 
+async function fetchDinnerDetailData(dinnerId) {
+  if (!dinnerId) return null;
+  const response = await api.get(
+    `${API_ENDPOINTS.DINNER_DETAIL}?dinner_id=${dinnerId}`,
+  );
+  if (!response.success) {
+    throw new Error(response.message || 'Failed to fetch dinner details');
+  }
+  return response.data;
+}
+
 export const useSubscription = () => {
   return useQuery({
     queryKey: ['subscription'],
@@ -36,14 +47,7 @@ export const useRequestedDinners = (index = 0, offset = 10) => {
 export const useDinnerDetail = (dinnerId) => {
   return useQuery({
     queryKey: ['dinnerDetail', dinnerId],
-    queryFn: async () => {
-      if (!dinnerId) return null;
-      const response = await api.get(`${API_ENDPOINTS.DINNER_DETAIL}?dinner_id=${dinnerId}`);
-      if (!response.success) {
-        throw new Error(response.message || 'Failed to fetch dinner details');
-      }
-      return response.data;
-    },
+    queryFn: () => fetchDinnerDetailData(dinnerId),
     enabled: !!dinnerId, // Only fetch if dinnerId is present
   });
 };
@@ -107,11 +111,15 @@ export const useRequestDinner = () => {
       }
       return response.data;
     },
-    onSuccess: () => {
-      // Invalidate queries to refresh lists
-      queryClient.invalidateQueries(['requestedDinners']);
-      queryClient.invalidateQueries(['availableDinners']);
-      queryClient.invalidateQueries(['dinnerDetail']); 
+    onSuccess: async (_, { dinnerId }) => {
+      await queryClient.refetchQueries({ queryKey: ['requestedDinners'] });
+      await queryClient.refetchQueries({ queryKey: ['availableDinners'] });
+      if (dinnerId) {
+        await queryClient.fetchQuery({
+          queryKey: ['dinnerDetail', dinnerId],
+          queryFn: () => fetchDinnerDetailData(dinnerId),
+        });
+      }
     },
   });
 };
@@ -131,10 +139,15 @@ export const useSwipeDinner = () => {
       }
       return response.data;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries(['requestedDinners']);
-      queryClient.invalidateQueries(['availableDinners']);
-      queryClient.invalidateQueries(['dinnerDetail']);
+    onSuccess: async (_, { newDinnerId }) => {
+      await queryClient.refetchQueries({ queryKey: ['requestedDinners'] });
+      await queryClient.refetchQueries({ queryKey: ['availableDinners'] });
+      if (newDinnerId) {
+        await queryClient.fetchQuery({
+          queryKey: ['dinnerDetail', newDinnerId],
+          queryFn: () => fetchDinnerDetailData(newDinnerId),
+        });
+      }
     },
   });
 };

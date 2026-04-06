@@ -6,10 +6,20 @@ const passwordValidation = yup.string()
   .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, 'Password must contain at least one uppercase letter, one lowercase letter, and one number')
   .required('Password is required');
 const requiredString = (label) => yup.string().required(`${label} is required`);
-const isSAPhone = (value) => {
+export const isSAPhone = (value) => {
   if (!value) return false;
   const stripped = value.replace(/[\s\-\(\)]/g, '');
   return /^(\+27|27)[0-9]{9}$/.test(stripped) || /^0[0-9]{9}$/.test(stripped);
+};
+
+/** Compact +27… form for API payloads (register / profile). */
+export const normalizeSAPhoneForApi = (value) => {
+  if (!value || typeof value !== 'string') return '';
+  const stripped = value.replace(/[\s\-\(\)]/g, '');
+  if (/^\+27[0-9]{9}$/.test(stripped)) return stripped;
+  if (/^27[0-9]{9}$/.test(stripped)) return `+${stripped}`;
+  if (/^0[0-9]{9}$/.test(stripped)) return `+27${stripped.slice(1)}`;
+  return '';
 };
 const phoneValidation = yup.string().test(
   'sa-phone',
@@ -37,6 +47,14 @@ export const signupSchema = yup.object().shape({
 
 export const forgotPasswordSchema = yup.object().shape({
   email: emailValidation,
+});
+
+export const resetPasswordSchema = yup.object().shape({
+  new_password: passwordValidation,
+  confirm_password: yup
+    .string()
+    .required('Please confirm your password')
+    .oneOf([yup.ref('new_password')], 'Passwords must match'),
 });
 
 export const editProfileSchema = yup.object().shape({
@@ -69,7 +87,14 @@ export const restaurantSchema = yup.object().shape({
   name: requiredString('Name'),
   city: requiredString('City'),
   location: requiredString('Location'),
-  number: requiredString('Contact number'),
+  number: yup
+    .string()
+    .required('Contact number is required')
+    .test(
+      'sa-phone',
+      'Please enter a valid South African phone number (e.g. 082 123 4567 or +27 82 123 4567)',
+      (value) => isSAPhone(value),
+    ),
   price: yup
     .number()
     .nullable()

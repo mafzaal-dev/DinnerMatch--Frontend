@@ -7,7 +7,16 @@ import { DatePicker } from '@/components/ui/date-picker';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
 import { debounce, isValidSearchQuery } from '@/utils/searchHelper';
-import { isDinnerPublished } from '@/utils/dinnerStatus';
+import {
+  disabledBeforeYmd,
+  disabledAfterYmd,
+  compareYmd,
+} from '@/utils/dateRangeFilters';
+import {
+  isDinnerPublished,
+  formatDinnerTypeForDisplay,
+  isDinnerTypeOpen,
+} from '@/utils/dinnerStatus';
 import { CustomDropdown } from '@/components/common';
 import { TablePagination } from '@/components/ui/Pagination';
 
@@ -55,7 +64,7 @@ const DinnerManagementPage = () => {
       }
       
       if (filterStatus) {
-        params.status = filterStatus;
+        params.dinner_status = filterStatus;
       }
       
       if (filterPublish) {
@@ -198,24 +207,37 @@ const DinnerManagementPage = () => {
                   { value: '', label: 'All Locations' },
                   { value: 'Cape Town', label: 'Cape Town' },
                   { value: 'Johannesburg', label: 'Johannesburg' },
-                  { value: 'Durban', label: 'Durban' },
-                  { value: 'Lahore', label: 'Lahore' },
                 ]}
                 placeholder="All Locations"
               />
 
               <DatePicker
                 date={startDate ? new Date(startDate) : undefined}
-                onSelect={(date) => setStartDate(date ? format(date, "yyyy-MM-dd") : "")}
+                onSelect={(date) => {
+                  const val = date ? format(date, "yyyy-MM-dd") : "";
+                  setStartDate(val);
+                  setEndDate((prev) =>
+                    val && prev && compareYmd(prev, val) < 0 ? "" : prev,
+                  );
+                }}
                 placeholder="From Date"
                 className="w-full"
+                disabled={disabledAfterYmd(endDate)}
               />
 
               <DatePicker
                 date={endDate ? new Date(endDate) : undefined}
-                onSelect={(date) => setEndDate(date ? format(date, "yyyy-MM-dd") : "")}
+                onSelect={(date) => {
+                  const val = date ? format(date, "yyyy-MM-dd") : "";
+                  if (val && startDate && compareYmd(val, startDate) < 0) {
+                    toast.error("To date cannot be before from date");
+                    return;
+                  }
+                  setEndDate(val);
+                }}
                 placeholder="To Date"
                 className="w-full"
+                disabled={disabledBeforeYmd(startDate)}
               />
 
               <CustomDropdown
@@ -223,8 +245,8 @@ const DinnerManagementPage = () => {
                 onChange={(e) => setFilterStatus(e.target.value)}
                 options={[
                   { value: '', label: 'All Status' },
-                  { value: 'Open', label: 'Open' },
-                  { value: 'Upcoming', label: 'Upcoming' },
+                  { value: 'open', label: 'Open' },
+                  { value: 'close', label: 'Close' },
                 ]}
                 placeholder="All Status"
               />
@@ -310,11 +332,11 @@ const DinnerManagementPage = () => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm">
                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          dinner.dinner_type === 'Open' 
-                            ? 'bg-green-100 text-green-800' 
+                          isDinnerTypeOpen(dinner.dinner_type)
+                            ? 'bg-green-100 text-green-800'
                             : 'bg-blue-100 text-blue-800'
                         }`}>
-                          {dinner.dinner_type}
+                          {formatDinnerTypeForDisplay(dinner.dinner_type)}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm">

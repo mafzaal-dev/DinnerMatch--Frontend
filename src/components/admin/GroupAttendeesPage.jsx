@@ -5,6 +5,11 @@ import { api, API_ENDPOINTS } from '../../utils/api';
 import { DatePicker } from "@/components/ui/date-picker";
 import { format } from "date-fns";
 import { toast } from 'react-hot-toast';
+import {
+  disabledBeforeYmd,
+  disabledAfterYmd,
+  compareYmd,
+} from '@/utils/dateRangeFilters';
 import { debounce, formatDisplayValue, isValidSearchQuery, capitalizeWords } from '../../utils/searchHelper';
 import { CustomDropdown, InlineSpinner } from '@/components/common';
 import { TablePagination } from '@/components/ui/Pagination';
@@ -1092,10 +1097,25 @@ const GroupAttendeesPage = () => {
             onSelect={(date) => {
                 const val = date ? format(date, "yyyy-MM-dd") : "";
                 if (activeTab === "users") setRequestsPage(0);
-                activeTab === 'groups' ? setFilterDateFrom(val) : setFilterRequestDateFrom(val);
+                if (activeTab === 'groups') {
+                  setFilterDateFrom(val);
+                  setFilterDateTo((prev) =>
+                    val && prev && compareYmd(prev, val) < 0 ? "" : prev,
+                  );
+                } else {
+                  setFilterRequestDateFrom(val);
+                  setFilterRequestDateTo((prev) =>
+                    val && prev && compareYmd(prev, val) < 0 ? "" : prev,
+                  );
+                }
             }}
             placeholder="From Date"
             className="w-full"
+            disabled={
+              activeTab === 'groups'
+                ? disabledAfterYmd(filterDateTo)
+                : disabledAfterYmd(filterRequestDateTo)
+            }
           />
           
           <DatePicker
@@ -1106,11 +1126,32 @@ const GroupAttendeesPage = () => {
             }
             onSelect={(date) => {
                 const val = date ? format(date, "yyyy-MM-dd") : "";
+                if (activeTab === 'groups') {
+                  if (val && filterDateFrom && compareYmd(val, filterDateFrom) < 0) {
+                    toast.error("To date cannot be before from date");
+                    return;
+                  }
+                  setFilterDateTo(val);
+                } else {
+                  if (
+                    val &&
+                    filterRequestDateFrom &&
+                    compareYmd(val, filterRequestDateFrom) < 0
+                  ) {
+                    toast.error("To date cannot be before from date");
+                    return;
+                  }
+                  setFilterRequestDateTo(val);
+                }
                 if (activeTab === "users") setRequestsPage(0);
-                activeTab === 'groups' ? setFilterDateTo(val) : setFilterRequestDateTo(val);
             }}
             placeholder="To Date"
             className="w-full"
+            disabled={
+              activeTab === 'groups'
+                ? disabledBeforeYmd(filterDateFrom)
+                : disabledBeforeYmd(filterRequestDateFrom)
+            }
           />
           
           {((activeTab === 'groups' &&
