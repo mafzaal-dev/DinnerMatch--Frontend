@@ -75,7 +75,7 @@ const AdminDashboardPage = () => {
           params.append("membership", selectedUserType.toLowerCase());
         }
         if (selectedCity !== "All Cities") {
-          params.append("city", selectedCity);
+          params.append("city_id", selectedCity);
         }
         if (selectedUpcomingDinner !== "Any Upcoming Dinner") {
           params.append(
@@ -289,7 +289,7 @@ const AdminDashboardPage = () => {
         params.append("membership", selectedUserType.toLowerCase());
       }
       if (selectedCity !== "All Cities") {
-        params.append("city", selectedCity);
+        params.append("city_id", selectedCity);
       }
       if (selectedUpcomingDinner !== "Any Upcoming Dinner") {
         params.append(

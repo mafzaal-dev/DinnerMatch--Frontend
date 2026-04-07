@@ -23,6 +23,7 @@ const GAP = 4;
  * @param {boolean} props.required - Whether the field is required
  * @param {string} props.error - Error message to display
  * @param {'top'|'bottom'|'auto'} props.placement - Open menu above ('top'), below ('bottom'), or choose automatically ('auto') based on viewport space.
+ * @param {'default'|'dark'} props.variant - "dark" matches DinnerMatch profile / dark surfaces (#111121, #FFAA55 accents).
  */
 const CustomDropdown = ({
   options = [],
@@ -35,7 +36,9 @@ const CustomDropdown = ({
   required = false,
   error = "",
   placement = "bottom",
+  variant = "default",
 }) => {
+  const isDark = variant === "dark";
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [menuPosition, setMenuPosition] = useState(null);
@@ -162,13 +165,18 @@ const CustomDropdown = ({
         onKeyDown={handleKeyDown}
         disabled={disabled}
         className={`
-          w-full px-4 py-2.5 text-left border rounded-lg text-sm whitespace-nowrap
+          w-full text-left border rounded-lg text-sm whitespace-nowrap
           focus:outline-none focus:ring-1 transition-colors
           flex items-center justify-between gap-2
+          ${isDark ? "px-4 py-3" : "px-4 py-2.5"}
           ${
             disabled
-              ? "bg-gray-100 text-gray-400 cursor-not-allowed border-gray-200"
-              : "bg-white text-gray-900 border-[#D1D5DB] hover:border-[#F97316] focus:border-[#F97316] focus:ring-[#F97316] cursor-pointer"
+              ? isDark
+                ? "bg-[#0c0c14] text-[#757575] cursor-not-allowed border-[#2F3A51]"
+                : "bg-gray-100 text-gray-400 cursor-not-allowed border-gray-200"
+              : isDark
+                ? "bg-[#111121] text-[#F5F5F5] border-[#2F3A51] hover:border-[#FFAA55] focus:border-[#FFAA55] focus:ring-[#FFAA55] cursor-pointer"
+                : "bg-white text-gray-900 border-[#D1D5DB] hover:border-[#F97316] focus:border-[#F97316] focus:ring-[#F97316] cursor-pointer"
           }
           ${error ? "border-red-500" : ""}
         `}
@@ -176,14 +184,28 @@ const CustomDropdown = ({
         aria-expanded={isOpen}
         aria-label={name}
       >
-        <span className={displayText ? "text-gray-900" : "text-gray-400"}>
+        <span
+          className={
+            displayText
+              ? isDark
+                ? "text-[#F5F5F5]"
+                : "text-gray-900"
+              : isDark
+                ? "text-[#757575]"
+                : "text-gray-400"
+          }
+        >
           {displayText || placeholder}
           {required && !value && <span className="text-red-500 ml-1">*</span>}
         </span>
         <ChevronDown
-          className={`w-4 h-4 shrink-0 transition-transform ${disabled ? "text-gray-400" : "text-gray-500"} ${
-            isOpen ? "rotate-180" : ""
-          }`}
+          className={`w-4 h-4 shrink-0 transition-transform ${
+            disabled
+              ? "text-gray-400"
+              : isDark
+                ? "text-[#A0A0A0]"
+                : "text-gray-500"
+          } ${isOpen ? "rotate-180" : ""}`}
         />
       </button>
 
@@ -198,7 +220,11 @@ const CustomDropdown = ({
         createPortal(
           <div
             ref={menuRef}
-            className="fixed bg-white border border-[#D1D5DB] rounded-lg shadow-lg max-h-60 overflow-hidden"
+            className={`fixed rounded-lg shadow-lg max-h-60 overflow-hidden ${
+              isDark
+                ? "bg-[#111121] border border-[#2F3A51] shadow-[0_8px_32px_rgba(0,0,0,0.45)]"
+                : "bg-white border border-[#D1D5DB]"
+            }`}
             style={{
               zIndex: DROPDOWN_Z_INDEX,
               left: menuPosition.left,
@@ -210,14 +236,22 @@ const CustomDropdown = ({
           >
             {/* Search Input (if there are many options) */}
             {options.length > 5 && (
-              <div className="p-2 border-b border-[#E5E7EB]">
+              <div
+                className={`p-2 border-b ${
+                  isDark ? "border-[#2F3A51]" : "border-[#E5E7EB]"
+                }`}
+              >
                 <input
                   ref={inputRef}
                   type="text"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   placeholder="Search..."
-                  className="w-full px-3 py-2 text-sm border border-[#D1D5DB] rounded-md focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316] outline-none"
+                  className={`w-full px-3 py-2 text-sm rounded-md focus:ring-1 outline-none ${
+                    isDark
+                      ? "bg-[#0c0c14] border border-[#2F3A51] text-[#F5F5F5] placeholder-[#757575] focus:border-[#FFAA55] focus:ring-[#FFAA55]"
+                      : "border border-[#D1D5DB] focus:border-[#F97316] focus:ring-[#F97316]"
+                  }`}
                   onClick={(e) => e.stopPropagation()}
                 />
               </div>
@@ -234,12 +268,19 @@ const CustomDropdown = ({
                       type="button"
                       onClick={() => handleSelectOption(option)}
                       className={`
-                        w-full px-4 py-2.5 text-left text-sm transition-colors
-                        hover:bg-[#FFF7ED] focus:bg-[#FFF7ED] focus:outline-none
+                        w-full px-4 py-2.5 text-left text-sm transition-colors focus:outline-none
                         ${
-                          isSelected
-                            ? "bg-[#FFF7ED] text-[#F97316] font-medium"
-                            : "text-gray-900"
+                          isDark
+                            ? `hover:bg-[#1A1D35] focus:bg-[#1A1D35] ${
+                                isSelected
+                                  ? "bg-[#FFAA55]/15 text-[#FFAA55] font-medium"
+                                  : "text-[#F5F5F5]"
+                              }`
+                            : `hover:bg-[#FFF7ED] focus:bg-[#FFF7ED] ${
+                                isSelected
+                                  ? "bg-[#FFF7ED] text-[#F97316] font-medium"
+                                  : "text-gray-900"
+                              }`
                         }
                       `}
                       role="option"
@@ -249,7 +290,7 @@ const CustomDropdown = ({
                         <span>{option.label}</span>
                         {isSelected && (
                           <svg
-                            className="w-4 h-4 text-[#F97316]"
+                            className={`w-4 h-4 ${isDark ? "text-[#FFAA55]" : "text-[#F97316]"}`}
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
@@ -267,7 +308,11 @@ const CustomDropdown = ({
                   );
                 })
               ) : (
-                <div className="px-4 py-3 text-sm text-gray-500 text-center">
+                <div
+                  className={`px-4 py-3 text-sm text-center ${
+                    isDark ? "text-[#757575]" : "text-gray-500"
+                  }`}
+                >
                   No options found
                 </div>
               )}

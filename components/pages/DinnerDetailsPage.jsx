@@ -1086,7 +1086,7 @@ const DinnerDetailsPage = ({
               </div>
               <div className="flex flex-col gap-3">
                 <p className="text-[#E0E0E0] text-sm">
-                  Unlock the experience of your dinner
+                  Unlock Your DinnerMatch Icebreakers
                 </p>
                 <p className="text-[#F5F5F5] font-bold text-lg">
                   {dinnerExperience}

@@ -7,6 +7,7 @@ import toast from 'react-hot-toast';
 import { debounce, formatDisplayValue, isValidSearchQuery } from '@/utils/searchHelper';
 import { CustomDropdown } from '@/components/common';
 import { TablePagination } from '@/components/ui/Pagination';
+import { api, API_ENDPOINTS } from '@/utils/api';
 
 const RestaurantManagementPage = () => {
   const router = useRouter();
@@ -22,7 +23,8 @@ const RestaurantManagementPage = () => {
   // Filters
   const [filterRating, setFilterRating] = useState('');
   const [filterBudget, setFilterBudget] = useState('');
-  const [filterCity, setFilterCity] = useState('');
+  const [cities, setCities] = useState([]);
+  const [filterCityId, setFilterCityId] = useState('');
 
   // Fetch restaurants from API
   const fetchRestaurants = async (query = null) => {
@@ -45,8 +47,8 @@ const RestaurantManagementPage = () => {
       if (filterBudget) {
         params.budget = filterBudget;
       }
-      if (filterCity) {
-        params.city = filterCity;
+      if (filterCityId) {
+        params.city_id = filterCityId;
       }
 
       const result = await getRestaurants(params);
@@ -74,7 +76,26 @@ const RestaurantManagementPage = () => {
 
   useEffect(() => {
     fetchRestaurants();
-  }, [currentPage, filterRating, filterBudget, filterCity]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [currentPage, filterRating, filterBudget, filterCityId]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    api
+      .get(API_ENDPOINTS.GET_CITY_AREA)
+      .then((res) => {
+        const raw = Array.isArray(res?.data)
+          ? res.data
+          : Array.isArray(res)
+            ? res
+            : [];
+        setCities(raw);
+      })
+      .catch(() => setCities([]));
+  }, []);
+
+  const cityFilterOptions = [
+    { value: '', label: 'All Cities' },
+    ...cities.map((c) => ({ value: c.id, label: c.name })),
+  ];
 
   const handleSearchChange = (e) => {
     const value = e.target.value;
@@ -210,19 +231,15 @@ const RestaurantManagementPage = () => {
               <div className="flex-1">
                 <label className="block text-xs text-[#6B7280] mb-1">City</label>
                 <CustomDropdown
-                  value={filterCity}
-                  onChange={(e) => setFilterCity(e.target.value)}
-                  options={[
-                    { value: '', label: 'All Cities' },
-                    { value: 'Cape Town', label: 'Cape Town' },
-                    { value: 'Johannesburg', label: 'Johannesburg' },
-                  ]}
+                  value={filterCityId}
+                  onChange={(e) => setFilterCityId(e.target.value)}
+                  options={cityFilterOptions}
                   placeholder="All Cities"
                 />
               </div>
               {(filterRating ||
                 filterBudget ||
-                filterCity ||
+                filterCityId ||
                 isValidSearchQuery(searchQuery)) && (
                 <div className="flex items-end">
                   <button
@@ -232,7 +249,7 @@ const RestaurantManagementPage = () => {
                       setCurrentPage(0);
                       setFilterRating('');
                       setFilterBudget('');
-                      setFilterCity('');
+                      setFilterCityId('');
                       setTimeout(() => fetchRestaurantsRef.current(''), 0);
                     }}
                     className="w-full px-3 py-2 text-sm text-[#6B7280] hover:text-[#374151] hover:bg-gray-50 rounded-lg transition-colors whitespace-nowrap"

@@ -19,6 +19,7 @@ import {
 } from '@/utils/dinnerStatus';
 import { CustomDropdown } from '@/components/common';
 import { TablePagination } from '@/components/ui/Pagination';
+import { api, API_ENDPOINTS } from '@/utils/api';
 
 const DinnerManagementPage = () => {
   const router = useRouter();
@@ -30,8 +31,9 @@ const DinnerManagementPage = () => {
   const [pageSize] = useState(10);
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
-  const [filterLocation, setFilterLocation] = useState('');
-  const [filterStatus, setFilterStatus] = useState('');
+  const [cities, setCities] = useState([]);
+  const [filterCityId, setFilterCityId] = useState('');
+  const [filterDinnerType, setFilterDinnerType] = useState('');
   const [filterPublish, setFilterPublish] = useState('');
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [dinnerToDelete, setDinnerToDelete] = useState(null);
@@ -59,16 +61,18 @@ const DinnerManagementPage = () => {
         params.end_date = endDate;
       }
       
-      if (filterLocation) {
-        params.location = filterLocation;
+      if (filterCityId) {
+        params.city_id = filterCityId;
       }
-      
-      if (filterStatus) {
-        params.dinner_status = filterStatus;
+
+      if (filterDinnerType) {
+        params.dinner_type = filterDinnerType;
       }
-      
-      if (filterPublish) {
-        params.publish = filterPublish;
+
+      if (filterPublish === 'true') {
+        params.dinner_status = 'published';
+      } else if (filterPublish === 'false') {
+        params.dinner_status = 'draft';
       }
 
       const result = await getDinners(params);
@@ -96,7 +100,33 @@ const DinnerManagementPage = () => {
 
   useEffect(() => {
     fetchDinners();
-  }, [currentPage, startDate, endDate, filterLocation, filterStatus, filterPublish]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [
+    currentPage,
+    startDate,
+    endDate,
+    filterCityId,
+    filterDinnerType,
+    filterPublish,
+  ]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    api
+      .get(API_ENDPOINTS.GET_CITY_AREA)
+      .then((res) => {
+        const raw = Array.isArray(res?.data)
+          ? res.data
+          : Array.isArray(res)
+            ? res
+            : [];
+        setCities(raw);
+      })
+      .catch(() => setCities([]));
+  }, []);
+
+  const cityFilterOptions = [
+    { value: '', label: 'All cities' },
+    ...cities.map((c) => ({ value: c.id, label: c.name })),
+  ];
 
   const handleSearchChange = (e) => {
     const value = e.target.value;
@@ -200,17 +230,18 @@ const DinnerManagementPage = () => {
 
             {/* Filters */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-              <CustomDropdown
-                value={filterLocation}
-                onChange={(e) => setFilterLocation(e.target.value)}
-                options={[
-                  { value: '', label: 'All Locations' },
-                  { value: 'Cape Town', label: 'Cape Town' },
-                  { value: 'Johannesburg', label: 'Johannesburg' },
-                ]}
-                placeholder="All Locations"
-              />
+              <div className="flex flex-col gap-1">
+                <span className="text-xs text-[#6B7280]">City</span>
+                <CustomDropdown
+                  value={filterCityId}
+                  onChange={(e) => setFilterCityId(e.target.value)}
+                  options={cityFilterOptions}
+                  placeholder="All cities"
+                />
+              </div>
 
+              <div className="flex flex-col gap-1">
+              <span className="text-xs text-[#6B7280]">From Date</span>
               <DatePicker
                 date={startDate ? new Date(startDate) : undefined}
                 onSelect={(date) => {
@@ -220,11 +251,14 @@ const DinnerManagementPage = () => {
                     val && prev && compareYmd(prev, val) < 0 ? "" : prev,
                   );
                 }}
-                placeholder="From Date"
+                placeholder="Select a Date"
                 className="w-full"
                 disabled={disabledAfterYmd(endDate)}
               />
+              </div>
 
+              <div className="flex flex-col gap-1">
+              <span className="text-xs text-[#6B7280]">To Date</span>
               <DatePicker
                 date={endDate ? new Date(endDate) : undefined}
                 onSelect={(date) => {
@@ -235,37 +269,44 @@ const DinnerManagementPage = () => {
                   }
                   setEndDate(val);
                 }}
-                placeholder="To Date"
+                placeholder="Select a Date"
                 className="w-full"
                 disabled={disabledBeforeYmd(startDate)}
               />
+              </div>
 
-              <CustomDropdown
-                value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value)}
-                options={[
-                  { value: '', label: 'All Status' },
-                  { value: 'open', label: 'Open' },
-                  { value: 'close', label: 'Close' },
-                ]}
-                placeholder="All Status"
-              />
+              <div className="flex flex-col gap-1">
+                <span className="text-xs text-[#6B7280]">Type</span>
+                <CustomDropdown
+                  value={filterDinnerType}
+                  onChange={(e) => setFilterDinnerType(e.target.value)}
+                  options={[
+                    { value: '', label: 'All types' },
+                    { value: 'open', label: 'Open' },
+                    { value: 'close', label: 'Close' },
+                  ]}
+                  placeholder="All types"
+                />
+              </div>
 
-              <CustomDropdown
-                value={filterPublish}
-                onChange={(e) => setFilterPublish(e.target.value)}
-                options={[
-                  { value: '', label: 'All Publish Status' },
-                  { value: 'true', label: 'Published' },
-                  { value: 'false', label: 'Draft' },
-                ]}
-                placeholder="All Publish Status"
-              />
+              <div className="flex flex-col gap-1">
+                <span className="text-xs text-[#6B7280]">Publish status</span>
+                <CustomDropdown
+                  value={filterPublish}
+                  onChange={(e) => setFilterPublish(e.target.value)}
+                  options={[
+                    { value: '', label: 'All' },
+                    { value: 'true', label: 'Published' },
+                    { value: 'false', label: 'Draft' },
+                  ]}
+                  placeholder="All"
+                />
+              </div>
 
-              {(filterLocation ||
+              {(filterCityId ||
                 startDate ||
                 endDate ||
-                filterStatus ||
+                filterDinnerType ||
                 filterPublish ||
                 isValidSearchQuery(searchQuery)) && (
                 <button
@@ -273,10 +314,10 @@ const DinnerManagementPage = () => {
                     debouncedSearchRef.current?.cancel?.();
                     setSearchQuery('');
                     setCurrentPage(0);
-                    setFilterLocation('');
+                    setFilterCityId('');
                     setStartDate('');
                     setEndDate('');
-                    setFilterStatus('');
+                    setFilterDinnerType('');
                     setFilterPublish('');
                     setTimeout(() => fetchDinnersRef.current(''), 0);
                   }}

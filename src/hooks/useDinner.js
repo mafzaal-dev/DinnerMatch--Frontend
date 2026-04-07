@@ -16,7 +16,11 @@ export const useDinner = () => {
       if (params.search) queryParams.append('search', params.search);
       if (params.start_date) queryParams.append('start_date', params.start_date);
       if (params.end_date) queryParams.append('end_date', params.end_date);
-      if (params.location) queryParams.append('location', params.location);
+      if (params.city_id) queryParams.append('city_id', params.city_id);
+      if (params.area_id) queryParams.append('area_id', params.area_id);
+      if (params.dinner_type) {
+        queryParams.append('dinner_type', params.dinner_type);
+      }
       if (params.dinner_status) {
         queryParams.append('dinner_status', params.dinner_status);
       }

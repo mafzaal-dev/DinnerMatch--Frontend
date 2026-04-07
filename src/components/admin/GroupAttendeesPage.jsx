@@ -319,7 +319,7 @@ const GroupAttendeesPage = () => {
       if (isValidSearchQuery(term)) {
         params.append('search', term);
       }
-      if (filterRequestCity) params.append('city', filterRequestCity);
+      if (filterRequestCity) params.append('city_id', filterRequestCity);
       if (filterRequestDinner) params.append('dinner', filterRequestDinner);
       if (filterRequestDateFrom) params.append('start_date', filterRequestDateFrom);
       if (filterRequestDateTo) params.append('end_date', filterRequestDateTo);
@@ -357,7 +357,7 @@ const GroupAttendeesPage = () => {
       if (isValidSearchQuery(term)) {
         params.append('search', term);
       }
-      if (filterCity) params.append('city', filterCity);
+      if (filterCity) params.append('city_id', filterCity);
       if (filterDinner) params.append('dinner', filterDinner);
       if (filterDateFrom) params.append('start_date', filterDateFrom);
       if (filterDateTo) params.append('end_date', filterDateTo);
@@ -627,7 +627,7 @@ const GroupAttendeesPage = () => {
         if (isValidSearchQuery(searchQuery)) {
           params.append("search", searchQuery);
         }
-        if (filterCity) params.append('city', filterCity);
+        if (filterCity) params.append('city_id', filterCity);
         if (filterDinner) params.append('dinner', filterDinner);
         if (filterDateFrom) params.append('start_date', filterDateFrom);
         if (filterDateTo) params.append('end_date', filterDateTo);
@@ -689,7 +689,7 @@ const GroupAttendeesPage = () => {
         if (isValidSearchQuery(searchQuery)) {
           params.append('search', searchQuery);
         }
-        if (filterRequestCity) params.append('city', filterRequestCity);
+        if (filterRequestCity) params.append('city_id', filterRequestCity);
         if (filterRequestDinner) params.append('dinner', filterRequestDinner);
         if (filterRequestDateFrom) params.append('start_date', filterRequestDateFrom);
         if (filterRequestDateTo) params.append('end_date', filterRequestDateTo);

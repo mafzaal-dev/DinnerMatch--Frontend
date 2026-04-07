@@ -31,3 +31,7 @@ button {
 .rdp-month_caption {
   text-align: center;
 }
+
+.peach .scroll-util {
+  height: 50vh !important;
+}

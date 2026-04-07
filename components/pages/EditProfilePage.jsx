@@ -8,8 +8,7 @@ import { editProfileSchema } from "@/constants/validationSchemas";
 import { DatePicker } from "@/components/ui/date-picker";
 import { api, API_ENDPOINTS } from "@/utils/api";
 import { formatSAPhone } from "@/utils/format";
-import CitySelectionModal from "../modals/CitySelectionModal";
-import AreaSelectionModal from "../modals/AreaSelectionModal";
+import { CustomDropdown } from "@/components/common";
 
 // Same questions/options as DemographicsFlow for consistent Identity data
 const IDENTITY_QUESTIONS = [
@@ -158,10 +157,8 @@ const EditProfilePage = ({
   const [languageDropdown, setLanguageDropdown] = useState(false);
 
   const [cities, setCities] = useState([]);
-  const [selectedCity, setSelectedCity] = useState(null);
-  const [selectedPlace, setSelectedPlace] = useState(null);
-  const [cityModalOpen, setCityModalOpen] = useState(false);
-  const [areaModalOpen, setAreaModalOpen] = useState(false);
+  const [profileCityId, setProfileCityId] = useState("");
+  const [profileAreaId, setProfileAreaId] = useState("");
 
   const watchedLanguages = watch("languages");
   const watchedMenuPreferences = watch("menuPreferences");
@@ -215,25 +212,49 @@ const EditProfilePage = ({
   }, []);
 
   useEffect(() => {
-    if (!profile?.city_id || !cities.length) return;
-    const city = cities.find((c) => c.id === profile.city_id);
-    if (!city) return;
-    setSelectedCity(city);
-    if (profile.area_id) {
-      const areaInCity = city.area?.find((a) => a.id === profile.area_id);
-      if (areaInCity) {
-        setSelectedPlace(areaInCity);
-        return;
-      }
+    if (!cities.length) return;
+    const cid = profile?.city_id ? String(profile.city_id) : "";
+    const aid = profile?.area_id ? String(profile.area_id) : "";
+    if (!cid) {
+      setProfileCityId("");
+      setProfileAreaId("");
+      return;
+    }
+    setProfileCityId(cid);
+    const city = cities.find((c) => String(c.id) === cid);
+    if (!city) {
+      setProfileAreaId(aid);
+      return;
+    }
+    if (aid && city.area?.some((a) => String(a.id) === aid)) {
+      setProfileAreaId(aid);
+      return;
+    }
+    if (aid) {
       for (const c of cities) {
-        const area = c.area?.find((a) => a.id === profile.area_id);
-        if (area) {
-          setSelectedPlace(area);
-          break;
+        if (c.area?.some((a) => String(a.id) === aid)) {
+          setProfileAreaId(aid);
+          return;
         }
       }
     }
+    setProfileAreaId("");
   }, [profile?.city_id, profile?.area_id, cities]);
+
+  const selectedCityForAreas = cities.find(
+    (c) => String(c.id) === String(profileCityId),
+  );
+  const citySelectOptions = [
+    { value: "", label: "Select city" },
+    ...cities.map((c) => ({ value: String(c.id), label: c.name })),
+  ];
+  const areaSelectOptions = [
+    { value: "", label: "Select area" },
+    ...(selectedCityForAreas?.area?.map((a) => ({
+      value: String(a.id),
+      label: a.name,
+    })) ?? []),
+  ];
 
   useEffect(() => {
     if (!profile) return;
@@ -327,8 +348,8 @@ const EditProfilePage = ({
         nationality: data.nationality || undefined,
         language: data.language || undefined,
         date_of_birth: data.date_of_birth || undefined,
-        city_id: selectedCity?.id || undefined,
-        area_id: selectedPlace?.id || undefined,
+        city_id: profileCityId || undefined,
+        area_id: profileAreaId || undefined,
       });
     }
   };
@@ -417,42 +438,47 @@ const EditProfilePage = ({
             </div>
           </div>
 
-          {/* Location (City & Area) */}
           <div className="bg-[#111121] border border-[#2F3A51] rounded-lg p-6 md:p-8 shadow-lg">
             <h2 className="text-lg font-bold italic uppercase mb-6 tracking-wide text-[#F5F5F5]">
               Location
             </h2>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm text-[#757575] font-semibold mb-2">City</label>
-                <div className="flex items-center gap-3">
-                  <span className="flex-1 px-4 py-3 bg-[#111121] border border-[#2F3A51] rounded-lg text-[#F5F5F5]">
-                    {selectedCity?.name ?? "—"}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => setCityModalOpen(true)}
-                    className="hidden px-4 py-3 rounded-lg border border-[#FFAA55] text-[#FFAA55] font-semibold hover:bg-[#FFAA55] hover:text-[#212121] transition-colors"
-                  >
-                    Change
-                  </button>
-                </div>
+                <label className="block text-sm text-[#757575] font-semibold mb-2">
+                  City
+                </label>
+                <CustomDropdown
+                  variant="dark"
+                  value={profileCityId}
+                  onChange={(e) => {
+                    setProfileCityId(e.target.value);
+                    setProfileAreaId("");
+                  }}
+                  options={citySelectOptions}
+                  placeholder={cities.length ? "Select city" : "Loading cities…"}
+                  disabled={!cities.length}
+                  name="profile_city"
+                />
               </div>
               <div>
-                <label className="block text-sm text-[#757575] font-semibold mb-2">Area</label>
-                <div className="flex items-center gap-3">
-                  <span className="flex-1 px-4 py-3 bg-[#111121] border border-[#2F3A51] rounded-lg text-[#F5F5F5]">
-                    {selectedPlace?.name ?? "—"}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => selectedCity && setAreaModalOpen(true)}
-                    disabled={!selectedCity}
-                    className="hidden px-4 py-3 rounded-lg border border-[#FFAA55] text-[#FFAA55] font-semibold hover:bg-[#FFAA55] hover:text-[#212121] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    Change
-                  </button>
-                </div>
+                <label className="block text-sm text-[#757575] font-semibold mb-2">
+                  Area
+                </label>
+                <CustomDropdown
+                  variant="dark"
+                  value={profileAreaId}
+                  onChange={(e) => setProfileAreaId(e.target.value)}
+                  options={areaSelectOptions}
+                  placeholder={
+                    !profileCityId
+                      ? "Select a city first"
+                      : areaSelectOptions.length <= 1
+                        ? "No areas listed for this city"
+                        : "Select area"
+                  }
+                  disabled={!profileCityId || areaSelectOptions.length <= 1}
+                  name="profile_area"
+                />
               </div>
             </div>
           </div>
@@ -622,24 +648,6 @@ const EditProfilePage = ({
         </div>
       </div>
 
-      <CitySelectionModal
-        isOpen={cityModalOpen}
-        onClose={() => setCityModalOpen(false)}
-        onSelectCity={(city) => {
-          setSelectedCity(city);
-          setSelectedPlace(null);
-          setCityModalOpen(false);
-        }}
-      />
-      <AreaSelectionModal
-        isOpen={areaModalOpen}
-        onClose={() => setAreaModalOpen(false)}
-        selectedCity={selectedCity}
-        onSelectArea={(area) => {
-          setSelectedPlace(area);
-          setAreaModalOpen(false);
-        }}
-      />
     </div>
   );
 };
