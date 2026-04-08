@@ -209,7 +209,7 @@ export default function Home() {
       const phoneApi = normalizeSAPhoneForApi(formData.mobileNumber);
       if (phoneApi) {
         registrationData.mobile_number = phoneApi;
-        registrationData.phone_number = phoneApi;
+        registrationData.phone = phoneApi;
       }
 
       const response = await api.post(API_ENDPOINTS.REGISTER_WITH_QUIZ, registrationData);

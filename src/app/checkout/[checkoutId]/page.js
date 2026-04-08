@@ -195,9 +195,9 @@ export default function CheckoutPage() {
         </button>
       </div>
 
-      <div className="max-w-xl mx-auto px-4 py-8 sm:py-12">
-        <div className="rounded-2xl bg-white shadow-xl border border-gray-200 overflow-hidden">
-          <div className="px-6 sm:px-8 pt-8 pb-6">
+      <div className="max-w-xl w-full min-w-0 mx-auto px-2 sm:px-4 py-8 sm:py-12">
+        <div className="rounded-2xl bg-white shadow-xl border border-gray-200 overflow-x-auto overflow-y-visible">
+          <div className="px-3 sm:px-8 pt-8 pb-6 min-w-0">
             <div className="text-center mb-6">
               <h1 className="text-2xl sm:text-3xl font-semibold text-gray-900 mb-2">
                 Complete payment
@@ -228,10 +228,10 @@ export default function CheckoutPage() {
             )}
 
             <div
-              className="rounded-xl overflow-hidden bg-gray-50 border border-gray-200 p-4 sm:p-5"
+              className="rounded-xl overflow-x-auto overflow-y-visible bg-gray-50 border border-gray-200 p-2 sm:p-5 min-w-0 max-w-full [-webkit-overflow-scrolling:touch]"
               style={{ minHeight: status === "loading" ? 0 : 420 }}
             >
-              <div id="peach-payment-form" />
+              <div id="peach-payment-form" className="min-w-0 max-w-full" />
             </div>
 
             <p className="text-center mt-6 text-gray-500 text-sm flex items-center justify-center gap-1.5">

@@ -35,3 +35,19 @@ button {
 .peach .scroll-util {
   height: 50vh !important;
 }
+
+/* Peach embedded checkout: SDK targets ~320px min width; keep it inside narrow viewports */
+#peach-payment-form {
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+#peach-payment-form .peach {
+  max-width: 100% !important;
+  box-sizing: border-box;
+}
+
+#peach-payment-form .peach iframe {
+  max-width: 100% !important;
+}

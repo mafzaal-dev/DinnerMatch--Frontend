@@ -213,33 +213,53 @@ const EditProfilePage = ({
 
   useEffect(() => {
     if (!cities.length) return;
-    const cid = profile?.city_id ? String(profile.city_id) : "";
-    const aid = profile?.area_id ? String(profile.area_id) : "";
-    if (!cid) {
+
+    // Prefer explicit UUID ids from profile API; fallback to legacy keys/names.
+    const rawCityId = profile?.city_id ?? profile?.city ?? initialData?.city_id;
+    const rawAreaId = profile?.area_id ?? profile?.area ?? initialData?.area_id;
+    const rawCityName = profile?.city_name ?? profile?.city;
+    const rawAreaName = profile?.area_name ?? profile?.location ?? profile?.area;
+
+    let resolvedCityId = rawCityId ? String(rawCityId) : "";
+    if (
+      resolvedCityId &&
+      !cities.some((c) => String(c.id) === resolvedCityId)
+    ) {
+      resolvedCityId = "";
+    }
+    if (!resolvedCityId && rawCityName) {
+      const byCityName = cities.find(
+        (c) => String(c.name).toLowerCase() === String(rawCityName).toLowerCase(),
+      );
+      resolvedCityId = byCityName ? String(byCityName.id) : "";
+    }
+
+    if (!resolvedCityId) {
       setProfileCityId("");
       setProfileAreaId("");
       return;
     }
-    setProfileCityId(cid);
-    const city = cities.find((c) => String(c.id) === cid);
-    if (!city) {
-      setProfileAreaId(aid);
-      return;
+
+    setProfileCityId(resolvedCityId);
+    const city = cities.find((c) => String(c.id) === resolvedCityId);
+    const cityAreas = city?.area ?? [];
+
+    let resolvedAreaId = rawAreaId ? String(rawAreaId) : "";
+    if (
+      resolvedAreaId &&
+      !cityAreas.some((a) => String(a.id) === resolvedAreaId)
+    ) {
+      resolvedAreaId = "";
     }
-    if (aid && city.area?.some((a) => String(a.id) === aid)) {
-      setProfileAreaId(aid);
-      return;
+    if (!resolvedAreaId && rawAreaName) {
+      const byAreaName = cityAreas.find(
+        (a) => String(a.name).toLowerCase() === String(rawAreaName).toLowerCase(),
+      );
+      resolvedAreaId = byAreaName ? String(byAreaName.id) : "";
     }
-    if (aid) {
-      for (const c of cities) {
-        if (c.area?.some((a) => String(a.id) === aid)) {
-          setProfileAreaId(aid);
-          return;
-        }
-      }
-    }
-    setProfileAreaId("");
-  }, [profile?.city_id, profile?.area_id, cities]);
+
+    setProfileAreaId(resolvedAreaId);
+  }, [profile?.city_id, profile?.area_id, profile?.city, profile?.area, cities, initialData?.city_id, initialData?.area_id]);
 
   const selectedCityForAreas = cities.find(
     (c) => String(c.id) === String(profileCityId),
