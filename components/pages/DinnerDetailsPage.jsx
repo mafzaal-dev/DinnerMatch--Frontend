@@ -81,12 +81,6 @@ const DinnerDetailsPage = ({
 
   const hasActiveSubscription = subscriptionData && subscriptionData.length > 0;
   const activeSubscription = hasActiveSubscription ? subscriptionData[0] : null;
-  const isAnnualPass = activeSubscription?.plan?.name
-    ?.toLowerCase()
-    .includes("annual");
-  const isMonthlyPass = activeSubscription?.plan?.name
-    ?.toLowerCase()
-    .includes("monthly");
 
   const memberSinceDate = activeSubscription
     ? new Date(activeSubscription.start_date || activeSubscription.created_at)
@@ -100,7 +94,7 @@ const DinnerDetailsPage = ({
 
   const subscriptionDisplay = {
     memberSince: memberSinceDate,
-    type: activeSubscription?.plan?.name || "Monthly Member",
+    type: activeSubscription?.plan?.name || "Member",
     status: activeSubscription?.plan?.is_active ? "Active" : "Inactive",
     unlimitedDinners: true,
     renewalDate: renewalDate,
@@ -274,8 +268,8 @@ const DinnerDetailsPage = ({
           )}
         </div>
 
-        {/* DinnerMatch Pass Section - Show only if Annual Pass */}
-        {isAnnualPass && (
+        {/* DinnerMatch Pass Section - Show only if Active Subscription */}
+        {hasActiveSubscription && (
           <div
             className="relative rounded-lg p-6 overflow-hidden"
             style={{
@@ -401,8 +395,8 @@ const DinnerDetailsPage = ({
         )}
 
         {/* Dinner Details Card */}
-        {/* Only show if user has joined a dinner */}
-        {hasJoinedDinner && (!hasActiveSubscription || isMonthlyPass) && (
+        {/* Only show if user has joined a dinner and has no active subscription */}
+        {hasJoinedDinner && !hasActiveSubscription && (
           <div
             className="bg-[#111121] border border-[#2F3A51] rounded-lg p-6 flex flex-col gap-6"
             style={{ boxShadow: "0 0 16px rgba(0, 0, 0, 0.12)" }}
@@ -473,7 +467,7 @@ const DinnerDetailsPage = ({
         )}
 
         {/* Empty State for Not Joined */}
-        {!hasJoinedDinner && !isAnnualPass && (
+        {!hasJoinedDinner && !hasActiveSubscription && (
           <div className="bg-[#111121] border border-[#2F3A51] rounded-lg p-8 text-center flex flex-col gap-4">
             {!hasActiveSubscription && (
               <div className="bg-[#CA8A04] rounded-lg h-10 flex items-center px-3 gap-2">
@@ -506,8 +500,8 @@ const DinnerDetailsPage = ({
           </div>
         )}
 
-        {/* Your Next Dinner Section - Only show for Annual Pass */}
-        {isAnnualPass && hasJoinedDinner && (
+        {/* Your Next Dinner Section - Only show for Active Subscription */}
+        {hasActiveSubscription && hasJoinedDinner && (
           <div
             className="bg-[#0F0F14] border border-[#191A1D] rounded-lg p-6"
             style={{
@@ -972,8 +966,8 @@ const DinnerDetailsPage = ({
           </div>
         )}
 
-        {/* Your Access Section - Only show for Annual Pass */}
-        {isAnnualPass && (
+        {/* Your Access Section - Only show for Active Subscription */}
+        {hasActiveSubscription && (
           <div
             className="bg-[#0F0F14] border border-[#191A1D] rounded-lg p-6"
             style={{ boxShadow: "0 0 16px rgba(0, 0, 0, 0.12)" }}
@@ -992,8 +986,8 @@ const DinnerDetailsPage = ({
           </div>
         )}
 
-        {/* Monthly Pass or No Subscription Specific Sections */}
-        {hasJoinedDinner && (isMonthlyPass || !hasActiveSubscription) && (
+        {/* No Subscription Specific Sections */}
+        {hasJoinedDinner && !hasActiveSubscription && (
           <>
             {/* Your Group */}
             <div
