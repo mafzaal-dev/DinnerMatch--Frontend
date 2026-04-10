@@ -41,10 +41,7 @@ const BookDinnerModal = ({ isOpen, onClose, onSuccess, onBack, selectedCity, sel
       }
     } catch (err) {
       console.error('Error fetching dinner slots:', err);
-      setDinnerSlots([
-        { id: '1', date: 'December 2, 2025', time: '7:00 PM' },
-        { id: '2', date: 'December 2, 2025', time: '10:00 PM' },
-      ]);
+      setDinnerSlots([]);
     } finally {
       setLoading(false);
     }
@@ -99,7 +96,7 @@ const BookDinnerModal = ({ isOpen, onClose, onSuccess, onBack, selectedCity, sel
         <div className="w-full max-w-xl mx-auto space-y-8">
           <div className="text-center">
             <h2 className="text-lg md:text-xl font-bold text-[#FFAA55]">Book Your Next Dinner</h2>
-            <p className="text-sm text-gray-400 mt-1">5 new people can't wait to meet you</p>
+            <p className="text-sm text-gray-400 mt-1">New people can't wait to meet you</p>
           </div>
 
           <div className="w-full space-y-4">

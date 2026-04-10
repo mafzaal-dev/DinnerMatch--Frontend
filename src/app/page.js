@@ -38,6 +38,28 @@ const GENDER_MAP = { woman: 'Female', man: 'Male', non_binary: 'Non-Binary' };
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const isValidUUID = (value) => value && UUID_REGEX.test(String(value).trim());
 
+/** City/area from modals are saved to localStorage; merge so signup still sends IDs if state was lost. */
+function resolveQuizCityAndArea(selectedCity, selectedPlace) {
+  let city = selectedCity;
+  let place = selectedPlace;
+  if (typeof window === "undefined") return { city, place };
+  if (!city) {
+    try {
+      city = JSON.parse(localStorage.getItem("quiz_city") || "null");
+    } catch {
+      city = null;
+    }
+  }
+  if (!place) {
+    try {
+      place = JSON.parse(localStorage.getItem("quiz_place") || "null");
+    } catch {
+      place = null;
+    }
+  }
+  return { city, place };
+}
+
 function buildProfileUpdatePayload(formData, demographicsData, selectedCity, selectedPlace) {
   const d = demographicsData || {};
   const payload = {
@@ -195,6 +217,11 @@ export default function Home() {
         demographicsData = JSON.parse(localStorage.getItem('quiz_demographics') || '{}');
       }
 
+      const { city: cityForRegister, place: areaForRegister } = resolveQuizCityAndArea(
+        selectedCity,
+        selectedPlace,
+      );
+
       const registrationData = {
         email: formData.email,
         password: formData.password,
@@ -202,9 +229,12 @@ export default function Home() {
         last_name: formData.lastName || '',
         answers: answersArray,
         ...demographicsData,
-        city_id: selectedCity?.id,
-        area_id: selectedPlace?.id
       };
+
+      const cityId = cityForRegister?.id != null ? String(cityForRegister.id).trim() : '';
+      const areaId = areaForRegister?.id != null ? String(areaForRegister.id).trim() : '';
+      if (isValidUUID(cityId)) registrationData.city_id = cityId;
+      if (isValidUUID(areaId)) registrationData.area_id = areaId;
 
       const phoneApi = normalizeSAPhoneForApi(formData.mobileNumber);
       if (phoneApi) {
@@ -261,8 +291,8 @@ export default function Home() {
           const profilePayload = buildProfileUpdatePayload(
             formData,
             demographicsData,
-            selectedCity,
-            selectedPlace
+            cityForRegister,
+            areaForRegister
           );
           await api.put(API_ENDPOINTS.PROFILE_UPDATE, profilePayload);
         } catch (profileErr) {

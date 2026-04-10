@@ -166,7 +166,7 @@ const DinnerDetailsPage = ({
         ? subscriptionDataMissing
           ? "Subscription expired"
           : "Payment incomplete"
-        : "Subscribed",
+        : subscriptionRecord?.plan?.name || "Member",
       status: isSubscribed
         ? "Active"
         : payAttention
