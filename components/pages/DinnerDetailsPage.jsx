@@ -79,26 +79,120 @@ const DinnerDetailsPage = ({
     }
   }, [dinner?.current_user_attendance]);
 
-  const hasActiveSubscription = subscriptionData && subscriptionData.length > 0;
-  const activeSubscription = hasActiveSubscription ? subscriptionData[0] : null;
+  const hasDetails =
+    dinner?.id &&
+    (dinner.status === "Published" ||
+      (dinner.status !== "Draft" && dinner.status !== "Pending"));
 
-  const memberSinceDate = activeSubscription
-    ? new Date(activeSubscription.start_date || activeSubscription.created_at)
-        .toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })
-    : "25 Nov 2025";
+  const hasJoinedDinner = !!dinner?.id;
 
-  const renewalDate = activeSubscription
-    ? new Date(activeSubscription.end_date)
-        .toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })
-    : "25 Nov 2025";
+  const subscriptionList = useMemo(() => {
+    if (subscriptionData == null) return [];
+    return Array.isArray(subscriptionData)
+      ? subscriptionData
+      : [subscriptionData];
+  }, [subscriptionData]);
 
-  const subscriptionDisplay = {
-    memberSince: memberSinceDate,
-    type: activeSubscription?.plan?.name || "Member",
-    status: activeSubscription?.plan?.is_active ? "Active" : "Inactive",
-    unlimitedDinners: true,
-    renewalDate: renewalDate,
-  };
+  /** API returned nothing useful (null, empty, or missing list) */
+  const subscriptionDataMissing = subscriptionList.length === 0;
+
+  /** Prefer active/trialing; otherwise first row (e.g. expired) for display dates only */
+  const subscriptionRecord = useMemo(() => {
+    const active = subscriptionList.find((s) => {
+      const st = String(s?.status ?? "").toLowerCase();
+      return st === "active" || st === "trialing";
+    });
+    if (active) return active;
+    if (subscriptionList.length > 0) return subscriptionList[0];
+    return null;
+  }, [subscriptionList]);
+
+  const hasPlanAttached = !!(
+    subscriptionRecord?.plan?.id ||
+    subscriptionRecord?.plan?.name ||
+    subscriptionRecord?.plan_id
+  );
+
+  const isSubscribed = useMemo(() => {
+    if (!subscriptionRecord || !hasPlanAttached) return false;
+    const st = String(subscriptionRecord.status ?? "").toLowerCase();
+    if (st === "active" || st === "trialing") return true;
+    if (
+      [
+        "cancelled",
+        "canceled",
+        "expired",
+        "inactive",
+        "past_due",
+        "unpaid",
+      ].includes(st)
+    ) {
+      return false;
+    }
+    return true;
+  }, [subscriptionRecord, hasPlanAttached]);
+
+  /** Joined a dinner but no valid subscription (missing, expired, cancelled, etc.) */
+  const needsPaymentAttention = hasJoinedDinner && !isSubscribed;
+
+  /** Same main dashboard as subscribed users: pass + next dinner + access */
+  const showMemberDashboard = isSubscribed || hasJoinedDinner;
+
+  const subscriptionDisplay = useMemo(() => {
+    const record = subscriptionRecord;
+    const memberSince =
+      record?.start_date || record?.created_at
+        ? new Date(record.start_date || record.created_at).toLocaleDateString(
+            "en-GB",
+            { day: "numeric", month: "short", year: "numeric" },
+          )
+        : null;
+    const renewal =
+      record?.end_date &&
+      !Number.isNaN(new Date(record.end_date).getTime())
+        ? new Date(record.end_date).toLocaleDateString("en-GB", {
+            day: "numeric",
+            month: "short",
+            year: "numeric",
+          })
+        : null;
+
+    const payAttention = hasJoinedDinner && !isSubscribed;
+
+    return {
+      memberSince,
+      renewalDate: renewal,
+      type: payAttention
+        ? subscriptionDataMissing
+          ? "Subscription expired"
+          : "Payment incomplete"
+        : "Subscribed",
+      status: isSubscribed
+        ? "Active"
+        : payAttention
+          ? "Action needed"
+          : "Inactive",
+      renewsLine: renewal
+        ? `Renews: ${renewal}`
+        : payAttention
+          ? subscriptionDataMissing
+            ? "Renew to keep your dinner spot and full member benefits."
+            : "Renew or finish checkout to restore access"
+          : "Renews: —",
+      accessRenewalLine: renewal
+        ? `Renewal on ${renewal}.`
+        : payAttention
+          ? subscriptionDataMissing
+            ? "We couldn’t find an active subscription. Renew anytime—it only takes a moment."
+            : "Complete payment to keep full access to your dinners."
+          : "Renewal on —.",
+    };
+  }, [
+    subscriptionRecord,
+    isSubscribed,
+    hasJoinedDinner,
+    subscriptionDataMissing,
+  ]);
 
   const handleRSVP = (status) => {
     setRsvpStatus(status);
@@ -136,66 +230,6 @@ const DinnerDetailsPage = ({
       setIsJoiningDinner(false);
     }
   };
-
-  // Determine if we should show details based on status
-  // Also check if dinner actually has data (id)
-  const hasDetails =
-    dinner?.id &&
-    (dinner.status === "Published" ||
-    (dinner.status !== "Draft" && dinner.status !== "Pending"));
-
-  const hasJoinedDinner = !!dinner?.id;
-
-  const getDynamicDates = () => {
-    if (!dinner?.isoDate && !dinner?.date) {
-      return {
-        groupReveal: "Monday, December 8, 7:00 PM",
-        restaurantReveal: "Tuesday, December 9, 10:00 AM",
-        dinnerExperience: "Tuesday, December 9, 7:00 PM"
-      };
-    }
-
-    let dinnerDate;
-    if (dinner.isoDate) {
-      dinnerDate = new Date(dinner.isoDate);
-    } else {
-      const dateStr = `${dinner.date} ${dinner.time}`;
-      dinnerDate = new Date(dateStr);
-    }
-
-    if (isNaN(dinnerDate.getTime())) {
-      return {
-        groupReveal: "Monday, December 8, 7:00 PM",
-        restaurantReveal: "Tuesday, December 9, 10:00 AM",
-        dinnerExperience: "Tuesday, December 9, 7:00 PM"
-      };
-    }
-    
-    const groupDate = new Date(dinnerDate);
-    groupDate.setDate(dinnerDate.getDate() - 1);
-    groupDate.setHours(19, 0, 0, 0);
-
-    const restaurantDate = new Date(dinnerDate);
-    restaurantDate.setHours(10, 0, 0, 0);
-
-    const experienceDate = dinnerDate;
-
-    const options = { 
-      weekday: 'long', 
-      month: 'long', 
-      day: 'numeric', 
-      hour: 'numeric', 
-      minute: '2-digit' 
-    };
-    
-    return {
-      groupReveal: groupDate.toLocaleString('en-US', options),
-      restaurantReveal: restaurantDate.toLocaleString('en-US', options),
-      dinnerExperience: experienceDate.toLocaleString('en-US', options)
-    };
-  };
-
-  const { groupReveal, restaurantReveal, dinnerExperience } = getDynamicDates();
 
   const getDinnerDateObj = () => {
     if (dinner?.isoDate) return new Date(dinner.isoDate);
@@ -268,8 +302,32 @@ const DinnerDetailsPage = ({
           )}
         </div>
 
-        {/* DinnerMatch Pass Section - Show only if Active Subscription */}
-        {hasActiveSubscription && (
+        {needsPaymentAttention && (
+          <div className="bg-[#CA8A04] rounded-lg px-3 py-3 flex gap-3 items-start">
+            <svg
+              className="w-6 h-6 text-[#D9D9D9] shrink-0 mt-0.5"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" />
+            </svg>
+            <div className="flex flex-col gap-1 min-w-0">
+              <span className="text-[#F5F5F5] font-semibold text-sm">
+                {subscriptionDataMissing
+                  ? "Subscription expired"
+                  : "Payment incomplete"}
+              </span>
+              <span className="text-[#F5F5F5] font-normal text-sm leading-snug">
+                {subscriptionDataMissing
+                  ? "We’re not seeing an active plan on your account—your membership may have ended, or we couldn’t load your billing details. Use Manage subscription below to renew and keep your dinner reservation and member access."
+                  : "Please finish checkout or update your payment so you don’t lose access to your dinners."}
+              </span>
+            </div>
+          </div>
+        )}
+
+        {/* DinnerMatch Pass — subscribed, or joined with lapsed / missing subscription */}
+        {showMemberDashboard && (
           <div
             className="relative rounded-lg p-6 overflow-hidden"
             style={{
@@ -299,9 +357,11 @@ const DinnerDetailsPage = ({
                     gap: "16px",
                   }}
                 >
-                  <p className="text-[#E3BF3B] text-xs uppercase tracking-wide">
-                    MEMBER SINCE {subscriptionDisplay.memberSince}
-                  </p>
+                  {subscriptionDisplay.memberSince && (
+                    <p className="text-[#E3BF3B] text-xs uppercase tracking-wide">
+                      MEMBER SINCE {subscriptionDisplay.memberSince}
+                    </p>
+                  )}
                   <h2 className="text-[#E3BF3B] text-2xl font-bold">
                     DinnerMatch Pass
                   </h2>
@@ -309,9 +369,23 @@ const DinnerDetailsPage = ({
                     {subscriptionDisplay.type}
                   </p>
                 </div>
-                <div className="flex items-center gap-2 bg-[#162B2A] p-3 rounded-full">
-                  <div className="size-2 bg-[#41B36E]  rounded-full"></div>
-                  <span className="text-[#41B359] text-sm font-semibold">
+                <div
+                  className={`flex items-center gap-2 p-3 rounded-full ${
+                    needsPaymentAttention ? "bg-[#3D2A1A]" : "bg-[#162B2A]"
+                  }`}
+                >
+                  <div
+                    className={`size-2 rounded-full shrink-0 ${
+                      needsPaymentAttention ? "bg-[#F59E0B]" : "bg-[#41B36E]"
+                    }`}
+                  />
+                  <span
+                    className={`text-sm font-semibold ${
+                      needsPaymentAttention
+                        ? "text-[#FBBF24]"
+                        : "text-[#41B359]"
+                    }`}
+                  >
                     {subscriptionDisplay.status}
                   </span>
                 </div>
@@ -361,7 +435,7 @@ const DinnerDetailsPage = ({
                     </svg>
                   </div>
                   <span className="text-[#F5F5F5] text-base">
-                    Renews: {subscriptionDisplay.renewalDate}
+                    {subscriptionDisplay.renewsLine}
                   </span>
                 </div>
               </div>
@@ -394,82 +468,10 @@ const DinnerDetailsPage = ({
           </div>
         )}
 
-        {/* Dinner Details Card */}
-        {/* Only show if user has joined a dinner and has no active subscription */}
-        {hasJoinedDinner && !hasActiveSubscription && (
-          <div
-            className="bg-[#111121] border border-[#2F3A51] rounded-lg p-6 flex flex-col gap-6"
-            style={{ boxShadow: "0 0 16px rgba(0, 0, 0, 0.12)" }}
-          >
-            {/* Header */}
-            <div className="flex items-center gap-3">
-              <svg
-                className="w-6 h-6 text-[#F5F5F5]"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M8 4V20M16 4V20M4 10H20"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-                <path
-                  d="M17 4V20M7 4V20"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-                <path
-                  d="M6 4H18C19.1046 4 20 4.89543 20 6V18C20 19.1046 19.1046 20 18 20H6C4.89543 20 4 19.1046 4 18V6C4 4.89543 4.89543 4 6 4Z"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-              <h2 className="text-[#F5F5F5] text-lg font-bold">Your Dinner</h2>
-            </div>
-
-            {/* Location Section */}
-            <div className="border-b border-[#2F3A51] pb-6 flex justify-between items-start">
-              <div className="flex flex-col gap-3">
-                <p className="text-[#E0E0E0] text-sm">Location</p>
-                <p className="text-[#F5F5F5] text-lg font-semibold">
-                  {dinner.city}
-                </p>
-              </div>
-            </div>
-
-            {/* Date Section */}
-            <div className="flex flex-col gap-3">
-              <p className="text-[#E0E0E0] text-sm">Date</p>
-              <p className="text-[#F5F5F5] text-lg font-semibold">
-                {dinner.date}, {dinner.time}
-              </p>
-            </div>
-
-            {!hasDetails && (
-              <p className="text-[#77777B] text-sm text-center bg-[#1A1A1E] p-2 rounded">
-                Details pending or to be announced.
-              </p>
-            )}
-            <button
-              onClick={onManageSubscription}
-              className="w-full bg-[#FFAA55] text-[#212121] font-bold py-3 rounded-lg hover:bg-[#FF9955] transition-colors"
-            >
-              Manage Subscription
-            </button>
-          </div>
-        )}
-
         {/* Empty State for Not Joined */}
-        {!hasJoinedDinner && !hasActiveSubscription && (
+        {!hasJoinedDinner && !isSubscribed && (
           <div className="bg-[#111121] border border-[#2F3A51] rounded-lg p-8 text-center flex flex-col gap-4">
-            {!hasActiveSubscription && (
+            {!isSubscribed && (
               <div className="bg-[#CA8A04] rounded-lg h-10 flex items-center px-3 gap-2">
                 <svg
                   className="w-6 h-6 text-[#D9D9D9]"
@@ -489,7 +491,7 @@ const DinnerDetailsPage = ({
             <p className="mb-5 text-[#BDBDBD]">
               Select an upcoming dinner below to join the fun!
             </p>
-            {!hasActiveSubscription && (
+            {!isSubscribed && (
               <button
                 onClick={onManageSubscription}
                 className="w-full bg-[#FFAA55] text-[#212121] font-bold py-3 rounded-lg hover:bg-[#FF9955] transition-colors"
@@ -500,8 +502,8 @@ const DinnerDetailsPage = ({
           </div>
         )}
 
-        {/* Your Next Dinner Section - Only show for Active Subscription */}
-        {hasActiveSubscription && hasJoinedDinner && (
+        {/* Your Next Dinner — any joined dinner (including lapsed subscription) */}
+        {hasJoinedDinner && (
           <div
             className="bg-[#0F0F14] border border-[#191A1D] rounded-lg p-6"
             style={{
@@ -966,8 +968,8 @@ const DinnerDetailsPage = ({
           </div>
         )}
 
-        {/* Your Access Section - Only show for Active Subscription */}
-        {hasActiveSubscription && (
+        {/* Your Access — same card for active subscribers and joined users fixing payment */}
+        {showMemberDashboard && (
           <div
             className="bg-[#0F0F14] border border-[#191A1D] rounded-lg p-6"
             style={{ boxShadow: "0 0 16px rgba(0, 0, 0, 0.12)" }}
@@ -980,114 +982,10 @@ const DinnerDetailsPage = ({
                 Access to all dinners this month.
               </p>
               <p className="text-[#77777B] text-base">
-                Renewal on {subscriptionDisplay.renewalDate}.
+                {subscriptionDisplay.accessRenewalLine}
               </p>
             </div>
           </div>
-        )}
-
-        {/* No Subscription Specific Sections */}
-        {hasJoinedDinner && !hasActiveSubscription && (
-          <>
-            {/* Your Group */}
-            <div
-              className="bg-[#111121] border border-[#2F3A51] rounded-lg p-6 flex flex-col gap-6"
-              style={{ boxShadow: "0 0 16px rgba(0, 0, 0, 0.12)" }}
-            >
-              <div className="bg-[#FFAA55] text-[#212121] font-bold px-3 h-10 rounded inline-flex items-center gap-2 w-fit">
-                <svg
-                  className="w-6 h-6 text-[#212121]"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-                  />
-                </svg>
-                Your Group
-              </div>
-              <div className="flex flex-col gap-3">
-                <p className="text-[#E0E0E0] text-sm">
-                  Find out more about your group on
-                </p>
-                <p className="text-[#F5F5F5] font-bold text-lg">
-                  {groupReveal}
-                </p>
-              </div>
-            </div>
-
-            {/* Your Restaurant */}
-            <div
-              className="bg-[#111121] border border-[#2F3A51] rounded-lg p-6 flex flex-col gap-6"
-              style={{ boxShadow: "0 0 16px rgba(0, 0, 0, 0.12)" }}
-            >
-              <div className="bg-[#FFAA55] text-[#212121] font-bold px-3 h-10 rounded inline-flex items-center gap-2 w-fit">
-                <svg
-                  className="w-6 h-6 text-[#212121]"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                  />
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                  />
-                </svg>
-                Your Restaurant
-              </div>
-              <div className="flex flex-col gap-3">
-                <p className="text-[#E0E0E0] text-sm">
-                  Get your dinner location on
-                </p>
-                <p className="text-[#F5F5F5] font-bold text-lg">
-                  {restaurantReveal}
-                </p>
-              </div>
-            </div>
-
-            {/* Your Dinner Experience */}
-            <div
-              className="bg-[#111121] border border-[#2F3A51] rounded-lg p-6 flex flex-col gap-6"
-              style={{ boxShadow: "0 0 16px rgba(0, 0, 0, 0.12)" }}
-            >
-              <div className="bg-[#FFAA55] text-[#212121] font-bold px-3 h-10 rounded inline-flex items-center gap-2 w-fit">
-                <svg
-                  className="w-6 h-6 text-[#212121]"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-                Your Dinner Experience
-              </div>
-              <div className="flex flex-col gap-3">
-                <p className="text-[#E0E0E0] text-sm">
-                  Unlock Your DinnerMatch Icebreakers
-                </p>
-                <p className="text-[#F5F5F5] font-bold text-lg">
-                  {dinnerExperience}
-                </p>
-              </div>
-            </div>
-          </>
         )}
 
         {upcomingDates && upcomingDates.length > 0 && (

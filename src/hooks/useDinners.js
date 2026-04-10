@@ -15,6 +15,12 @@ async function fetchDinnerDetailData(dinnerId) {
   return response.data;
 }
 
+function normalizeSubscriptionPayload(raw) {
+  if (raw == null) return [];
+  if (Array.isArray(raw)) return raw;
+  return [raw];
+}
+
 export const useSubscription = () => {
   return useQuery({
     queryKey: ['subscription'],
@@ -23,8 +29,9 @@ export const useSubscription = () => {
       if (!response.success) {
         throw new Error('Failed to fetch subscription');
       }
-      // Return data object if subscription doesn't exist to prevent undefined error
-      return response.data?.subscription || response.subscription || [];
+      const raw =
+        response.data?.subscription ?? response.subscription ?? [];
+      return normalizeSubscriptionPayload(raw);
     },
     enabled: hasAccessToken(), // Only fetch when user is logged in
   });
