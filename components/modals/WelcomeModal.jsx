@@ -23,7 +23,7 @@ const WelcomeModal = ({ isOpen, onClose, onNext }) => {
         </button>
 
         <div className="text-center mb-12">
-          <h1 class="text-2xl md:text-4xl font-bold mb-1"><span class="text-white">Dinner</span><span class="text-[#FFAA55]">Match</span></h1>
+          <h1 className="text-2xl md:text-4xl font-bold mb-1"><span className="text-white">Dinner</span><span className="text-[#FFAA55]">Match</span></h1>
         </div>
 
         <div className="w-full border border-[#2F3A51] rounded-2xl p-6 shadow-2xl mb-12 max-w-xl mx-auto">

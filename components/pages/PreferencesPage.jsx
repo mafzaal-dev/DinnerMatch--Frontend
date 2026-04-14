@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from 'react';
+import { LANGUAGES, MENU_CHOICES } from '@/constants/preferences';
 
 const PreferencesPage = ({ onSave, onBack }) => {
   const [preferences, setPreferences] = useState({
@@ -13,11 +14,11 @@ const PreferencesPage = ({ onSave, onBack }) => {
     alcoholPreference: [],
   });
 
-  const languages = ['English', 'Afrikaans', 'Xhosa', 'Zulu'];
+  const languages = LANGUAGES;
   const cuisines = ['Italian', 'Mexican', 'Asian', 'French', 'Mediterranean', 'American', 'Indian', 'Japanese', 'Thai', 'Other'];
   const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
   const timesOfDay = ['Morning', 'Afternoon', 'Evening'];
-  const dietaryOptions = ['Vegetarian', 'Vegan', 'Gluten-free', 'Dairy-free', 'Keto', 'Paleo', 'Halal', 'Kosher', 'No restrictions'];
+  const dietaryOptions = MENU_CHOICES;
   const alcoholOptions = ['Wine', 'Beer', 'Spirits', 'Non-alcoholic', 'No preference'];
 
   const toggleArrayItem = (key, value) => {

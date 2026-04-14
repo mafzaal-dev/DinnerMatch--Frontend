@@ -4,12 +4,35 @@ import { useEffect, useMemo, Suspense, useState } from 'react';
 import DinnerDetailsPage from '../../../components/pages/DinnerDetailsPage';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useSubscription, useRequestedDinners, useDinnerDetail, useUpdateAttendance, useAvailableDinners, useRequestDinner, useSwipeDinner, useRateGroup, useRateRestaurant } from '../../hooks/useDinners';
+import { useAuth } from '@/hooks/useAuth';
+import { api, API_ENDPOINTS } from '@/utils/api';
 import { toast } from 'react-hot-toast';
 
 function DinnerDetailsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const urlDinnerId = searchParams.get('id');
+  const { getProfile } = useAuth();
+  const [userCityName, setUserCityName] = useState('');
+
+  // Resolve user's city name from profile + cities list
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const [profile, citiesRes] = await Promise.all([
+          getProfile(),
+          api.get(API_ENDPOINTS.GET_CITY_AREA),
+        ]);
+        if (cancelled) return;
+        const cityId = profile?.city_id;
+        const cities = Array.isArray(citiesRes?.data) ? citiesRes.data : Array.isArray(citiesRes) ? citiesRes : [];
+        const city = cities.find((c) => c.id === cityId);
+        if (city?.name) setUserCityName(city.name);
+      } catch (_) {}
+    })();
+    return () => { cancelled = true; };
+  }, []);
 
   // Fetch all necessary data using React Query
   const { 
@@ -58,13 +81,13 @@ function DinnerDetailsContent() {
       return {
         id: dinner.id,
         date: dateObj.toLocaleDateString('en-US', { month: 'long', day: 'numeric' }),
-        city: dinner.location || dinner.city || 'Location TBD',
+        city: userCityName || 'Location TBD',
         status: 'Available', // Or check if requested? But requested ones should be currentDinnerId
         originalDate: dateObj,
         title: dinner.title // useful for modal
       };
     });
-  }, [availableDinners, currentDinnerId]);
+  }, [availableDinners, currentDinnerId, userCityName]);
 
   // Process dinner details
   const dinnerData = useMemo(() => {
@@ -107,7 +130,7 @@ function DinnerDetailsContent() {
 
     return {
       id: d.id,
-      city: d.location,
+      city: userCityName || d.location,
       isoDate: d.date,
       date: dateObj.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
       time: dateObj.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
@@ -132,7 +155,7 @@ function DinnerDetailsContent() {
         }
       },
     };
-  }, [dinnerDetailData]);
+  }, [dinnerDetailData, userCityName]);
 
   const handleManageSubscription = () => {
     router.push('/manage-subscription');

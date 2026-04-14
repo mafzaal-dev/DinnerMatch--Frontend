@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'react-hot-toast';
+import { LANGUAGES, BUDGETS, MENU_CHOICES } from '@/constants/preferences';
 
 const PreferencesModal = ({ isOpen, onClose, onConfirm, onBack }) => {
     const { updateProfile } = useAuth();
@@ -15,9 +16,9 @@ const PreferencesModal = ({ isOpen, onClose, onConfirm, onBack }) => {
         dietaryRestrictions: []
     });
 
-    const languages = ['English', 'Afrikaans', 'Xhosa'];
-    const budgets = ['$', '$$', '$$$'];
-    const dietaryOptions = ['Vegetarian', 'Meat', 'Fish', 'Vegan', 'Halaal'];
+    const languages = LANGUAGES;
+    const budgets = BUDGETS;
+    const dietaryOptions = MENU_CHOICES;
 
     useEffect(() => {
         document.body.style.overflow = isOpen ? 'hidden' : '';

@@ -5,7 +5,7 @@ import { api, API_ENDPOINTS } from "@/utils/api";
 import { formatSAPhone } from "@/utils/format";
 
 const INPUT_CLASS =
-  "flex h-10 w-full border text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-[#1E1E2E] border-[#333] text-white py-6 px-4 rounded-lg focus:border-[#FFAA55] focus:ring-[#FFAA55] transition-all";
+  "flex h-10 w-full border text-base ring-offset-background file:border-0 file:bg-transparent file:text-base file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-[#1E1E2E] border-[#333] text-white py-6 px-4 rounded-lg focus:border-[#FFAA55] focus:ring-[#FFAA55] transition-all";
 
 const EyeOpen = () => (
   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

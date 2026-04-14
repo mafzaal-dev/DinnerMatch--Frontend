@@ -1,16 +1,13 @@
 "use client";
 
 import React, { useState } from 'react';
+import { LANGUAGES, BUDGETS, MENU_CHOICES } from '@/constants/preferences';
 
 const PreferencesForm = ({ onContinue, onBack }) => {
   const [language, setLanguage] = useState('English');
   const [budget, setBudget] = useState('$');
   const [hasDietaryRestrictions, setHasDietaryRestrictions] = useState(false);
   const [menuOptions, setMenuOptions] = useState(['Vegetarian']);
-
-  const languages = ['English', 'Afrikaans', 'Xhosa'];
-  const budgets = ['$', '$$', '$$$'];
-  const menuChoices = ['Vegetarian', 'Meat', 'Fish', 'Vegan', 'Halaal'];
 
   const toggleMenuOption = (option) => {
     setMenuOptions((prev) =>
@@ -37,7 +34,7 @@ const PreferencesForm = ({ onContinue, onBack }) => {
             What language do you prefer to speak at dinner?
           </label>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {languages.map((lang) => (
+            {LANGUAGES.map((lang) => (
               <button
                 key={lang}
                 onClick={() => setLanguage(lang)}
@@ -71,7 +68,7 @@ const PreferencesForm = ({ onContinue, onBack }) => {
             <span className="text-[#F97315]">(Required)</span>
           </label>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {budgets.map((budgetLevel) => (
+            {BUDGETS.map((budgetLevel) => (
               <button
                 key={budgetLevel}
                 onClick={() => setBudget(budgetLevel)}
@@ -130,7 +127,7 @@ const PreferencesForm = ({ onContinue, onBack }) => {
             several options available.
           </p>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            {menuChoices.map((option) => (
+            {MENU_CHOICES.map((option) => (
               <button
                 key={option}
                 onClick={() => toggleMenuOption(option)}

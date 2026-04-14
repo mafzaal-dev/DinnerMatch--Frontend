@@ -181,7 +181,7 @@ const GroupAttendeesPage = () => {
 
   useEffect(() => {
     fetchDinners();
-    fetchRestaurants();
+    fetchRestaurants(filterCity);
     fetchGroups();
   }, []);
 
@@ -231,6 +231,8 @@ const GroupAttendeesPage = () => {
       setHasMoreGroups(true);
       fetchGroups(false);
     }
+    fetchRestaurants(filterCity);
+    setSelectedRestaurant('');
   }, [filterCity, filterDinner, filterDateFrom, filterDateTo]); // eslint-disable-line
 
   const fetchGroupsRef = useRef(null);
@@ -285,9 +287,11 @@ const GroupAttendeesPage = () => {
     }
   };
 
-  const fetchRestaurants = async () => {
+  const fetchRestaurants = async (cityId) => {
     try {
-      const response = await api.get(`${API_ENDPOINTS.RESTAURANT_LIST}?index=0&offset=100`);
+      const params = new URLSearchParams({ index: '0', offset: '100' });
+      if (cityId) params.set('city_id', cityId);
+      const response = await api.get(`${API_ENDPOINTS.RESTAURANT_LIST}?${params.toString()}`);
       if (response.success) {
         setRestaurants(response.data || []);
       }

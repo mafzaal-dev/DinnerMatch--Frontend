@@ -17,7 +17,7 @@ const BookDinnerModal = ({ isOpen, onClose, onSuccess, onBack, selectedCity, sel
     if (isOpen) {
       fetchDinnerSlots();
     }
-  }, [isOpen]);
+  }, [isOpen, selectedCity?.id]);
 
   useEffect(() => {
     document.body.style.overflow = isOpen ? 'hidden' : '';
@@ -28,7 +28,15 @@ const BookDinnerModal = ({ isOpen, onClose, onSuccess, onBack, selectedCity, sel
     try {
       setLoading(true);
       setError('');
-      const response = await api.get(API_ENDPOINTS.DINNER_LIST);
+
+      const params = new URLSearchParams();
+      params.set('start_date', new Date().toISOString().split('T')[0]);
+      params.set('dinner_status', 'published');
+      if (selectedCity?.id) {
+        params.set('city_id', selectedCity.id);
+      }
+
+      const response = await api.get(`${API_ENDPOINTS.DINNER_LIST}?${params.toString()}`);
 
       if (response.success && response.data) {
         const formattedSlots = response.data.map(dinner => ({
@@ -41,6 +49,12 @@ const BookDinnerModal = ({ isOpen, onClose, onSuccess, onBack, selectedCity, sel
       }
     } catch (err) {
       console.error('Error fetching dinner slots:', err);
+      const msg = err?.data?.city || err?.data?.detail || err?.message || '';
+      if (msg.toLowerCase().includes('no city')) {
+        setError('Please set your city in your profile to see available dinners.');
+      } else {
+        setError('Unable to load dinner slots. Please try again.');
+      }
       setDinnerSlots([]);
     } finally {
       setLoading(false);
@@ -100,6 +114,16 @@ const BookDinnerModal = ({ isOpen, onClose, onSuccess, onBack, selectedCity, sel
           </div>
 
           <div className="w-full space-y-4">
+            {error && (
+              <div className="text-center py-6">
+                <p className="text-[#FFAA55] text-sm">{error}</p>
+              </div>
+            )}
+            {!error && dinnerSlots.length === 0 && (
+              <div className="text-center py-6">
+                <p className="text-gray-400 text-sm">No upcoming dinners available right now. Check back soon!</p>
+              </div>
+            )}
             {dinnerSlots.map((slot) => {
               const isSelected = selectedSlot === slot.id;
               return (
@@ -127,7 +151,7 @@ const BookDinnerModal = ({ isOpen, onClose, onSuccess, onBack, selectedCity, sel
 
           <button
             onClick={handleSecureSpot}
-            disabled={!selectedSlot || submitting}
+            disabled={!selectedSlot || submitting || !!error}
             className={`w-full bg-[#FFAA55] text-white py-3 px-4 rounded-lg font-bold uppercase tracking-widest hover:bg-[#FF9955] transition-all shadow-lg hover:shadow-[0_0_20px_rgba(255,170,85,0.4)]`}
           >
             {submitting ? 'Securing spot...' : 'Secure My Spot'}
