@@ -69,9 +69,7 @@ function DinnerDetailsContent() {
     error: detailError
   } = useDinnerDetail(currentDinnerId);
 
-  // Process available dinners for the "Upcoming/Reschedule" list
   const upcomingDates = useMemo(() => {
-    // Filter out the current dinner from the list
     const filteredDinners = availableDinners.filter(dinner => dinner.id !== currentDinnerId);
     
     return filteredDinners.map(dinner => {
@@ -82,9 +80,9 @@ function DinnerDetailsContent() {
         id: dinner.id,
         date: dateObj.toLocaleDateString('en-US', { month: 'long', day: 'numeric' }),
         city: userCityName || 'Location TBD',
-        status: 'Available', // Or check if requested? But requested ones should be currentDinnerId
+        status: 'Available', 
         originalDate: dateObj,
-        title: dinner.title // useful for modal
+        title: dinner.title
       };
     });
   }, [availableDinners, currentDinnerId, userCityName]);

@@ -7,6 +7,7 @@ import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from '@/context/AuthContext';
 import QueryProvider from '@/providers/QueryProvider';
 import AdminUserRouteGuard from '@/components/common/AdminUserRouteGuard';
+import UserLoggedInBodyBackground from '@/components/common/UserLoggedInBodyBackground';
 
 const roboto = Roboto({
   weight: ['300', '400', '500', '700'],
@@ -30,6 +31,7 @@ export default function RootLayout({ children }) {
               <UTMTracker />
             </NoSSR>
             <AdminUserRouteGuard />
+            <UserLoggedInBodyBackground />
             <Toaster position="top-center" toastOptions={{
               style: {
                 background: '#333',

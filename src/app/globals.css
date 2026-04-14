@@ -1,8 +1,16 @@
 @import "tailwindcss";
 
+:root {
+  --dm-page-canvas: #ffffff;
+}
+
 html {
   scroll-behavior: smooth;
-  background-color: #080814;
+  background-color: var(--dm-page-canvas);
+}
+
+html.dm-user-app-shell {
+  --dm-page-canvas: #080814;
 }
 
 @theme {
@@ -14,6 +22,8 @@ html {
 body {
   font-family: "Roboto", sans-serif;
   @apply antialiased text-[#0b0e14];
+  min-height: 100dvh;
+  background-color: var(--dm-page-canvas);
 }
 
 button {

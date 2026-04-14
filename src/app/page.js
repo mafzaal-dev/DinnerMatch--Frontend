@@ -25,6 +25,7 @@ import {
 } from "../../components/modals";
 import { api, API_ENDPOINTS } from '../utils/api';
 import { normalizeSAPhoneForApi } from '@/constants/validationSchemas';
+import { formatApiValidationError } from '@/utils/formatApiValidationError';
 
 // Format demographic value for profile API (snake_case -> Title Case)
 const formatProfileValue = (value) => {
@@ -244,6 +245,11 @@ export default function Home() {
 
       const response = await api.post(API_ENDPOINTS.REGISTER_WITH_QUIZ, registrationData);
 
+      if (response && response.success === false) {
+        setError(formatApiValidationError({ data: response }));
+        return;
+      }
+
       if (response.success) {
         const accessToken = response.data?.access || response.data?.tokens?.access || response.access;
         const refreshToken = response.data?.refresh || response.data?.tokens?.refresh || response.refresh;
@@ -307,8 +313,9 @@ export default function Home() {
       }
     } catch (err) {
       console.error('Registration error:', err);
-      const errorMessage = err.data?.message || err.message || 'Registration failed. Please try again.';
-      setError(errorMessage);
+      setError(
+        formatApiValidationError(err) || 'Registration failed. Please try again.',
+      );
     } finally {
       setLoading(false);
     }

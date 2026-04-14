@@ -82,9 +82,28 @@ export const useUpdateAttendance = () => {
   });
 };
 
-export const useAvailableDinners = (startDate, index = 0, offset = 50) => {
+/**
+ * @param {string} [startDate] - YYYY-MM-DD (e.g. today)
+ * @param {{ index?: number, offset?: number, cityId?: string, dinnerStatus?: string, enabled?: boolean }} [options]
+ */
+export const useAvailableDinners = (startDate, options = {}) => {
+  const {
+    index = 0,
+    offset = 50,
+    cityId,
+    dinnerStatus,
+    enabled = true,
+  } = options;
+
   return useQuery({
-    queryKey: ['availableDinners', startDate, index, offset],
+    queryKey: [
+      'availableDinners',
+      startDate,
+      index,
+      offset,
+      cityId ?? null,
+      dinnerStatus ?? null,
+    ],
     queryFn: async () => {
       const params = {
         index,
@@ -93,14 +112,21 @@ export const useAvailableDinners = (startDate, index = 0, offset = 50) => {
       if (startDate) {
         params.start_date = startDate;
       }
-      
+      if (cityId) {
+        params.city_id = cityId;
+      }
+      if (dinnerStatus) {
+        params.dinner_status = dinnerStatus;
+      }
+
       const response = await api.get(API_ENDPOINTS.DINNER_LIST, { params });
-      
+
       if (!response.success) {
         throw new Error(response.message || 'Failed to fetch available dinners');
       }
       return response.data || [];
     },
+    enabled,
   });
 };
 

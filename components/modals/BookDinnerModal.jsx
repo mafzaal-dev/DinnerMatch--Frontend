@@ -1,65 +1,74 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import { api, API_ENDPOINTS } from '../../src/utils/api';
-import { useSubscription } from '../../src/hooks/useDinners';
-import { toast } from 'react-hot-toast';
+import React, { useState, useEffect, useMemo } from "react";
+import { useAvailableDinners } from "../../src/hooks/useDinners";
 
-const BookDinnerModal = ({ isOpen, onClose, onSuccess, onBack, selectedCity, selectedPlace }) => {
+const BookDinnerModal = ({
+  isOpen,
+  onClose,
+  onSuccess,
+  onBack,
+  selectedCity,
+  selectedPlace,
+}) => {
   const [selectedSlot, setSelectedSlot] = useState(null);
-  const [dinnerSlots, setDinnerSlots] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState('');
-  const { data: subscriptionData } = useSubscription();
+
+  const today = useMemo(() => new Date().toISOString().split("T")[0], []);
+
+  const {
+    data: availableDinners = [],
+    isLoading,
+    isError,
+    error: queryError,
+  } = useAvailableDinners(today, {
+    cityId: selectedCity?.id,
+    dinnerStatus: "published",
+    enabled: isOpen,
+  });
+
+  const dinnerSlots = useMemo(
+    () =>
+      (availableDinners || []).map((dinner) => ({
+        id: dinner.id,
+        date: new Date(dinner.date).toLocaleDateString("en-US", {
+          month: "long",
+          day: "numeric",
+          year: "numeric",
+        }),
+        time: new Date(dinner.date).toLocaleTimeString("en-US", {
+          hour: "numeric",
+          minute: "2-digit",
+        }),
+        fullDate: dinner.date,
+      })),
+    [availableDinners],
+  );
+
+  const error = useMemo(() => {
+    if (!isError || !queryError) return "";
+    const msg =
+      queryError?.message ||
+      queryError?.data?.detail ||
+      queryError?.data?.city ||
+      "";
+    if (String(msg).toLowerCase().includes("no city")) {
+      return "Please set your city in your profile to see available dinners.";
+    }
+    return "Unable to load dinner slots. Please try again.";
+  }, [isError, queryError]);
 
   useEffect(() => {
     if (isOpen) {
-      fetchDinnerSlots();
+      setSelectedSlot(null);
     }
   }, [isOpen, selectedCity?.id]);
 
   useEffect(() => {
-    document.body.style.overflow = isOpen ? 'hidden' : '';
-    return () => { document.body.style.overflow = ''; };
+    document.body.style.overflow = isOpen ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
   }, [isOpen]);
-
-  const fetchDinnerSlots = async () => {
-    try {
-      setLoading(true);
-      setError('');
-
-      const params = new URLSearchParams();
-      params.set('start_date', new Date().toISOString().split('T')[0]);
-      params.set('dinner_status', 'published');
-      if (selectedCity?.id) {
-        params.set('city_id', selectedCity.id);
-      }
-
-      const response = await api.get(`${API_ENDPOINTS.DINNER_LIST}?${params.toString()}`);
-
-      if (response.success && response.data) {
-        const formattedSlots = response.data.map(dinner => ({
-          id: dinner.id,
-          date: new Date(dinner.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
-          time: new Date(dinner.date).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
-          fullDate: dinner.date
-        }));
-        setDinnerSlots(formattedSlots);
-      }
-    } catch (err) {
-      console.error('Error fetching dinner slots:', err);
-      const msg = err?.data?.city || err?.data?.detail || err?.message || '';
-      if (msg.toLowerCase().includes('no city')) {
-        setError('Please set your city in your profile to see available dinners.');
-      } else {
-        setError('Unable to load dinner slots. Please try again.');
-      }
-      setDinnerSlots([]);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleSecureSpot = () => {
     if (!selectedSlot) return;
@@ -70,11 +79,13 @@ const BookDinnerModal = ({ isOpen, onClose, onSuccess, onBack, selectedCity, sel
 
   if (!isOpen) return null;
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
         <div className="bg-[#111121] border border-[#2F3A51] rounded-2xl w-full max-w-md p-10 relative shadow-2xl">
-          <div className="text-center text-[#F5F5F5]">Loading dinner slots...</div>
+          <div className="text-center text-[#F5F5F5]">
+            Loading dinner slots...
+          </div>
         </div>
       </div>
     );
@@ -104,13 +115,16 @@ const BookDinnerModal = ({ isOpen, onClose, onSuccess, onBack, selectedCity, sel
               <span className="text-sm md:block hidden">Back</span>
             </button>
           )}
-          <h1 className="text-2xl md:text-4xl font-bold mb-1"><span className="text-white">Dinner</span><span className="text-[#FFAA55]">Match</span></h1>
+          <h1 className="text-2xl md:text-4xl font-bold mb-1">
+            <span className="text-white">Dinner</span>
+            <span className="text-[#FFAA55]">Match</span>
+          </h1>
         </div>
 
         <div className="w-full max-w-xl mx-auto space-y-8">
           <div className="text-center">
             <h2 className="text-lg md:text-xl font-bold text-[#FFAA55]">Book Your Next Dinner</h2>
-            <p className="text-sm text-gray-400 mt-1">New people can't wait to meet you</p>
+            <p className="text-sm text-gray-400 mt-1">New people can&apos;t wait to meet you</p>
           </div>
 
           <div className="w-full space-y-4">
@@ -121,7 +135,9 @@ const BookDinnerModal = ({ isOpen, onClose, onSuccess, onBack, selectedCity, sel
             )}
             {!error && dinnerSlots.length === 0 && (
               <div className="text-center py-6">
-                <p className="text-gray-400 text-sm">No upcoming dinners available right now. Check back soon!</p>
+                <p className="text-gray-400 text-sm">
+                  No upcoming dinners available right now. Check back soon!
+                </p>
               </div>
             )}
             {dinnerSlots.map((slot) => {
@@ -129,19 +145,29 @@ const BookDinnerModal = ({ isOpen, onClose, onSuccess, onBack, selectedCity, sel
               return (
                 <button
                   key={slot.id}
+                  type="button"
                   onClick={() => setSelectedSlot(slot.id)}
-                  className={`w-full p-4 rounded-xl border transition-all duration-300 flex items-center justify-between ${isSelected
-                    ? 'border-[#FFAA55] bg-[#FFAA55] text-[#111]'
-                    : 'bg-transparent text-white border-white/20 hover:border-white/40 hover:bg-white/5'
-                    }`}
+                  className={`w-full p-4 rounded-xl border transition-all duration-300 flex items-center justify-between ${
+                    isSelected
+                      ? "border-[#FFAA55] bg-[#FFAA55] text-[#111]"
+                      : "bg-transparent text-white border-white/20 hover:border-white/40 hover:bg-white/5"
+                  }`}
                 >
                   <div className="text-left">
-                    <p className={`text-base font-bold ${isSelected ? 'text-[#111]' : 'text-white'}`}>{slot.date}</p>
-                    <p className={`text-xs ${isSelected ? 'text-[#111]/80' : 'text-gray-400'}`}>{slot.time}</p>
+                    <p className={`text-base font-bold ${isSelected ? "text-[#111]" : "text-white"}`}>
+                      {slot.date}
+                    </p>
+                    <p className={`text-xs ${isSelected ? "text-[#111]/80" : "text-gray-400"}`}>
+                      {slot.time}
+                    </p>
                   </div>
                   {isSelected && (
                     <svg className="w-4 h-4 text-[#111]" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      <path
+                        fillRule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clipRule="evenodd"
+                      />
                     </svg>
                   )}
                 </button>
@@ -150,11 +176,12 @@ const BookDinnerModal = ({ isOpen, onClose, onSuccess, onBack, selectedCity, sel
           </div>
 
           <button
+            type="button"
             onClick={handleSecureSpot}
-            disabled={!selectedSlot || submitting || !!error}
-            className={`w-full bg-[#FFAA55] text-white py-3 px-4 rounded-lg font-bold uppercase tracking-widest hover:bg-[#FF9955] transition-all shadow-lg hover:shadow-[0_0_20px_rgba(255,170,85,0.4)]`}
+            disabled={!selectedSlot || !!error}
+            className="w-full bg-[#FFAA55] text-white py-3 px-4 rounded-lg font-bold uppercase tracking-widest hover:bg-[#FF9955] transition-all shadow-lg hover:shadow-[0_0_20px_rgba(255,170,85,0.4)]"
           >
-            {submitting ? 'Securing spot...' : 'Secure My Spot'}
+            Secure My Spot
           </button>
         </div>
       </div>
