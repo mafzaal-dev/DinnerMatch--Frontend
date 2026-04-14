@@ -15,7 +15,8 @@ const GAP = 4;
  * @param {Object} props
  * @param {Array} props.options - Array of options: [{ value: string, label: string }]
  * @param {string} props.value - Currently selected value
- * @param {Function} props.onChange - Callback function when value changes: (value) => void
+ * @param {Function} props.onChange - Callback when value changes: (eventLike) => void with target.value
+ * @param {Function} [props.onBlur] - Optional blur handler (e.g. react-hook-form field.onBlur)
  * @param {string} props.placeholder - Placeholder text when no value is selected
  * @param {boolean} props.disabled - Whether the dropdown is disabled
  * @param {string} props.className - Additional CSS classes for the container
@@ -29,6 +30,7 @@ const CustomDropdown = ({
   options = [],
   value = "",
   onChange,
+  onBlur,
   placeholder = "Select an option",
   disabled = false,
   className = "",
@@ -162,6 +164,7 @@ const CustomDropdown = ({
       <button
         type="button"
         onClick={handleToggle}
+        onBlur={onBlur}
         onKeyDown={handleKeyDown}
         disabled={disabled}
         className={`
@@ -220,7 +223,7 @@ const CustomDropdown = ({
         createPortal(
           <div
             ref={menuRef}
-            className={`fixed rounded-lg shadow-lg max-h-60 overflow-hidden ${
+            className={`fixed flex flex-col overflow-hidden rounded-lg shadow-lg max-h-[min(24rem,calc(100dvh-1.5rem))] ${
               isDark
                 ? "bg-[#111121] border border-[#2F3A51] shadow-[0_8px_32px_rgba(0,0,0,0.45)]"
                 : "bg-white border border-[#D1D5DB]"
@@ -237,7 +240,7 @@ const CustomDropdown = ({
             {/* Search Input (if there are many options) */}
             {options.length > 5 && (
               <div
-                className={`p-2 border-b ${
+                className={`shrink-0 p-2 border-b ${
                   isDark ? "border-[#2F3A51]" : "border-[#E5E7EB]"
                 }`}
               >
@@ -257,11 +260,18 @@ const CustomDropdown = ({
               </div>
             )}
 
-            {/* Options List */}
-            <div className="overflow-y-auto max-h-60" role="listbox">
+            {/* Options list: min-h-0 + flex-1 so this region actually scrolls inside the capped portal */}
+            <div
+              className="min-h-0 flex-1 overflow-y-auto overscroll-y-contain [-webkit-overflow-scrolling:touch] touch-pan-y"
+              role="listbox"
+            >
               {filteredOptions.length > 0 ? (
                 filteredOptions.map((option, index) => {
-                  const isSelected = option.value === value;
+                  const isSelected =
+                    option.value === value ||
+                    (value != null &&
+                      option.value != null &&
+                      String(option.value) === String(value));
                   return (
                     <button
                       key={`${option.value}-${index}`}

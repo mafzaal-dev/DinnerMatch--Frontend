@@ -90,13 +90,17 @@ const CreateEditRestaurantPage = ({ restaurantId = null, isEdit = false }) => {
   }, []);
 
   const watchedCityId = watch("city");
-  const selectedCityData = cityAreaList.find((c) => c.id === watchedCityId);
+  const selectedCityData = cityAreaList.find(
+    (c) => String(c.id) === String(watchedCityId),
+  );
   const areaOptions = [
     { value: "", label: "Select location" },
-    ...(selectedCityData?.area?.map((a) => ({
-      value: a.id,
-      label: a.name,
-    })) ?? []),
+    ...(selectedCityData?.area
+      ?.map((a) => ({
+        value: a.id != null && a.id !== "" ? String(a.id) : "",
+        label: a.name ?? "",
+      }))
+      .filter((o) => o.value !== "" && o.label !== "") ?? []),
   ];
   const watchedIsMeat = watch("is_meat");
   const watchedIsVegetarian = watch("is_vegetarian");
@@ -126,8 +130,8 @@ const CreateEditRestaurantPage = ({ restaurantId = null, isEdit = false }) => {
         const areaId = resolveAreaId(restaurant.location, list, cityId);
 
         setValue("name", restaurant.name || "");
-        setValue("city", cityId);
-        setValue("location", areaId);
+        setValue("city", cityId ? String(cityId) : "");
+        setValue("location", areaId ? String(areaId) : "");
         setValue(
           "number",
           restaurant.number
@@ -157,8 +161,12 @@ const CreateEditRestaurantPage = ({ restaurantId = null, isEdit = false }) => {
 
   const onSubmit = async (data) => {
     try {
-      const cityObj = cityAreaList.find((c) => c.id === data.city);
-      const areaObj = cityObj?.area?.find((a) => a.id === data.location);
+      const cityObj = cityAreaList.find(
+        (c) => String(c.id) === String(data.city),
+      );
+      const areaObj = cityObj?.area?.find(
+        (a) => String(a.id) === String(data.location),
+      );
 
       if (!cityObj?.name) {
         toast.error("Please select a valid city");
@@ -281,14 +289,6 @@ const CreateEditRestaurantPage = ({ restaurantId = null, isEdit = false }) => {
               )}
             </div>
 
-            {/* City and Location - Backend Driven */}
-            <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950">
-              <p className="font-medium text-amber-900">Select City first, then Location</p>
-              <p className="mt-1 text-amber-800/90 leading-relaxed">
-                You need to <strong>select a city</strong> before the location list is available. Locations are areas within the city you chose.
-              </p>
-            </div>
-
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-[#374151] mb-2">
@@ -301,14 +301,18 @@ const CreateEditRestaurantPage = ({ restaurantId = null, isEdit = false }) => {
                     <CustomDropdown
                       value={field.value}
                       onChange={(e) => {
-                        field.onChange(e.target.value);
-                        setValue("location", "", { shouldValidate: true });
+                        const v = e?.target?.value;
+                        field.onChange(
+                          v != null && v !== "" ? String(v) : "",
+                        );
+                        setValue("location", "", { shouldValidate: false });
                       }}
+                      onBlur={field.onBlur}
                       options={[
                         { value: "", label: "Select city" },
                         ...cityAreaList.map((c) => ({
-                          value: c.id,
-                          label: c.name,
+                          value: c.id != null ? String(c.id) : "",
+                          label: c.name ?? "",
                         })),
                       ]}
                       placeholder={
@@ -325,9 +329,6 @@ const CreateEditRestaurantPage = ({ restaurantId = null, isEdit = false }) => {
                     {errors.city.message}
                   </p>
                 )}
-                <p className="mt-1 text-xs text-[#6B7280]">
-                  Pick the city first — the location field below depends on this.
-                </p>
               </div>
 
               <div>
@@ -335,12 +336,19 @@ const CreateEditRestaurantPage = ({ restaurantId = null, isEdit = false }) => {
                   Location <span className="text-red-500">*</span>
                 </label>
                 <Controller
+                  key={watchedCityId || "no-city"}
                   name="location"
                   control={control}
                   render={({ field }) => (
                     <CustomDropdown
                       value={field.value}
-                      onChange={(e) => field.onChange(e.target.value)}
+                      onChange={(e) => {
+                        const v = e?.target?.value;
+                        field.onChange(
+                          v != null && v !== "" ? String(v) : "",
+                        );
+                      }}
+                      onBlur={field.onBlur}
                       options={areaOptions}
                       placeholder={
                         !watchedCityId

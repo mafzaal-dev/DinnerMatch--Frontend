@@ -27,24 +27,119 @@ import {
   useDroppable,
 } from '@dnd-kit/core';
 
+function resolveCityAreaNames(cities, cityId, areaId) {
+  if (!cities?.length) return { cityName: '—', areaName: '—' };
+  if (cityId) {
+    const city = cities.find((c) => c.id === cityId);
+    const cityName = city?.name ?? '—';
+    if (!areaId) return { cityName, areaName: '—' };
+    const areaInCity = city?.area?.find((a) => a.id === areaId);
+    if (areaInCity) return { cityName, areaName: areaInCity.name };
+  }
+  if (areaId) {
+    for (const c of cities) {
+      const area = c.area?.find((a) => a.id === areaId);
+      if (area) return { cityName: c.name, areaName: area.name };
+    }
+  }
+  if (cityId) {
+    const city = cities.find((c) => c.id === cityId);
+    return { cityName: city?.name ?? '—', areaName: '—' };
+  }
+  return { cityName: '—', areaName: '—' };
+}
+
+function formatProfileAreaLabel(profile, cities) {
+  if (!profile) return '-';
+  const explicit = profile.area;
+  if (explicit != null && String(explicit).trim() !== '') return String(explicit).trim();
+  const { cityName, areaName } = resolveCityAreaNames(cities, profile.city_id, profile.area_id);
+  const a = areaName && areaName !== '—' ? areaName : '';
+  const c = cityName && cityName !== '—' ? cityName : '';
+  if (a && c) return `${c}, ${a}`;
+  if (a) return a;
+  if (c) return c;
+  return '-';
+}
+
+function formatMealPreferenceLabel(profile) {
+  if (!profile) return '';
+  const prefs = profile.menu_preferences;
+  if (Array.isArray(prefs) && prefs.length) {
+    return prefs.filter(Boolean).join(', ');
+  }
+  if (profile.meal_preference != null && String(profile.meal_preference).trim() !== '') {
+    return String(profile.meal_preference).trim();
+  }
+  return '';
+}
+
+function normalizeGenderToken(gender) {
+  if (gender == null || String(gender).trim() === '') return null;
+  const g = String(gender).trim().toLowerCase().replace(/[\s_-]/g, '');
+  if (['f', 'female', 'woman', 'women', 'girl'].includes(g) || g.startsWith('female')) return 'F';
+  if (['m', 'male', 'man', 'men', 'boy'].includes(g) || g.startsWith('male')) return 'M';
+  return null;
+}
+
+function genderCountsForMembers(members) {
+  let female = 0;
+  let male = 0;
+  (members || []).forEach((m) => {
+    const token = normalizeGenderToken(m?.profile?.gender);
+    if (token === 'F') female += 1;
+    else if (token === 'M') male += 1;
+  });
+  return { female, male };
+}
+
+function formatRestaurantDietarySummary(restaurant) {
+  if (!restaurant) return '';
+  const tags = [];
+  if (restaurant.is_meat) tags.push('Meat');
+  if (restaurant.is_vegetarian) tags.push('Vegetarian');
+  if (restaurant.is_vegan) tags.push('Vegan');
+  if (restaurant.is_fish) tags.push('Fish');
+  if (restaurant.is_halal) tags.push('Halal');
+  if (restaurant.is_other) tags.push('Other');
+  return tags.length ? tags.join(', ') : '';
+}
+
 // Helper Components defined outside to prevent re-creation on render
 const GenderBadge = ({ gender }) => {
   if (!gender) return <span>-</span>;
-  
-  const normalizedGender = gender?.toUpperCase();
-  const isValid = normalizedGender === 'F' || normalizedGender === 'M' || normalizedGender === 'FEMALE' || normalizedGender === 'MALE';
-  const isFemale = normalizedGender === 'F' || normalizedGender === 'FEMALE';
-  const displayGender = isFemale ? 'F' : normalizedGender === 'M' || normalizedGender === 'MALE' ? 'M' : '-';
-  
-  if (displayGender === '-') return <span>-</span>;
-  
+
+  const token = normalizeGenderToken(gender);
+  if (token === 'F') {
+    return (
+      <span className="inline-flex items-center justify-center w-6 h-6 rounded text-xs font-medium bg-pink-100 text-pink-600">
+        F
+      </span>
+    );
+  }
+  if (token === 'M') {
+    return (
+      <span className="inline-flex items-center justify-center w-6 h-6 rounded text-xs font-medium bg-blue-100 text-blue-600">
+        M
+      </span>
+    );
+  }
+
+  const g = String(gender).trim().toLowerCase().replace(/[\s_-]/g, '');
+  if (g.includes('nonbinary') || g === 'nb' || g === 'enby' || g === 'x') {
+    return (
+      <span
+        className="inline-flex items-center justify-center min-w-[1.5rem] h-6 px-1 rounded text-xs font-medium bg-violet-100 text-violet-700"
+        title={gender}
+      >
+        NB
+      </span>
+    );
+  }
+
   return (
-    <span className={`inline-flex items-center justify-center w-6 h-6 rounded text-xs font-medium ${
-      isFemale 
-        ? 'bg-pink-100 text-pink-600' 
-        : 'bg-blue-100 text-blue-600'
-    }`}>
-      {displayGender}
+    <span className="text-xs text-[#6B7280] max-w-[120px] truncate inline-block align-middle" title={gender}>
+      {formatDisplayValue(gender)}
     </span>
   );
 };
@@ -717,15 +812,17 @@ const GroupAttendeesPage = () => {
             const user = item.user || {};
             const profile = user.profile || {};
             
+            const areaLabel = formatProfileAreaLabel(profile, cities);
+            const mealLabel = formatMealPreferenceLabel(profile);
             const row = [
               formatDisplayValue(`${user.first_name || ''} ${user.last_name || ''}`.trim()),
               formatDisplayValue(user.email),
               formatDisplayValue(profile.gender),
               calculateAge(profile.date_of_birth),
-              formatDisplayValue(profile.area),
+              formatDisplayValue(areaLabel),
               capitalizeWords(profile.language),
               capitalizeWords(profile.nationality),
-              capitalizeWords(profile.meal_preference),
+              mealLabel ? capitalizeWords(mealLabel) : '-',
               formatDisplayValue(profile.budget)
             ];
             
@@ -855,7 +952,7 @@ const GroupAttendeesPage = () => {
                         {calculateAge(profile.date_of_birth)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-[#6B7280]">
-                        {formatDisplayValue(profile.area)}
+                        {formatDisplayValue(formatProfileAreaLabel(profile, cities))}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-[#6B7280]">
                         {formatDisplayValue(profile.language)}
@@ -864,7 +961,7 @@ const GroupAttendeesPage = () => {
                         {formatDisplayValue(profile.nationality)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-[#6B7280]">
-                        {formatDisplayValue(profile.meal_preference)}
+                        {formatDisplayValue(formatMealPreferenceLabel(profile))}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-[#6B7280]">
                         {formatDisplayValue(profile.budget)}
@@ -1223,10 +1320,9 @@ const GroupAttendeesPage = () => {
                   {groups.map((group, index) => {
                     const isLastElement = groups.length === index + 1;
                     const members = group.members || [];
-                    
-                    const femaleCount = members.filter(m => m.profile?.gender === 'Female' || m.profile?.gender === 'F').length;
-                    const maleCount = members.filter(m => m.profile?.gender === 'Male' || m.profile?.gender === 'M').length;
-                    
+                    const { female: femaleCount, male: maleCount } = genderCountsForMembers(members);
+                    const restaurantDiet = formatRestaurantDietarySummary(group.restaurant);
+
                     return (
                       <DroppableGroupCard
                         key={group.id}
@@ -1248,6 +1344,11 @@ const GroupAttendeesPage = () => {
                                 <span>•</span>
                                 <span>{femaleCount}F/{maleCount}M</span>
                               </div>
+                              {(group.dinner?.title || group.restaurant?.name || restaurantDiet) && (
+                                <p className="text-xs text-[#6B7280] mt-1 max-w-xl leading-relaxed">
+                                  {[group.dinner?.title, group.restaurant?.name, restaurantDiet].filter(Boolean).join(' · ')}
+                                </p>
+                              )}
                             </div>
                           </div>
                           <div className="flex items-center gap-3">
@@ -1649,7 +1750,7 @@ const GroupAttendeesPage = () => {
                 </div>
                 <div>
                   <label className="text-sm font-medium text-gray-500">Gender</label>
-                  <p className="text-sm text-gray-900">{formatDisplayValue(selectedProfile.profile?.gender)}</p>
+                  <p className="text-sm text-gray-900 capitalize">{formatDisplayValue(selectedProfile.profile?.gender)}</p>
                 </div>
                 <div>
                   <label className="text-sm font-medium text-gray-500">Age</label>
@@ -1657,7 +1758,9 @@ const GroupAttendeesPage = () => {
                 </div>
                 <div>
                   <label className="text-sm font-medium text-gray-500">Area</label>
-                  <p className="text-sm text-gray-900">{formatDisplayValue(selectedProfile.profile?.area)}</p>
+                  <p className="text-sm text-gray-900">
+                    {formatDisplayValue(formatProfileAreaLabel(selectedProfile.profile, cities))}
+                  </p>
                 </div>
                 <div>
                   <label className="text-sm font-medium text-gray-500">Language</label>
@@ -1665,7 +1768,9 @@ const GroupAttendeesPage = () => {
                 </div>
                 <div>
                   <label className="text-sm font-medium text-gray-500">Meal Preference</label>
-                  <p className="text-sm text-gray-900">{capitalizeWords(selectedProfile.profile?.meal_preference)}</p>
+                  <p className="text-sm text-gray-900">
+                    {capitalizeWords(formatMealPreferenceLabel(selectedProfile.profile))}
+                  </p>
                 </div>
                 <div>
                   <label className="text-sm font-medium text-gray-500">Budget</label>

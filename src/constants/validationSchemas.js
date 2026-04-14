@@ -83,10 +83,20 @@ export const dinnerSchema = yup.object().shape({
   is_published: yup.boolean(),
 });
 
+/** IDs from APIs / dropdowns may be non-strings; coerce so validation matches UI selection. */
+const requiredIdLike = (label) =>
+  yup
+    .mixed()
+    .transform((v) => {
+      if (v == null || v === '') return '';
+      return String(v).trim();
+    })
+    .test('required', `${label} is required`, (v) => typeof v === 'string' && v.length > 0);
+
 export const restaurantSchema = yup.object().shape({
   name: requiredString('Name'),
-  city: requiredString('City'),
-  location: requiredString('Location'),
+  city: requiredIdLike('City'),
+  location: requiredIdLike('Location'),
   number: yup
     .string()
     .required('Contact number is required')
