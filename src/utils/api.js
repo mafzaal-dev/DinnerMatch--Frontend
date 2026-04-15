@@ -206,6 +206,7 @@ export const API_ENDPOINTS = {
   GROUP_UPDATE: "/group/update/",
   GROUP_DELETE: (id) => `/group/delete/${id}/`,
   GROUP_MARK_BOOKED: "/group/mark-as-booked/",
+  GROUP_REMOVE_USER: "/users/group/remove-user/",
 
   // Dinner Requests
   DINNER_MAKE_REQUEST: "/dinner/make-request/",

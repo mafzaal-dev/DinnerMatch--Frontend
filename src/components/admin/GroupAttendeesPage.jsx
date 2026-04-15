@@ -162,7 +162,7 @@ const DroppableGroupCard = ({ groupId, children, innerRef }) => {
   );
 };
 
-const DraggableMemberRow = ({ group, member }) => {
+const DraggableMemberRow = ({ group, member, onRemoveMember }) => {
   const dragId = `user-${member.id}-group-${group.id}`;
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({ id: dragId });
   return (
@@ -191,6 +191,29 @@ const DraggableMemberRow = ({ group, member }) => {
       <td className="px-6 py-4 whitespace-nowrap">
         <GenderBadge gender={member.profile?.gender} />
       </td>
+      <td className="px-6 py-4 whitespace-nowrap text-right">
+        <button
+          type="button"
+          onClick={() => onRemoveMember(group, member)}
+          className="p-1.5 hover:bg-[#FEE2E2] text-[#DC2626] rounded transition-colors"
+          title="Remove from group"
+          aria-label={`Remove ${member.first_name || ''} ${member.last_name || ''} from ${group.name}`}
+        >
+          <svg
+            className="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+            />
+          </svg>
+        </button>
+      </td>
     </tr>
   );
 };
@@ -213,9 +236,12 @@ const GroupAttendeesPage = () => {
   const [showCreateGroupModal, setShowCreateGroupModal] = useState(false);
   const [showMakeBookingModal, setShowMakeBookingModal] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showRemoveMemberConfirm, setShowRemoveMemberConfirm] = useState(false);
   const [showViewProfile, setShowViewProfile] = useState(false);
   const [selectedGroup, setSelectedGroup] = useState(null);
   const [selectedProfile, setSelectedProfile] = useState(null);
+  const [memberToRemove, setMemberToRemove] = useState(null);
+  const [groupForMemberRemoval, setGroupForMemberRemoval] = useState(null);
   
   const [selectedRestaurant, setSelectedRestaurant] = useState('');
   const [activeDragId, setActiveDragId] = useState(null);
@@ -665,6 +691,47 @@ const GroupAttendeesPage = () => {
       toast.error(err?.message || 'Failed to move user');
       // 4. Revert on failure
       setGroups(previousGroups);
+    }
+  };
+
+  const handleRemoveMemberFromGroup = (group, member) => {
+    setGroupForMemberRemoval(group);
+    setMemberToRemove(member);
+    setShowRemoveMemberConfirm(true);
+  };
+
+  const confirmRemoveMemberFromGroup = async () => {
+    if (!groupForMemberRemoval || !memberToRemove) return;
+    const previousGroups = [...groups];
+    setGroups((prevGroups) =>
+      prevGroups.map((g) =>
+        g.id === groupForMemberRemoval.id
+          ? { ...g, members: (g.members || []).filter((m) => m.id !== memberToRemove.id) }
+          : g
+      )
+    );
+    setShowRemoveMemberConfirm(false);
+
+    try {
+      const response = await api.post(API_ENDPOINTS.GROUP_REMOVE_USER, {
+        group_id: groupForMemberRemoval.id,
+        user_id: memberToRemove.id,
+      });
+
+      if (response?.success) {
+        toast.success('User removed from group');
+        setMemberToRemove(null);
+        setGroupForMemberRemoval(null);
+        return;
+      }
+      throw new Error(response?.message || 'Failed to remove user from group');
+    } catch (err) {
+      console.error('Error removing user from group:', err);
+      toast.error(err?.message || 'Failed to remove user from group');
+      setGroups(previousGroups);
+    } finally {
+      setMemberToRemove(null);
+      setGroupForMemberRemoval(null);
     }
   };
 
@@ -1394,12 +1461,15 @@ const GroupAttendeesPage = () => {
                                   <th className="px-6 py-3 text-left text-xs font-semibold text-[#6B7280] uppercase tracking-wide">
                                     Gender
                                   </th>
+                                  <th className="px-6 py-3 text-right text-xs font-semibold text-[#6B7280] uppercase tracking-wide">
+                                    Actions
+                                  </th>
                                 </tr>
                               </thead>
                               <tbody className="divide-y divide-[#F3F4F6]">
                                 {members.length === 0 ? (
                                   <tr>
-                                    <td colSpan="4" className="px-6 py-4 text-center text-sm text-[#6B7280]">
+                                    <td colSpan="5" className="px-6 py-4 text-center text-sm text-[#6B7280]">
                                       No members in this group — drag users from another group to add
                                     </td>
                                   </tr>
@@ -1409,6 +1479,7 @@ const GroupAttendeesPage = () => {
                                       key={member.id}
                                       group={group}
                                       member={member}
+                                      onRemoveMember={handleRemoveMemberFromGroup}
                                     />
                                   ))
                                 )}
@@ -1713,6 +1784,43 @@ const GroupAttendeesPage = () => {
                 className="flex-1 px-4 py-2.5 bg-[#DC2626] text-white rounded-lg text-sm font-medium hover:bg-[#B91C1C] transition-colors"
               >
                 Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Remove Member Confirmation Modal */}
+      {showRemoveMemberConfirm && memberToRemove && groupForMemberRemoval && (
+        <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
+            <div className="flex items-center justify-center w-12 h-12 mx-auto mb-4 bg-red-100 rounded-full">
+              <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-semibold text-[#111827] text-center mb-2">Remove Member</h3>
+            <p className="text-sm text-[#6B7280] text-center mb-6">
+              Are you sure you want to remove "
+              {`${memberToRemove.first_name || ''} ${memberToRemove.last_name || ''}`.trim() || 'this user'}
+              " from "{groupForMemberRemoval.name}"?
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  setShowRemoveMemberConfirm(false);
+                  setMemberToRemove(null);
+                  setGroupForMemberRemoval(null);
+                }}
+                className="flex-1 px-4 py-2.5 border border-[#D1D5DB] text-[#374151] rounded-lg text-sm font-medium hover:bg-[#F9FAFB] transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmRemoveMemberFromGroup}
+                className="flex-1 px-4 py-2.5 bg-[#DC2626] text-white rounded-lg text-sm font-medium hover:bg-[#B91C1C] transition-colors"
+              >
+                Remove
               </button>
             </div>
           </div>
