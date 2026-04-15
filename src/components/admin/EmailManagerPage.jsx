@@ -11,7 +11,7 @@ import * as yup from 'yup';
 
 const emailTemplateSchema = yup.object().shape({
   name: yup.string().required('Template Name is required'),
-  subject: yup.string().required('Subject is required'),
+  subject: yup.string().max(255, 'Subject cannot be more than 255 characters').required('Subject is required'),
   type: yup.string().required('Mail Type is required'),
   plain_text_body: yup.string().required('Plain Text Body is required'),
   html_body: yup.string().nullable(), // Optional
@@ -332,6 +332,7 @@ const EmailManagerPage = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-1">Subject *</label>
                   <input
                     type="text"
+                    maxLength={255}
                     {...register('subject')}
                     placeholder="e.g., Welcome to DinnerMatch!"
                     className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-orange-500 ${errors.subject ? 'border-red-500' : 'border-gray-300'}`}

@@ -132,6 +132,7 @@ const EmailModal = ({ onClose, contextText, totalUsers, recipientCount, userIds 
               </label>
               <input
                 type="text"
+                maxLength={255}
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
                 placeholder="e.g., Welcome to DinnerMatch!"
