@@ -140,9 +140,22 @@ function DinnerDetailsContent() {
       group: {
         id: d.group?.id,
         members: members,
-        languages: [],
-        nationalities: calculatePercentages(nationalityCounts),
-        occupations: calculatePercentages(industryCounts),
+        languages: Array.isArray(d.group?.demographics_snapshot?.languages)
+          ? d.group.demographics_snapshot.languages
+          : [],
+        nationalities:
+          d.group?.demographics_snapshot?.nationality_pct &&
+          Object.keys(d.group.demographics_snapshot.nationality_pct).length > 0
+            ? d.group.demographics_snapshot.nationality_pct
+            : calculatePercentages(nationalityCounts),
+        occupations:
+          d.group?.demographics_snapshot?.occupation_pct &&
+          Object.keys(d.group.demographics_snapshot.occupation_pct).length > 0
+            ? d.group.demographics_snapshot.occupation_pct
+            : calculatePercentages(industryCounts),
+        area_label: d.group?.area_label ?? null,
+        budget_label: d.group?.budget_label ?? null,
+        demographics_snapshot: d.group?.demographics_snapshot ?? null,
         attendance_stats: d.group?.attendance_stats || {
           total: 0,
           there: 0,

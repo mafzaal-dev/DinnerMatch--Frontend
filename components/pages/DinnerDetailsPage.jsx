@@ -697,6 +697,28 @@ const DinnerDetailsPage = ({
                       ? "A little sneak peak of your group:"
                       : "Coming soon"}
                   </p>
+                  {hasDetails &&
+                    (() => {
+                      const g = dinner.group || {};
+                      const snap = g.demographics_snapshot || {};
+                      const nationalityCount = snap.nationality_pct
+                        ? Object.keys(snap.nationality_pct).length
+                        : 0;
+                      const parts = [];
+                      if (g.area_label) parts.push(g.area_label);
+                      if (g.budget_label) parts.push(g.budget_label);
+                      if (nationalityCount > 0) {
+                        parts.push(
+                          `${nationalityCount} nationalit${nationalityCount === 1 ? "y" : "ies"}`,
+                        );
+                      }
+                      if (!parts.length) return null;
+                      return (
+                        <p className="text-[#77777B] text-sm mt-1">
+                          {parts.join(" • ")}
+                        </p>
+                      );
+                    })()}
                 </div>
               </div>
             </div>
