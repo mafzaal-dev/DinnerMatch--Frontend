@@ -240,6 +240,47 @@ export const API_ENDPOINTS = {
   DINNER_SWIPE: "/swipe/dinner/",
   MEMBER_RATING: "/group/members/rate/",
   RESTAURANT_RATING: "/restaurant/rate/",
+
+  // Grouping ("Do The Thing") engine
+  GROUPING_DO_THE_THING: "/grouping/do-the-thing/",
+  GROUPING_COMMIT: "/grouping/commit/",
+  GROUPING_RUN: (runId) => `/grouping/run/${runId}/`,
+  GROUPING_LATEST_RUN: "/grouping/run/",
+  GROUPING_MATCH_HISTORY_CHECK: "/grouping/match-history-check/",
 };
+
+// --- Grouping ("Do The Thing") helpers ----------------------------------
+// Thin wrappers over the shared axios instance. The response interceptor
+// already returns the JSON envelope (with .data / .success / .message), so
+// callers receive that envelope directly.
+
+export const groupingDoTheThing = ({ dinner_id, seed } = {}) => {
+  const body = { dinner_id };
+  if (seed !== undefined && seed !== null && seed !== "") {
+    body.seed = seed;
+  }
+  return api.post(API_ENDPOINTS.GROUPING_DO_THE_THING, body);
+};
+
+export const groupingCommit = ({ run_id, groups_override } = {}) => {
+  const body = { run_id };
+  if (Array.isArray(groups_override)) {
+    body.groups_override = groups_override;
+  }
+  return api.post(API_ENDPOINTS.GROUPING_COMMIT, body);
+};
+
+export const groupingGetRun = (runId) =>
+  api.get(API_ENDPOINTS.GROUPING_RUN(runId));
+
+export const groupingGetLatestRun = (dinnerId) =>
+  api.get(API_ENDPOINTS.GROUPING_LATEST_RUN, {
+    params: { dinner_id: dinnerId },
+  });
+
+export const groupingMatchHistoryCheck = ({ group_id, user_id } = {}) =>
+  api.get(API_ENDPOINTS.GROUPING_MATCH_HISTORY_CHECK, {
+    params: { group_id, user_id },
+  });
 
 export default axiosInstance;

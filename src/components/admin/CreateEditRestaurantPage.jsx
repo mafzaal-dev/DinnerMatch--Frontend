@@ -59,6 +59,8 @@ const CreateEditRestaurantPage = ({ restaurantId = null, isEdit = false }) => {
       number: "",
       price: "",
       budget: "",
+      budget_label: "",
+      areas: [],
       is_meat: false,
       is_vegetarian: false,
       is_vegan: false,
@@ -140,6 +142,18 @@ const CreateEditRestaurantPage = ({ restaurantId = null, isEdit = false }) => {
         );
         setValue("price", restaurant.price != null && restaurant.price !== "" ? restaurant.price : "");
         setValue("budget", restaurant.budget != null ? String(restaurant.budget) : "");
+        setValue(
+          "budget_label",
+          restaurant.budget_label != null ? String(restaurant.budget_label) : "",
+        );
+        // Restaurant.areas can come back either as an array of UUID strings
+        // or an array of Area objects (depending on the serializer). Normalise
+        // to an array of ids for the multi-select.
+        const rawAreas = Array.isArray(restaurant.areas) ? restaurant.areas : [];
+        const areaIds = rawAreas
+          .map((a) => (typeof a === 'string' ? a : a?.id))
+          .filter(Boolean);
+        setValue("areas", areaIds);
         setValue("is_meat", restaurant.is_meat || false);
         setValue("is_vegetarian", restaurant.is_vegetarian || false);
         setValue("is_vegan", restaurant.is_vegan || false);
@@ -184,6 +198,8 @@ const CreateEditRestaurantPage = ({ restaurantId = null, isEdit = false }) => {
         number: data.number,
         price: data.price !== "" && data.price != null && !isNaN(Number(data.price)) ? parseFloat(data.price).toFixed(2) : null,
         budget: data.budget,
+        budget_label: data.budget_label || null,
+        areas: Array.isArray(data.areas) ? data.areas : [],
         is_meat: data.is_meat,
         is_vegetarian: data.is_vegetarian,
         is_vegan: data.is_vegan,
@@ -476,6 +492,96 @@ const CreateEditRestaurantPage = ({ restaurantId = null, isEdit = false }) => {
                   {errors.budget.message}
                 </p>
               )}
+            </div>
+
+            {/* Budget Label (grouping engine) */}
+            <div>
+              <label className="block text-sm font-medium text-[#374151] mb-2">
+                Budget Label
+              </label>
+              <Controller
+                name="budget_label"
+                control={control}
+                render={({ field }) => (
+                  <CustomDropdown
+                    value={field.value}
+                    onChange={(e) => field.onChange(e.target.value)}
+                    options={[
+                      { value: "", label: "Not set" },
+                      { value: "$", label: "$" },
+                      { value: "$$", label: "$$" },
+                      { value: "$$$", label: "$$$" },
+                    ]}
+                    placeholder="Not set"
+                  />
+                )}
+              />
+              <p className="mt-1 text-xs text-[#6B7280]">
+                Used by the grouping engine to match group spend tiers.
+              </p>
+            </div>
+
+            {/* Areas (multi-select, grouping engine) */}
+            <div>
+              <label className="block text-sm font-medium text-[#374151] mb-2">
+                Areas Served
+              </label>
+              <Controller
+                name="areas"
+                control={control}
+                render={({ field }) => {
+                  const allAreas = (cityAreaList || []).flatMap((c) =>
+                    (c.area || []).map((a) => ({
+                      id: a.id,
+                      name: a.name,
+                      city: c.name,
+                    })),
+                  );
+                  const selected = Array.isArray(field.value) ? field.value : [];
+                  const toggle = (id) => {
+                    if (selected.includes(id)) {
+                      field.onChange(selected.filter((x) => x !== id));
+                    } else {
+                      field.onChange([...selected, id]);
+                    }
+                  };
+                  return (
+                    <div
+                      className={`border rounded-lg px-3 py-2 max-h-52 overflow-y-auto bg-white ${cityAreaLoading ? "opacity-60" : ""}`}
+                    >
+                      {cityAreaLoading ? (
+                        <p className="text-sm text-[#6B7280]">Loading areas…</p>
+                      ) : allAreas.length === 0 ? (
+                        <p className="text-sm text-[#6B7280]">No areas available.</p>
+                      ) : (
+                        <ul className="space-y-1">
+                          {allAreas.map((a) => (
+                            <li key={a.id}>
+                              <label className="flex items-center gap-2 cursor-pointer text-sm text-[#374151] py-1">
+                                <input
+                                  type="checkbox"
+                                  checked={selected.includes(a.id)}
+                                  onChange={() => toggle(a.id)}
+                                  className="w-4 h-4 text-[#F97316] border-[#D1D5DB] rounded focus:ring-[#F97316]"
+                                />
+                                <span>
+                                  {a.name}
+                                  <span className="text-[#9CA3AF] text-xs ml-1">
+                                    ({a.city})
+                                  </span>
+                                </span>
+                              </label>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  );
+                }}
+              />
+              <p className="mt-1 text-xs text-[#6B7280]">
+                Select every area this restaurant is willing to seat groups from. Used by the grouping engine for restaurant assignment.
+              </p>
             </div>
 
             {/* Food Options */}

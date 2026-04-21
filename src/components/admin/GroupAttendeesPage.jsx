@@ -26,6 +26,32 @@ import {
   useDraggable,
   useDroppable,
 } from '@dnd-kit/core';
+import {
+  useDoTheThing,
+  useCommitRun,
+  useMatchHistoryCheck,
+} from '@/hooks/useGrouping';
+
+// Feature flag to toggle the "Do The Thing" preview flow. Existing manual
+// drag-drop / create-group flow is untouched regardless of this value.
+const FEATURE_DO_THE_THING = true;
+
+// Preview-group id helpers. We use a stable string prefix so the existing
+// drag-drop regex parser keeps working, and preview groups stay cleanly
+// separate from real UserGroup ids in state.
+const PREVIEW_GROUP_PREFIX = 'preview-';
+const LEFTOVERS_GROUP_ID = `${PREVIEW_GROUP_PREFIX}leftovers`;
+const makePreviewGroupId = (index) => `${PREVIEW_GROUP_PREFIX}${index}`;
+const isPreviewGroupId = (id) =>
+  typeof id === 'string' && id.startsWith(PREVIEW_GROUP_PREFIX);
+const previewGroupIndexFromId = (id) => {
+  if (!isPreviewGroupId(id) || id === LEFTOVERS_GROUP_ID) return null;
+  const n = Number(id.slice(PREVIEW_GROUP_PREFIX.length));
+  return Number.isFinite(n) ? n : null;
+};
+
+const shortRunId = (runId) =>
+  typeof runId === 'string' && runId.length > 8 ? runId.slice(0, 8) : runId;
 
 function resolveCityAreaNames(cities, cityId, areaId) {
   if (!cities?.length) return { cityName: '—', areaName: '—' };
@@ -218,6 +244,325 @@ const DraggableMemberRow = ({ group, member, onRemoveMember }) => {
   );
 };
 
+// Top-bar strip that hosts the dinner selector + "Do The Thing" button on
+// the groups tab. Stays mounted even while a preview is active so the
+// admin can see which dinner the preview is attached to.
+const DoTheThingBar = ({
+  dinners,
+  selectedDinner,
+  onSelectDinner,
+  onRun,
+  isRunning,
+  isPreviewMode,
+}) => {
+  const options = [
+    { value: '', label: 'Select a dinner' },
+    ...(dinners || []).map((d) => ({
+      value: String(d.id),
+      label: `${d.title} - ${new Date(d.date).toLocaleDateString()}`,
+    })),
+  ];
+  return (
+    <div className="bg-white rounded-xl border border-[#E5E7EB] shadow-sm px-4 sm:px-6 py-4 flex flex-col sm:flex-row sm:items-center gap-3 sm:justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-3 flex-1 min-w-0">
+        <span className="text-xs uppercase tracking-wide text-[#6B7280] font-medium whitespace-nowrap">
+          Auto-group a dinner
+        </span>
+        <div className="sm:w-80">
+          <CustomDropdown
+            value={selectedDinner}
+            onChange={(e) =>
+              onSelectDinner(e.target.value === '' ? '' : String(e.target.value))
+            }
+            options={options}
+            placeholder="Select a dinner"
+          />
+        </div>
+      </div>
+      <button
+        type="button"
+        onClick={onRun}
+        disabled={!selectedDinner || isRunning || isPreviewMode}
+        className="px-4 py-2 bg-[#F97316] text-white rounded-lg text-sm font-medium hover:bg-[#EA580C] flex items-center gap-2 whitespace-nowrap disabled:opacity-60 disabled:cursor-not-allowed"
+        title={
+          !selectedDinner
+            ? 'Select a dinner first'
+            : isPreviewMode
+              ? 'A preview is already in progress — commit or discard it first.'
+              : 'Run the grouping engine and preview proposed groups.'
+        }
+      >
+        {isRunning ? (
+          <InlineSpinner className="h-4 w-4 text-white" label="Running" />
+        ) : null}
+        {isRunning ? 'Running…' : 'Do The Thing'}
+      </button>
+    </div>
+  );
+};
+
+// Preview block rendered above the live groups list. Contains the banner,
+// commit/discard actions, a stacked list of proposed groups (drag-drop
+// enabled via DroppableGroupCard / DraggableMemberRow), a leftovers panel,
+// and a read-only violations summary.
+const PreviewPanel = ({
+  run,
+  groups,
+  leftovers,
+  violations,
+  onCommit,
+  onCancel,
+  onDiscard,
+  isCommitting,
+}) => {
+  if (!run) return null;
+  return (
+    <div className="space-y-4">
+      {/* Banner */}
+      <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div className="text-sm text-amber-900">
+          <span className="font-semibold">⚠ Preview from run {shortRunId(run.id)}</span>
+          <span className="ml-1">— not yet committed.</span>
+          <button
+            type="button"
+            onClick={onCancel}
+            className="ml-3 text-amber-900 underline hover:text-amber-950"
+          >
+            Cancel preview
+          </button>
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={onDiscard}
+            disabled={isCommitting}
+            className="px-3 py-1.5 rounded-lg text-sm font-medium border border-amber-300 text-amber-900 hover:bg-amber-100 disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            Discard preview
+          </button>
+          <button
+            type="button"
+            onClick={onCommit}
+            disabled={isCommitting}
+            className="px-4 py-1.5 rounded-lg text-sm font-medium bg-[#111827] text-white hover:bg-black flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            {isCommitting ? (
+              <InlineSpinner className="h-4 w-4 text-white" label="Committing" />
+            ) : null}
+            {isCommitting ? 'Committing…' : 'Commit'}
+          </button>
+        </div>
+      </div>
+
+      {/* Violations summary */}
+      {violations?.length > 0 && (
+        <div className="bg-white rounded-xl border border-[#E5E7EB] p-4">
+          <p className="text-xs font-semibold uppercase tracking-wide text-[#6B7280] mb-2">
+            Engine notes
+          </p>
+          <ul className="list-disc list-inside space-y-1 text-sm text-[#374151]">
+            {violations.map((v, i) => (
+              <li key={i}>{v}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {/* Proposed groups */}
+      <div className="space-y-4">
+        {groups.map((g, idx) => {
+          const members = g.members || [];
+          const femaleCount = members.filter(
+            (m) =>
+              m.profile?.gender === 'Female' || m.profile?.gender === 'F',
+          ).length;
+          const maleCount = members.filter(
+            (m) =>
+              m.profile?.gender === 'Male' || m.profile?.gender === 'M',
+          ).length;
+          const hasNoWarn = (g.warnings || []).some(
+            (w) => w.feedback === 'NO',
+          );
+          const hasYesWarn = (g.warnings || []).some(
+            (w) => w.feedback === 'YES',
+          );
+          const demographics = g.demographics || {};
+          const nationalities = demographics.nationality_pct || {};
+          const languages = Array.isArray(demographics.languages)
+            ? demographics.languages
+            : [];
+          const nationalitiesCount = Object.keys(nationalities).length;
+
+          return (
+            <DroppableGroupCard key={g.id} groupId={g.id}>
+              <div className="px-6 py-5 border-b border-[#E5E7EB] flex items-start justify-between gap-4">
+                <div className="flex items-start gap-4">
+                  <div className="w-10 h-10 bg-[#FFF7ED] rounded-lg flex items-center justify-center text-[#F97316]">
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                      />
+                    </svg>
+                  </div>
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h3 className="text-base font-bold text-[#111827]">
+                        Preview Group {idx + 1}
+                      </h3>
+                      {hasNoWarn && (
+                        <span
+                          className="inline-flex items-center gap-1 text-xs font-semibold text-red-700 bg-red-100 px-2 py-0.5 rounded"
+                          title="Match history includes a NO feedback pair"
+                        >
+                          ⚠ NO
+                        </span>
+                      )}
+                      {hasYesWarn && !hasNoWarn && (
+                        <span
+                          className="inline-flex items-center gap-1 text-xs font-semibold text-blue-700 bg-blue-100 px-2 py-0.5 rounded"
+                          title="Match history includes a YES feedback pair"
+                        >
+                          ℹ YES
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex flex-wrap items-center gap-2 text-sm text-[#6B7280] mt-1">
+                      <span>{members.length} peoples</span>
+                      <span>•</span>
+                      <span>{femaleCount}F/{maleCount}M</span>
+                      {g.area_label && (
+                        <>
+                          <span>•</span>
+                          <span className="font-medium text-[#374151]">
+                            {g.area_label}
+                          </span>
+                        </>
+                      )}
+                      {g.budget_label && (
+                        <>
+                          <span>•</span>
+                          <span className="font-medium text-[#374151]">
+                            {g.budget_label}
+                          </span>
+                        </>
+                      )}
+                      {nationalitiesCount > 0 && (
+                        <>
+                          <span>•</span>
+                          <span>{nationalitiesCount} nationalities</span>
+                        </>
+                      )}
+                      {languages.length > 0 && (
+                        <>
+                          <span>•</span>
+                          <span className="truncate max-w-[200px]">
+                            {languages.join(', ')}
+                          </span>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-[#F9FAFB] border-b border-[#E5E7EB]">
+                    <tr>
+                      <th className="px-6 py-3 w-10"></th>
+                      <th className="px-6 py-3 text-left text-xs font-semibold text-[#6B7280] uppercase tracking-wide">
+                        Name
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-semibold text-[#6B7280] uppercase tracking-wide">
+                        Email
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-semibold text-[#6B7280] uppercase tracking-wide">
+                        Gender
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[#F3F4F6]">
+                    {members.length === 0 ? (
+                      <tr>
+                        <td
+                          colSpan="4"
+                          className="px-6 py-4 text-center text-sm text-[#6B7280]"
+                        >
+                          No members — drag from another group or the leftovers panel.
+                        </td>
+                      </tr>
+                    ) : (
+                      members.map((member) => (
+                        <DraggableMemberRow
+                          key={member.id}
+                          group={g}
+                          member={member}
+                        />
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </DroppableGroupCard>
+          );
+        })}
+      </div>
+
+      {/* Leftovers panel */}
+      <DroppableGroupCard groupId={LEFTOVERS_GROUP_ID}>
+        <div className="px-6 py-5 border-b border-[#E5E7EB] flex items-center justify-between">
+          <div>
+            <h3 className="text-base font-bold text-[#111827]">Leftovers</h3>
+            <p className="text-sm text-[#6B7280]">
+              {leftovers.length} user{leftovers.length === 1 ? '' : 's'} not placed by the engine.
+            </p>
+          </div>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead className="bg-[#F9FAFB] border-b border-[#E5E7EB]">
+              <tr>
+                <th className="px-6 py-3 w-10"></th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-[#6B7280] uppercase tracking-wide">
+                  Name
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-[#6B7280] uppercase tracking-wide">
+                  Email
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-[#6B7280] uppercase tracking-wide">
+                  Gender
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-[#F3F4F6]">
+              {leftovers.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan="4"
+                    className="px-6 py-4 text-center text-sm text-[#6B7280]"
+                  >
+                    No leftovers — drag a user here to remove them from a group.
+                  </td>
+                </tr>
+              ) : (
+                leftovers.map((member) => (
+                  <DraggableMemberRow
+                    key={member.id}
+                    group={{ id: LEFTOVERS_GROUP_ID }}
+                    member={member}
+                  />
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </DroppableGroupCard>
+    </div>
+  );
+};
+
 const GroupAttendeesPage = () => {
   const [activeTab, setActiveTab] = useState('groups'); // 'groups' or 'users'
   const [searchQuery, setSearchQuery] = useState('');
@@ -245,6 +590,20 @@ const GroupAttendeesPage = () => {
   
   const [selectedRestaurant, setSelectedRestaurant] = useState('');
   const [activeDragId, setActiveDragId] = useState(null);
+
+  // "Do The Thing" preview state (strictly additive — live groups above
+  // are untouched while in preview mode).
+  const [previewRun, setPreviewRun] = useState(null); // DinnerGroupingRun
+  const [previewGroups, setPreviewGroups] = useState([]); // [{members:[userObj], area_label, budget_label, restaurant_id, demographics, warnings}]
+  const [previewLeftovers, setPreviewLeftovers] = useState([]); // [userObj]
+  const [previewViolations, setPreviewViolations] = useState([]);
+  const isPreviewMode = !!previewRun;
+
+  const { mutateAsync: runDoTheThingAsync, isPending: isRunningDoTheThing } =
+    useDoTheThing();
+  const { mutateAsync: commitRunAsync, isPending: isCommittingRun } =
+    useCommitRun();
+  const { mutateAsync: checkMatchHistoryAsync } = useMatchHistoryCheck();
 
   // React Hook Form for Create Group
   const {
@@ -319,6 +678,15 @@ const GroupAttendeesPage = () => {
     { value: '', label: 'All Cities' },
     ...cities.map((c) => ({ value: c.id, label: c.name })),
   ];
+
+  // When the admin changes the selected dinner, drop any in-progress preview
+  // — a preview is always tied to a specific dinner.
+  useEffect(() => {
+    if (!selectedDinner) return;
+    if (previewRun && previewRun.dinner_id !== selectedDinner) {
+      clearPreview();
+    }
+  }, [selectedDinner]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (activeTab !== "users") return;
@@ -694,44 +1062,224 @@ const GroupAttendeesPage = () => {
     }
   };
 
-  const handleRemoveMemberFromGroup = (group, member) => {
-    setGroupForMemberRemoval(group);
-    setMemberToRemove(member);
-    setShowRemoveMemberConfirm(true);
-  };
+  // --- "Do The Thing" preview helpers -------------------------------------
 
-  const confirmRemoveMemberFromGroup = async () => {
-    if (!groupForMemberRemoval || !memberToRemove) return;
-    const previousGroups = [...groups];
-    setGroups((prevGroups) =>
-      prevGroups.map((g) =>
-        g.id === groupForMemberRemoval.id
-          ? { ...g, members: (g.members || []).filter((m) => m.id !== memberToRemove.id) }
-          : g
-      )
-    );
-    setShowRemoveMemberConfirm(false);
+  // Hydrate preview state from a DinnerGroupingRun returned by the backend.
+  // The run's proposal is a list of `{members: [uuid], ...}` — we resolve
+  // each uuid to the full user object so the drag-drop UI has names/emails
+  // to display. Resolution pulls from (a) dinnerRequests for the selected
+  // dinner, (b) existing groups currently loaded. Any user we can't resolve
+  // is preserved as a minimal `{id}` placeholder so subsequent re-runs stay
+  // stable.
+  const resolveUserById = useCallback(
+    (userId) => {
+      if (!userId) return null;
+      const fromRequests = dinnerRequests.find((r) => r.user?.id === userId);
+      if (fromRequests?.user) return fromRequests.user;
+      for (const g of groups) {
+        const member = (g.members || []).find((m) => m.id === userId);
+        if (member) return member;
+      }
+      return { id: userId };
+    },
+    [dinnerRequests, groups],
+  );
 
-    try {
-      const response = await api.post(API_ENDPOINTS.GROUP_REMOVE_USER, {
-        group_id: groupForMemberRemoval.id,
-        user_id: memberToRemove.id,
-      });
-
-      if (response?.success) {
-        toast.success('User removed from group');
-        setMemberToRemove(null);
-        setGroupForMemberRemoval(null);
+  const hydratePreviewFromRun = useCallback(
+    (run) => {
+      if (!run) {
+        setPreviewRun(null);
+        setPreviewGroups([]);
+        setPreviewLeftovers([]);
+        setPreviewViolations([]);
         return;
       }
-      throw new Error(response?.message || 'Failed to remove user from group');
+      const proposal = Array.isArray(run.proposal) ? run.proposal : [];
+      const hydratedGroups = proposal.map((g, idx) => ({
+        index: idx,
+        id: makePreviewGroupId(idx),
+        members: (g.members || []).map((uid) => resolveUserById(uid)).filter(Boolean),
+        area_label: g.area_label ?? null,
+        budget_label: g.budget_label ?? null,
+        restaurant_id: g.restaurant_id ?? null,
+        demographics: g.demographics ?? {},
+        warnings: [], // populated per-drop
+      }));
+      const hydratedLeftovers = (run.leftovers || [])
+        .map((uid) => resolveUserById(uid))
+        .filter(Boolean);
+
+      setPreviewRun(run);
+      setPreviewGroups(hydratedGroups);
+      setPreviewLeftovers(hydratedLeftovers);
+      setPreviewViolations(
+        Array.isArray(run.violations) ? run.violations : [],
+      );
+    },
+    [resolveUserById],
+  );
+
+  const clearPreview = useCallback(() => {
+    setPreviewRun(null);
+    setPreviewGroups([]);
+    setPreviewLeftovers([]);
+    setPreviewViolations([]);
+  }, []);
+
+  const handleDoTheThing = async () => {
+    if (!selectedDinner) {
+      toast.error('Please select a dinner first');
+      return;
+    }
+    try {
+      const run = await runDoTheThingAsync({ dinner_id: selectedDinner });
+      hydratePreviewFromRun(run);
+      toast.success('Preview generated');
     } catch (err) {
-      console.error('Error removing user from group:', err);
-      toast.error(err?.message || 'Failed to remove user from group');
-      setGroups(previousGroups);
-    } finally {
-      setMemberToRemove(null);
-      setGroupForMemberRemoval(null);
+      console.error('Do The Thing failed:', err);
+      const msg =
+        err?.status === 409
+          ? 'A grouping run is already in progress for this dinner.'
+          : err?.message || 'Failed to run grouping engine';
+      toast.error(msg);
+    }
+  };
+
+  const runMatchHistoryCheckForMove = useCallback(
+    async (runId, targetIndex, userId, nextMemberIds) => {
+      // No point calling the backend if there are no existing neighbours to
+      // check against (e.g., dropped into an empty group). Also skip for
+      // leftovers drops — no co-member set exists.
+      if (targetIndex == null) return [];
+      if (!nextMemberIds || nextMemberIds.length <= 1) return [];
+      try {
+        const groupId = `preview:${runId}:${targetIndex}`;
+        const result = await checkMatchHistoryAsync({
+          group_id: groupId,
+          user_id: userId,
+        });
+        return Array.isArray(result?.warnings) ? result.warnings : [];
+      } catch (err) {
+        console.warn('match-history-check failed:', err);
+        return [];
+      }
+    },
+    [checkMatchHistoryAsync],
+  );
+
+  const handlePreviewMove = useCallback(
+    async (sourceId, targetId, userId) => {
+      if (!previewRun) return;
+      if (sourceId === targetId) return;
+
+      // Snapshot state so we can revert cleanly on any failure.
+      const prevGroups = previewGroups;
+      const prevLeftovers = previewLeftovers;
+
+      const findUser = () => {
+        if (sourceId === LEFTOVERS_GROUP_ID) {
+          return prevLeftovers.find((u) => u.id === userId) || null;
+        }
+        const srcIdx = previewGroupIndexFromId(sourceId);
+        if (srcIdx == null) return null;
+        const srcGroup = prevGroups[srcIdx];
+        return (
+          srcGroup?.members.find((m) => m.id === userId) || null
+        );
+      };
+      const movedUser = findUser();
+      if (!movedUser) return;
+
+      // Build next state (pure).
+      let nextGroups = prevGroups.map((g) => ({
+        ...g,
+        members: [...g.members],
+      }));
+      let nextLeftovers = [...prevLeftovers];
+
+      // Remove from source.
+      if (sourceId === LEFTOVERS_GROUP_ID) {
+        nextLeftovers = nextLeftovers.filter((u) => u.id !== userId);
+      } else {
+        const srcIdx = previewGroupIndexFromId(sourceId);
+        if (srcIdx != null) {
+          nextGroups[srcIdx].members = nextGroups[srcIdx].members.filter(
+            (m) => m.id !== userId,
+          );
+        }
+      }
+
+      // Add to target.
+      let targetIndex = null;
+      if (targetId === LEFTOVERS_GROUP_ID) {
+        if (!nextLeftovers.some((u) => u.id === userId)) {
+          nextLeftovers.push(movedUser);
+        }
+      } else {
+        const tIdx = previewGroupIndexFromId(targetId);
+        if (tIdx == null) return;
+        targetIndex = tIdx;
+        if (!nextGroups[tIdx].members.some((m) => m.id === userId)) {
+          nextGroups[tIdx].members.push(movedUser);
+        }
+      }
+
+      setPreviewGroups(nextGroups);
+      setPreviewLeftovers(nextLeftovers);
+
+      // Run the match-history check against the target's NEW membership.
+      if (targetIndex != null) {
+        const nextMemberIds = nextGroups[targetIndex].members.map((m) => m.id);
+        const warnings = await runMatchHistoryCheckForMove(
+          previewRun.id,
+          targetIndex,
+          userId,
+          nextMemberIds,
+        );
+        setPreviewGroups((cur) => {
+          if (!cur[targetIndex]) return cur;
+          const updated = [...cur];
+          updated[targetIndex] = {
+            ...updated[targetIndex],
+            warnings: warnings || [],
+          };
+          return updated;
+        });
+      }
+    },
+    [previewRun, previewGroups, previewLeftovers, runMatchHistoryCheckForMove],
+  );
+
+  const handleCommitPreview = async () => {
+    if (!previewRun) return;
+    // Guard: avoid committing when any group is out of spec (5–7 members).
+    const invalid = previewGroups.find(
+      (g) => g.members.length < 5 || g.members.length > 7,
+    );
+    if (invalid) {
+      toast.error(
+        `Group ${invalid.index + 1} has ${invalid.members.length} members — must be 5–7 before committing.`,
+      );
+      return;
+    }
+    const groups_override = previewGroups.map((g) => ({
+      members: g.members.map((m) => m.id),
+      area_label: g.area_label ?? null,
+      budget_label: g.budget_label ?? null,
+      restaurant_id: g.restaurant_id ?? null,
+    }));
+    try {
+      await commitRunAsync({ run_id: previewRun.id, groups_override });
+      toast.success('Groups committed');
+      clearPreview();
+      // Refresh the live groups list so the committed rows appear.
+      setGroupsPage(0);
+      setGroups([]);
+      setHasMoreGroups(true);
+      setTimeout(() => fetchGroupsRef.current?.(false, ''), 0);
+    } catch (err) {
+      console.error('Commit failed:', err);
+      toast.error(err?.message || 'Failed to commit groups');
     }
   };
 
@@ -753,6 +1301,24 @@ const GroupAttendeesPage = () => {
       const targetGroupId = overId.replace(/^group-/, '');
       if (sourceGroupId === targetGroupId) return;
 
+      // Preview drops: route through the preview-specific handler which
+      // fires the match-history warning and only touches client state.
+      if (
+        isPreviewGroupId(sourceGroupId) ||
+        isPreviewGroupId(targetGroupId)
+      ) {
+        // Both sides must be preview ids — we never allow dragging between
+        // live groups and preview groups.
+        if (
+          !isPreviewGroupId(sourceGroupId) ||
+          !isPreviewGroupId(targetGroupId)
+        ) {
+          return;
+        }
+        handlePreviewMove(sourceGroupId, targetGroupId, userId);
+        return;
+      }
+
       const sourceGroup = groups.find((g) => String(g.id) === sourceGroupId);
       const targetGroup = groups.find((g) => String(g.id) === targetGroupId);
       if (!sourceGroup || !targetGroup) return;
@@ -760,7 +1326,7 @@ const GroupAttendeesPage = () => {
       const userIdActual = isNaN(Number(userId)) ? userId : Number(userId);
       handleMoveUserToGroup(sourceGroup, targetGroup, userIdActual);
     },
-    [groups]
+    [groups, handlePreviewMove]
   );
 
   const handleUpdateRequestStatus = async (requestId, status) => {
@@ -946,11 +1512,33 @@ const GroupAttendeesPage = () => {
     const match = String(dragId).match(/^user-(.+)-group-(.+)$/);
     if (!match) return null;
     const [, userId, groupId] = match;
+
+    // Preview mode sources.
+    if (isPreviewGroupId(groupId)) {
+      if (groupId === LEFTOVERS_GROUP_ID) {
+        const member = previewLeftovers.find((m) => String(m.id) === userId);
+        if (member) {
+          return {
+            member,
+            group: { id: LEFTOVERS_GROUP_ID, name: 'Leftovers' },
+          };
+        }
+        return null;
+      }
+      const idx = previewGroupIndexFromId(groupId);
+      const group = idx != null ? previewGroups[idx] : null;
+      if (!group?.members) return null;
+      const member = group.members.find((m) => String(m.id) === userId);
+      return member
+        ? { member, group: { ...group, name: `Preview ${idx + 1}` } }
+        : null;
+    }
+
     const group = groups.find((g) => String(g.id) === groupId);
     if (!group?.members) return null;
     const member = group.members.find((m) => String(m.id) === userId);
     return member && group ? { member, group } : null;
-  }, [groups]);
+  }, [groups, previewGroups, previewLeftovers]);
 
   // Derived state for dragged item overlay
   const draggedItem = activeDragId ? getDraggedMemberAndGroup(activeDragId) : null;
@@ -1145,16 +1733,40 @@ const GroupAttendeesPage = () => {
                     )}
                     {exportingCsv ? 'Exporting…' : 'Export All CSV'}
                   </button>
-                  <button 
+                  <button
                     onClick={() => {
                       setShowCreateGroupModal(true);
-                      setValueGroup('selectedUsers', selectedUsers); 
+                      setValueGroup('selectedUsers', selectedUsers);
                     }}
                     className="px-4 py-2 bg-white border border-[#E5E7EB] text-[#374151] rounded-lg text-sm font-medium hover:bg-gray-50 whitespace-nowrap"
                   >
                     Create Manual Group
                   </button>
-                  <button 
+                  {FEATURE_DO_THE_THING && (
+                    <button
+                      type="button"
+                      onClick={handleDoTheThing}
+                      disabled={
+                        !selectedDinner ||
+                        isRunningDoTheThing ||
+                        isPreviewMode
+                      }
+                      className="px-4 py-2 bg-[#F97316] text-white rounded-lg text-sm font-medium hover:bg-[#EA580C] whitespace-nowrap flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+                      title={
+                        !selectedDinner
+                          ? 'Select a dinner first'
+                          : isPreviewMode
+                            ? 'A preview is already in progress — commit or discard it first.'
+                            : 'Run the grouping engine and preview proposed groups.'
+                      }
+                    >
+                      {isRunningDoTheThing ? (
+                        <InlineSpinner className="h-4 w-4 text-white" label="Running" />
+                      ) : null}
+                      {isRunningDoTheThing ? 'Running…' : 'Do The Thing'}
+                    </button>
+                  )}
+                  <button
                     className="px-4 py-2 bg-[#F97316] text-white rounded-lg text-sm font-medium hover:bg-[#EA580C] whitespace-nowrap"
                   >
                     AI Match
@@ -1378,6 +1990,28 @@ const GroupAttendeesPage = () => {
         {!loading && activeTab === 'groups' && (
           <DndContext sensors={dndSensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
             <div className="space-y-6">
+              {FEATURE_DO_THE_THING && (
+                <DoTheThingBar
+                  dinners={dinners}
+                  selectedDinner={selectedDinner}
+                  onSelectDinner={setSelectedDinner}
+                  onRun={handleDoTheThing}
+                  isRunning={isRunningDoTheThing}
+                  isPreviewMode={isPreviewMode}
+                />
+              )}
+              {isPreviewMode && (
+                <PreviewPanel
+                  run={previewRun}
+                  groups={previewGroups}
+                  leftovers={previewLeftovers}
+                  violations={previewViolations}
+                  onCommit={handleCommitPreview}
+                  onCancel={clearPreview}
+                  onDiscard={clearPreview}
+                  isCommitting={isCommittingRun}
+                />
+              )}
               {groups.length === 0 ? (
                 <div className="text-center py-12 bg-white rounded-xl border border-[#E5E7EB]">
                   <p className="text-sm text-[#6B7280]">No groups found</p>
