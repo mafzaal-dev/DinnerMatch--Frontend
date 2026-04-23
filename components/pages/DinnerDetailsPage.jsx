@@ -249,6 +249,11 @@ const DinnerDetailsPage = ({
     return todayStart.getTime() === dinnerStart.getTime();
   }, [dinnerDateObj]);
 
+  const isTableTalkUnlocked = useMemo(() => {
+    if (!dinnerDateObj || isNaN(dinnerDateObj.getTime())) return false;
+    return Date.now() >= dinnerDateObj.getTime();
+  }, [dinnerDateObj]);
+
   const isDinnerPassed = useMemo(() => {
     if (!dinnerDateObj || isNaN(dinnerDateObj.getTime())) return false;
     const now = new Date();
@@ -954,14 +959,6 @@ const DinnerDetailsPage = ({
                   </div>
                 ) : null}
 
-                {/* TableTalk Unlock - reuse isDinnerToday logic if intent is 24h, but logic said "within 24h" previously. 
-                    If TableTalk should unlock strictly "on the day", use isDinnerToday. 
-                    If keeping "within 24h", we need to restore showTableTalk logic or derive it from isDinnerToday if acceptable.
-                    Assuming TableTalk is also day-of feature based on "Unlocks at 7:00 PM" context typically implies same day.
-                    Let's restore showTableTalk logic separately to be safe or use isDinnerToday if that covers it.
-                    I will restore showTableTalk as a separate memo for clarity if needed, or just use isDinnerToday if that's the "day of" requirement.
-                    Re-adding showTableTalk based on previous logic for now to avoid breaking that specific feature if it differs.
-                */}
                 {isDinnerToday && (
                   <div
                     className="bg-[#1A1711] border border-[#534A3E] rounded-lg p-4"
@@ -973,7 +970,9 @@ const DinnerDetailsPage = ({
                     }}
                   >
                     <p className="text-[#FFAA55] text-sm font-semibold">
-                      TableTalk Unlocks at {unlockTime}
+                      {isTableTalkUnlocked
+                        ? "TableTalk is now unlocked"
+                        : `TableTalk Unlocks at ${unlockTime}`}
                     </p>
                   </div>
                 )}

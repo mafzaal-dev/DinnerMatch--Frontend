@@ -28,6 +28,8 @@ const CreateEditDinnerPage = ({ dinnerId = null, isEdit = false }) => {
     location: "",
     dinner_type: "Open",
     is_published: false,
+    sneak_peek_hours_before: 24,
+    restaurant_reveal_hours_before: 9,
   });
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
@@ -63,6 +65,10 @@ const CreateEditDinnerPage = ({ dinnerId = null, isEdit = false }) => {
           location: dinner.location || "",
           dinner_type: formatDinnerTypeForDisplay(dinner.dinner_type),
           is_published: isPublished,
+          sneak_peek_hours_before:
+            dinner.sneak_peek_hours_before ?? 24,
+          restaurant_reveal_hours_before:
+            dinner.restaurant_reveal_hours_before ?? 9,
         });
       } else {
         toast.error("Dinner not found");
@@ -104,6 +110,17 @@ const CreateEditDinnerPage = ({ dinnerId = null, isEdit = false }) => {
       // Format date to ISO string if needed
       const dateToSend = formData.date;
 
+      const sneakPeek = Number(formData.sneak_peek_hours_before);
+      const restaurantReveal = Number(formData.restaurant_reveal_hours_before);
+      if (!Number.isInteger(sneakPeek) || sneakPeek < 0) {
+        toast.error("Sneak peek hours must be a non-negative whole number");
+        return;
+      }
+      if (!Number.isInteger(restaurantReveal) || restaurantReveal < 0) {
+        toast.error("Restaurant reveal hours must be a non-negative whole number");
+        return;
+      }
+
       const payload = {
         title: formData.title,
         date: dateToSend,
@@ -112,6 +129,8 @@ const CreateEditDinnerPage = ({ dinnerId = null, isEdit = false }) => {
         is_published: formData.is_published,
         // Also send as dinner_status for backwards compatibility
         dinner_status: formData.is_published ? "published" : "draft",
+        sneak_peek_hours_before: sneakPeek,
+        restaurant_reveal_hours_before: restaurantReveal,
       };
 
       if (isEdit && dinnerId) {
@@ -305,6 +324,44 @@ const CreateEditDinnerPage = ({ dinnerId = null, isEdit = false }) => {
               </div>
               <p className="mt-1 text-xs text-[#6B7280]">
                 Toggle to publish or keep as draft
+              </p>
+            </div>
+
+            {/* Sneak Peek reveal (hours before dinner) */}
+            <div>
+              <label className="block text-sm font-medium text-[#374151] mb-2">
+                Sneak Peek reveal (hours before dinner)
+              </label>
+              <input
+                type="number"
+                name="sneak_peek_hours_before"
+                min="0"
+                step="1"
+                value={formData.sneak_peek_hours_before}
+                onChange={handleChange}
+                className="w-full px-4 py-2.5 border border-[#D1D5DB] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#F97316] focus:border-transparent"
+              />
+              <p className="mt-1 text-xs text-[#6B7280]">
+                e.g. 24 = group preview reveals 24h before dinner start (Mon 7pm for a Tue 7pm dinner).
+              </p>
+            </div>
+
+            {/* Restaurant reveal (hours before dinner) */}
+            <div>
+              <label className="block text-sm font-medium text-[#374151] mb-2">
+                Restaurant reveal (hours before dinner)
+              </label>
+              <input
+                type="number"
+                name="restaurant_reveal_hours_before"
+                min="0"
+                step="1"
+                value={formData.restaurant_reveal_hours_before}
+                onChange={handleChange}
+                className="w-full px-4 py-2.5 border border-[#D1D5DB] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#F97316] focus:border-transparent"
+              />
+              <p className="mt-1 text-xs text-[#6B7280]">
+                e.g. 9 = restaurant reveals 9h before dinner start (Tue 10am for a Tue 7pm dinner).
               </p>
             </div>
           </div>
